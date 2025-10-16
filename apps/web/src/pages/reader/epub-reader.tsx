@@ -87,18 +87,18 @@ export function EpubReader({
         variant='ghost'
         size='icon'
         onClick={goToPrevPage}
-        className='absolute left-4 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-white/80 dark:bg-neutral-800/80 hover:bg-white dark:hover:bg-neutral-800 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity'
+        className='absolute left-4 top-1/2 -translate-y-1/2 h-16 w-6 rounded-lg bg-transparent hover:bg-gray-200 opacity-0 group-hover:opacity-100 transition-opacity'
       >
-        <ChevronLeft className='h-6 w-6' />
+        <ChevronLeft className='h-5 w-5' />
       </Button>
 
       <Button
         variant='ghost'
         size='icon'
         onClick={goToNextPage}
-        className='absolute right-4 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-white/80 dark:bg-neutral-800/80 hover:bg-white dark:hover:bg-neutral-800 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity'
+        className='absolute right-4 top-1/2 -translate-y-1/2 h-16 w-6 rounded-lg bg-transparent hover:bg-gray-200  opacity-0 group-hover:opacity-100 transition-opacity'
       >
-        <ChevronRight className='h-6 w-6' />
+        <ChevronRight className='h-5 w-5' />
       </Button>
     </div>
   )
