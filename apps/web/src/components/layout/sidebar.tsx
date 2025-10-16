@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import {
   Library,
@@ -6,9 +7,11 @@ import {
   Clock,
   CheckCircle2,
 } from 'lucide-react'
+import { Resizable } from 're-resizable'
 import { cn } from '../../lib/utils'
 
 export function Sidebar() {
+  const [width, setWidth] = useState(260)
   const navItems = [
     {
       title: '主页',
@@ -46,7 +49,25 @@ export function Sidebar() {
   }
 
   return (
-    <div className='w-64 h-screen bg-neutral-100 dark:bg-neutral-900 border-r border-neutral-200 dark:border-neutral-800 flex flex-col'>
+    <Resizable
+      size={{ width, height: '100vh' }}
+      onResizeStop={(e, direction, ref, d) => {
+        setWidth(width + d.width)
+      }}
+      minWidth={160}
+      maxWidth={260}
+      enable={{
+        right: true,
+        top: false,
+        bottom: false,
+        left: false,
+        topRight: false,
+        bottomRight: false,
+        bottomLeft: false,
+        topLeft: false,
+      }}
+      className='h-screen bg-neutral-100 dark:bg-neutral-900 border-r border-neutral-200 dark:border-neutral-800 flex flex-col'
+    >
       {/* Header */}
       <div className='p-4 border-b border-neutral-200 dark:border-neutral-800'>
         <h1 className='text-xl font-bold text-neutral-900 dark:text-neutral-100'>
@@ -127,6 +148,6 @@ export function Sidebar() {
           © 2025 Read Flow
         </div>
       </div>
-    </div>
+    </Resizable>
   )
 }
