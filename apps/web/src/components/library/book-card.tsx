@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import { Book } from '../../data/books'
 import { cn } from '../../lib/utils'
 import { MoreHorizontal } from 'lucide-react'
@@ -7,8 +8,18 @@ interface BookCardProps {
 }
 
 export function BookCard({ book }: BookCardProps) {
+  const navigate = useNavigate()
+
+  const handleClick = () => {
+    navigate(`/reader/${book.id}`)
+  }
+
+  const handleMoreClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+  }
+
   return (
-    <div className='group relative'>
+    <div className='group relative cursor-pointer' onClick={handleClick}>
       <div className='relative aspect-[3/4] overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow'>
         <img
           src={book.cover}
@@ -32,7 +43,10 @@ export function BookCard({ book }: BookCardProps) {
             )}
           </div>
         </div>
-        <button className='absolute top-2 right-2 p-1.5 rounded-full bg-white/90 dark:bg-neutral-800/90 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white dark:hover:bg-neutral-800'>
+        <button
+          onClick={handleMoreClick}
+          className='absolute top-2 right-2 p-1.5 rounded-full bg-white/90 dark:bg-neutral-800/90 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white dark:hover:bg-neutral-800'
+        >
           <MoreHorizontal className='h-4 w-4 text-neutral-700 dark:text-neutral-300' />
         </button>
       </div>
