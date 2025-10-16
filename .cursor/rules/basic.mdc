@@ -1,6 +1,4 @@
 ---
-description: 
-globs: 
 alwaysApply: true
 ---
 # AI 工作指南
@@ -60,3 +58,8 @@ alwaysApply: true
 
 # 代码要求
 不要添加过多注释！
+
+# 文件命名规范
+- 组件和页面文件使用 kebab-case 命名法（全小写，用 `-` 分割）
+- 示例：`home.tsx`, `all-books.tsx`, `book-card.tsx`, `sidebar.tsx`
+- UI 组件保持原命名规则：`button.tsx`, `card.tsx`, `tabs.tsx`
