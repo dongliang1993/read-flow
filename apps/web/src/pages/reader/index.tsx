@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { mockBooks } from '../../data/books'
 import { Button } from '../../components/ui/button'
 import HeaderBar from './components/header-bar'
+import SideChat from './components/side-chat'
 import {
   Card,
   CardContent,
@@ -20,7 +21,7 @@ export function Reader() {
 
   const book = mockBooks.find((b) => b.id === bookId)
 
-  if (!book) {
+  if (!book || !bookId) {
     return (
       <div className='flex items-center justify-center min-h-screen p-8 bg-neutral-50 dark:bg-neutral-950'>
         <Card className='max-w-md'>
@@ -57,15 +58,18 @@ export function Reader() {
         increaseFontSize={increaseFontSize}
       />
 
-      <main className='flex-1 overflow-hidden p-6'>
-        <div className='h-full max-w-6xl mx-auto'>
-          <EpubReader
-            url={epubUrl}
-            fontSize={fontSize}
-            onLocationChange={setLocation}
-          />
-        </div>
-      </main>
+      <div className='flex h-screen bg-neutral-50 dark:bg-neutral-950 p-2'>
+        <main className='flex-1 overflow-hidden'>
+          <div className='h-full max-w-6xl'>
+            <EpubReader
+              url={epubUrl}
+              fontSize={fontSize}
+              onLocationChange={setLocation}
+            />
+          </div>
+        </main>
+        <SideChat bookId={bookId} minWidth={360} />
+      </div>
     </div>
   )
 }

@@ -1,4 +1,5 @@
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
+import { env } from '../config/env'
 
 interface UploadBookParams {
   file: File
@@ -15,9 +16,7 @@ interface UploadBookResult {
 }
 
 const getS3Client = () => {
-  const region = import.meta.env.VITE_AWS_REGION || 'us-east-1'
-  const accessKeyId = import.meta.env.VITE_AWS_ACCESS_KEY_ID
-  const secretAccessKey = import.meta.env.VITE_AWS_SECRET_ACCESS_KEY
+  const { region, accessKeyId, secretAccessKey } = env.aws
 
   if (!accessKeyId || !secretAccessKey) {
     throw new Error('AWS credentials not configured')
@@ -39,7 +38,7 @@ export const uploadBook = async ({
   onProgress,
 }: UploadBookParams): Promise<UploadBookResult> => {
   try {
-    const bucket = bucketName || import.meta.env.VITE_AWS_BUCKET_NAME
+    const bucket = bucketName || env.aws.bucketName
 
     if (!bucket) {
       throw new Error('S3 bucket name not configured')
@@ -72,8 +71,7 @@ export const uploadBook = async ({
       onProgress(100)
     }
 
-    const region = import.meta.env.VITE_AWS_REGION || 'us-east-1'
-    const url = `https://${bucket}.s3.${region}.amazonaws.com/${key}`
+    const url = `https://${bucket}.s3.${env.aws.region}.amazonaws.com/${key}`
 
     return {
       success: true,

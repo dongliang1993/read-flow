@@ -1,18 +1,25 @@
+import 'dotenv/config'
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
+import chat from './routes/chat'
+import { env } from './config/env'
 
 const app = new Hono()
 
-// 启用 CORS
 app.use('/*', cors())
 
-// 根路由
 app.get('/', (c) => {
-  return c.json({ message: 'Hello from Hono! 你好，来自 Hono 服务器！' })
+  return c.json({
+    message: 'Read Flow API Server',
+    version: '1.0.0',
+    endpoints: {
+      chat: '/api/v1/chat',
+      health: '/api/v1/chat/health',
+    },
+  })
 })
 
-// API 路由
 app.get('/api', (c) => {
   return c.json({
     message: 'Hono 服务器运行正常！',
@@ -25,8 +32,11 @@ app.get('/api/hello/:name', (c) => {
   return c.json({ message: `你好, ${name}!` })
 })
 
-const port = 3001
+app.route('/api/v1/chat', chat)
+
+const port = env.port
 console.log(`🚀 Server is running on http://localhost:${port}`)
+console.log(`📝 Environment: ${env.nodeEnv}`)
 
 serve({
   fetch: app.fetch,
