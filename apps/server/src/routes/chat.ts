@@ -53,6 +53,12 @@ chat.post('/', async (c) => {
       system:
         'You are a helpful reading assistant for books. Help users understand and analyze the content they are reading.',
       messages: convertToModelMessages(messages as unknown as UIMessage[]),
+      providerOptions: {
+        store: {
+          store: false,
+          include: ['reasoning.encrypted_content'],
+        },
+      },
     })
 
     return result.toUIMessageStreamResponse()

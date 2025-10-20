@@ -13,12 +13,11 @@ export const useChat = () => {
       api: `${env.apiBaseUrl}/api/v1/chat`,
     }),
     experimental_throttle: 50,
-    messages: [],
     onError: (error) => {
       console.error('Error:', error)
     },
     onFinish: (message) => {
-      console.log(message)
+      console.log('Message finished:', message)
     },
   })
 
