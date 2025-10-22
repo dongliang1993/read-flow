@@ -3,6 +3,7 @@ import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import chat from './routes/chat'
+import books from './routes/books'
 import { env } from './config/env'
 
 const app = new Hono()
@@ -15,7 +16,8 @@ app.get('/', (c) => {
     version: '1.0.0',
     endpoints: {
       chat: '/api/v1/chat',
-      health: '/api/v1/chat/health',
+      books: '/api/v1/books',
+      health: '/api/v1/health',
     },
   })
 })
@@ -33,6 +35,7 @@ app.get('/api/hello/:name', (c) => {
 })
 
 app.route('/api/v1/chat', chat)
+app.route('/api/v1/books', books)
 
 const port = env.port
 console.log(`🚀 Server is running on http://localhost:${port}`)

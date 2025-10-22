@@ -1,7 +1,10 @@
 import { Hono } from 'hono'
-import { convertToModelMessages, streamText, UIMessage } from 'ai'
+import { convertToModelMessages, streamText, UIMessage, ModelMessage } from 'ai'
 import { createOpenAI } from '@ai-sdk/openai'
 import { env } from '../config/env'
+import { db } from '../db'
+import { chatHistory, books } from '../db/schema'
+import { eq, desc } from 'drizzle-orm'
 
 const openai = createOpenAI({
   apiKey: env.openai.apiKey,
@@ -19,11 +22,30 @@ interface ChatMessage {
 }
 
 interface ChatRequest {
-  messages: ChatMessage[]
+  messages: UIMessage[]
   bookId?: string
   context?: string
   model?: string
 }
+
+chat.get('/history/:bookId', async (c) => {
+  try {
+    const bookId = parseInt(c.req.param('bookId'))
+    const limit = parseInt(c.req.query('limit') || '50')
+
+    const messages = await db
+      .select()
+      .from(chatHistory)
+      .where(eq(chatHistory.bookId, bookId))
+      .orderBy(desc(chatHistory.createdAt))
+      .limit(limit)
+
+    return c.json({ messages: messages.reverse() })
+  } catch (error) {
+    console.error('Get chat history error:', error)
+    return c.json({ error: 'Failed to fetch chat history' }, 500)
+  }
+})
 
 chat.post('/', async (c) => {
   try {
@@ -38,26 +60,46 @@ chat.post('/', async (c) => {
       return c.json({ error: 'At least one message is required' }, 400)
     }
 
-    const lastMessage = messages[messages.length - 1]
+    const modelMessages: ModelMessage[] = convertToModelMessages(
+      messages as unknown as UIMessage[]
+    )
 
-    console.log('Chat request:', {
-      bookId,
-      messageCount: messages.length,
-      lastMessage: lastMessage.content,
-      hasContext: !!context,
-      env,
-    })
+    const lastMessage = modelMessages[modelMessages.length - 1]
+
+    if (lastMessage.content) {
+      await db.insert(chatHistory).values({
+        bookId: bookId ? parseInt(bookId) : null,
+        userId: 'default-user',
+        role: lastMessage.role,
+        content: lastMessage.content,
+      })
+    }
+
+    const validBookId = bookId ? parseInt(bookId) : null
 
     const result = await streamText({
       model: openai(env.openai.model),
       system:
         'You are a helpful reading assistant for books. Help users understand and analyze the content they are reading.',
-      messages: convertToModelMessages(messages as unknown as UIMessage[]),
+      messages: modelMessages,
       providerOptions: {
         store: {
           store: false,
           include: ['reasoning.encrypted_content'],
         },
+      },
+      onFinish: async ({ text, finishReason }) => {
+        try {
+          await db.insert(chatHistory).values({
+            bookId: validBookId,
+            userId: 'default-user',
+            role: 'assistant',
+            content: text,
+          })
+          console.log('✅ AI response saved to database')
+        } catch (error) {
+          console.error('Failed to save AI response:', error)
+        }
       },
     })
 
