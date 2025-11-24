@@ -1,7 +1,25 @@
-import { mockBooks } from '../../data/books'
-import { BookCard } from '../../components/library/book-card'
+import { BookCard } from './components/book-card'
+import { useBooks } from '@/hooks/use-books'
 
 export function AllBooks() {
+  const { data: books, isLoading, error } = useBooks()
+
+  if (isLoading) {
+    return (
+      <div className='flex items-center justify-center p-8'>
+        <div className='text-neutral-600'>加载中...</div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className='flex items-center justify-center p-8'>
+        <div className='text-red-600'>加载失败：{error.message}</div>
+      </div>
+    )
+  }
+
   return (
     <div className='p-8'>
       <div className='mb-8'>
@@ -11,7 +29,7 @@ export function AllBooks() {
       </div>
 
       <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6'>
-        {mockBooks.map((book) => (
+        {books?.map((book) => (
           <BookCard key={book.id} book={book} />
         ))}
       </div>

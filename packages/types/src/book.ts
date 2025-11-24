@@ -1,8 +1,76 @@
 export interface Book {
-  id: string
+  id: number
   title: string
-  author: string
-  cover: string
+  author: string | null
+  coverUrl: string | null
+  filePath: string | null
+  fileSize: number | null
+  status: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface NewBook {
+  title: string
+  author?: string | null
+  coverUrl?: string | null
+  filePath?: string | null
+  fileSize?: number | null
+  status?: string
+}
+
+export interface ReadingProgress {
+  id: number
+  bookId: number
+  userId: string
+  currentLocation: string | null
   progress: number
-  status: 'reading' | 'finished' | 'unread'
+  lastReadAt: string
+}
+
+export interface NewReadingProgress {
+  bookId: number
+  userId: string
+  currentLocation?: string | null
+  progress?: number
+}
+
+export type MessageContent =
+  | string
+  | Array<{ type: string; text?: string; image?: string }>
+
+export interface ChatMessage {
+  id: number
+  bookId: number | null
+  userId: string
+  role: string
+  content: MessageContent
+  createdAt: string
+}
+
+export interface NewChatMessage {
+  bookId?: number | null
+  userId: string
+  role: string
+  content: MessageContent
+}
+
+export interface Annotation {
+  id: number
+  bookId: number
+  userId: string
+  cfiRange: string
+  highlightedText: string | null
+  note: string | null
+  color: string
+  createdAt: string
+}
+
+export interface NewAnnotation {
+  bookId: number
+  userId: string
+  cfiRange: string
+  highlightedText?: string | null
+  note?: string | null
+  color?: string
 }

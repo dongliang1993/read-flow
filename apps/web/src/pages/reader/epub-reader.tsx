@@ -21,33 +21,68 @@ export function EpubReader({
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    if (!viewerRef.current) return
+    if (!viewerRef.current || !url) return
 
     setIsLoading(true)
-    const book = ePub(url)
-    bookRef.current = book
 
-    const rendition = book.renderTo(viewerRef.current, {
-      width: '100%',
-      height: '100%',
-      spread: 'none',
-    })
+    // 通过 fetch 下载为 ArrayBuffer，然后传给 epub.js
+    fetch(url)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        return response.arrayBuffer()
+      })
+      .then((arrayBuffer) => {
+        console.log('📦 ArrayBuffer 大小:', arrayBuffer.byteLength)
 
-    renditionRef.current = rendition
+        // 🧪 测试：可以切换这两种模式
+        // 模式1：从服务器加载的 ArrayBuffer
+        const book = ePub('/test.epub')
 
-    rendition.display().then(() => {
-      setIsLoading(false)
-    })
+        // 模式2：从本地 public 目录加载（取消注释测试）
+        // const book = ePub('/test.epub')
 
-    rendition.on('relocated', (location: any) => {
-      const locationString = location.start.cfi
-      setCurrentLocation(locationString)
-      onLocationChange?.(locationString)
-    })
+        console.log('📖 Book 对象创建:', book)
+        bookRef.current = book
+
+        const rendition = book.renderTo(viewerRef.current as HTMLElement, {
+          width: '100%',
+          height: '100%',
+          spread: 'none',
+        })
+        console.log('🎨 Rendition 对象创建:', rendition)
+
+        renditionRef.current = rendition
+
+        rendition.on('relocated', (location: any) => {
+          console.log('📍 位置变化:', location)
+          const locationString = location.start.cfi
+          setCurrentLocation(locationString)
+          onLocationChange?.(locationString)
+        })
+
+        console.log('🎬 开始调用 display()')
+        const displayPromise = rendition.display()
+        console.log('🎬 display() 返回值:', displayPromise)
+        return displayPromise
+      })
+      .then(() => {
+        console.log('✅ EPUB 渲染成功!')
+        setIsLoading(false)
+      })
+      .catch((error) => {
+        console.error('Failed to load EPUB:', error)
+        setIsLoading(false)
+      })
 
     return () => {
-      rendition.destroy()
-      book.destroy()
+      if (renditionRef.current) {
+        renditionRef.current.destroy()
+      }
+      if (bookRef.current) {
+        bookRef.current.destroy()
+      }
     }
   }, [url, onLocationChange])
 

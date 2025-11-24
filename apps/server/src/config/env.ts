@@ -9,4 +9,8 @@ export const env = {
   database: {
     url: process.env.DATABASE_URL || '',
   },
+  supabase: {
+    url: process.env.SUPABASE_URL || '',
+    serviceKey: process.env.SUPABASE_SERVICE_KEY || '',
+  },
 } as const

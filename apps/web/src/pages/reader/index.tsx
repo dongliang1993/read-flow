@@ -1,6 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { mockBooks } from '../../data/books'
 import { Button } from '../../components/ui/button'
 import HeaderBar from './components/header-bar'
 import SideChat from './components/side-chat'
@@ -12,23 +11,50 @@ import {
   CardTitle,
 } from '../../components/ui/card'
 import { EpubReader } from './epub-reader'
+import { useBook } from '../../hooks/use-books'
+import { booksApi } from '../../service/books'
 
 export function Reader() {
   const { bookId } = useParams<{ bookId: string }>()
   const navigate = useNavigate()
   const [location, setLocation] = useState<string>('')
   const [fontSize, setFontSize] = useState(100)
+  const [epubUrl, setEpubUrl] = useState<string | null>(null)
 
-  const book = mockBooks.find((b) => b.id === bookId)
+  const { data: book, isLoading, error } = useBook(Number(bookId))
 
-  if (!book || !bookId) {
+  useEffect(() => {
+    if (book?.id) {
+      // 使用服务器代理，返回完整文件流
+      const fileUrl = booksApi.getFileUrl(book.id)
+      console.log('fileUrl', fileUrl)
+      setEpubUrl(fileUrl)
+    }
+  }, [book?.id])
+
+  if (isLoading) {
+    return (
+      <div className='flex items-center justify-center min-h-screen p-8 bg-neutral-50 dark:bg-neutral-950'>
+        <Card className='max-w-md'>
+          <CardHeader>
+            <CardTitle>加载中...</CardTitle>
+            <CardDescription>正在加载书籍信息</CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
+    )
+  }
+
+  if (error || !book || !bookId) {
     return (
       <div className='flex items-center justify-center min-h-screen p-8 bg-neutral-50 dark:bg-neutral-950'>
         <Card className='max-w-md'>
           <CardHeader>
             <CardTitle>书籍未找到</CardTitle>
             <CardDescription>
-              抱歉，找不到 ID 为 {bookId} 的书籍
+              {error
+                ? `加载失败：${error.message}`
+                : `抱歉，找不到 ID 为 ${bookId} 的书籍`}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -39,7 +65,21 @@ export function Reader() {
     )
   }
 
-  const epubUrl = 'https://s3.amazonaws.com/moby-dick/moby-dick.epub'
+  if (!epubUrl) {
+    return (
+      <div className='flex items-center justify-center min-h-screen p-8 bg-neutral-50 dark:bg-neutral-950'>
+        <Card className='max-w-md'>
+          <CardHeader>
+            <CardTitle>文件加载失败</CardTitle>
+            <CardDescription>无法获取书籍文件</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={() => navigate('/library/all')}>返回书库</Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
 
   const increaseFontSize = () => {
     setFontSize((prev) => Math.min(prev + 10, 200))

@@ -1,0 +1,1 @@
+ALTER TABLE "chat_history" ALTER COLUMN "content" SET DATA TYPE jsonb;

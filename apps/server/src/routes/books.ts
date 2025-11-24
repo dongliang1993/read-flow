@@ -2,19 +2,57 @@ import { Hono } from 'hono'
 import { db } from '../db'
 import { books, readingProgress } from '../db/schema'
 import { eq, desc } from 'drizzle-orm'
+import { supabaseAdmin } from '../lib/supabase'
 
 const booksRoute = new Hono()
 
 booksRoute.get('/', async (c) => {
   try {
-    const allBooks = await db
-      .select()
-      .from(books)
-      .orderBy(desc(books.createdAt))
+    const allBooks = await db.select().from(books)
+    // .orderBy(desc(books.createdAt))
     return c.json({ books: allBooks })
   } catch (error) {
     console.error('Get books error:', error)
     return c.json({ error: 'Failed to fetch books' }, 500)
+  }
+})
+
+booksRoute.get('/:id/file', async (c) => {
+  try {
+    const id = parseInt(c.req.param('id'))
+
+    const [book] = await db.select().from(books).where(eq(books.id, id))
+
+    if (!book || !book.filePath) {
+      return c.json({ error: 'Book file not found' }, 404)
+    }
+
+    console.log('📖 开始下载书籍文件:', book.filePath)
+
+    const { data, error } = await supabaseAdmin.storage
+      .from('books')
+      .download(book.filePath)
+
+    if (error) {
+      console.error('❌ Supabase 下载失败:', error)
+      return c.json({ error: 'Failed to download file' }, 500)
+    }
+
+    console.log('✅ Supabase 下载成功')
+    console.log('   数据类型:', data.constructor.name)
+    console.log('   数据大小:', data.size, 'bytes')
+    console.log('   MIME 类型:', data.type)
+
+    return new Response(data, {
+      headers: {
+        'Content-Type': 'application/epub+zip',
+        'Access-Control-Allow-Origin': '*',
+        'Cache-Control': 'public, max-age=3600',
+      },
+    })
+  } catch (error) {
+    console.error('❌ 文件下载错误:', error)
+    return c.json({ error: 'Internal server error' }, 500)
   }
 })
 
@@ -61,6 +99,73 @@ booksRoute.post('/', async (c) => {
   }
 })
 
+booksRoute.post('/upload', async (c) => {
+  try {
+    const formData = await c.req.formData()
+    const file = formData.get('file') as File
+    const title = formData.get('title') as string
+    const author = formData.get('author') as string
+
+    if (!file) {
+      return c.json({ error: 'File is required' }, 400)
+    }
+
+    if (!title) {
+      return c.json({ error: 'Title is required' }, 400)
+    }
+
+    let originalFileName = file.name || 'book.epub'
+
+    // 确保文件名有 .epub 扩展名
+    if (!originalFileName.toLowerCase().endsWith('.epub')) {
+      originalFileName = `${originalFileName}.epub`
+    }
+
+    const fileName = `${Date.now()}-${originalFileName}`
+    const fileBuffer = await file.arrayBuffer()
+
+    const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
+      .from('books')
+      .upload(fileName, fileBuffer, {
+        contentType: 'application/epub+zip',
+        cacheControl: '3600',
+        upsert: false,
+      })
+
+    if (uploadError) {
+      console.error('Upload error:', uploadError)
+      return c.json({ error: 'Failed to upload file' }, 500)
+    }
+
+    const {
+      data: { publicUrl },
+    } = supabaseAdmin.storage.from('books').getPublicUrl(fileName)
+
+    const [newBook] = await db
+      .insert(books)
+      .values({
+        title,
+        author: author || null,
+        filePath: uploadData.path,
+        coverUrl: null,
+        fileSize: file.size,
+        status: 'unread',
+      })
+      .returning()
+
+    return c.json(
+      {
+        book: newBook,
+        fileUrl: publicUrl,
+      },
+      201
+    )
+  } catch (error) {
+    console.error('Upload error:', error)
+    return c.json({ error: 'Internal server error' }, 500)
+  }
+})
+
 booksRoute.put('/:id', async (c) => {
   try {
     const id = parseInt(c.req.param('id'))
@@ -93,19 +198,59 @@ booksRoute.delete('/:id', async (c) => {
   try {
     const id = parseInt(c.req.param('id'))
 
+    const [book] = await db.select().from(books).where(eq(books.id, id))
+
+    if (!book) {
+      return c.json({ error: 'Book not found' }, 404)
+    }
+
+    if (book.filePath) {
+      try {
+        await supabaseAdmin.storage.from('books').remove([book.filePath])
+      } catch (storageError) {
+        console.error('Failed to delete file from storage:', storageError)
+      }
+    }
+
     const [deletedBook] = await db
       .delete(books)
       .where(eq(books.id, id))
       .returning()
 
-    if (!deletedBook) {
-      return c.json({ error: 'Book not found' }, 404)
-    }
-
     return c.json({ message: 'Book deleted successfully', book: deletedBook })
   } catch (error) {
     console.error('Delete book error:', error)
     return c.json({ error: 'Failed to delete book' }, 500)
+  }
+})
+
+booksRoute.get('/:id/download', async (c) => {
+  try {
+    const id = parseInt(c.req.param('id'))
+
+    const [book] = await db.select().from(books).where(eq(books.id, id))
+
+    if (!book) {
+      return c.json({ error: 'Book not found' }, 404)
+    }
+
+    if (!book.filePath) {
+      return c.json({ error: 'Book file not found' }, 404)
+    }
+
+    const { data, error } = await supabaseAdmin.storage
+      .from('books')
+      .createSignedUrl(book.filePath, 3600)
+
+    if (error) {
+      console.error('Failed to generate download URL:', error)
+      return c.json({ error: 'Failed to generate download URL' }, 500)
+    }
+
+    return c.json({ downloadUrl: data.signedUrl })
+  } catch (error) {
+    console.error('Download error:', error)
+    return c.json({ error: 'Internal server error' }, 500)
   }
 })
 

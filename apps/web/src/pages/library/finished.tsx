@@ -1,5 +1,5 @@
 import { mockBooks } from '../../data/books'
-import { BookCard } from '../../components/library/book-card'
+import { BookCard } from './components/book-card'
 
 export function Finished() {
   const finishedBooks = mockBooks.filter((book) => book.status === 'finished')

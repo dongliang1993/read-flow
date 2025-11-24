@@ -1,10 +1,9 @@
 import { useNavigate } from 'react-router-dom'
-import { Book } from '../../data/books'
-import { cn } from '../../lib/utils'
+import { Book } from '@read-flow/types'
 import { MoreHorizontal } from 'lucide-react'
 
 interface BookCardProps {
-  book: Book
+  book: Book & { progress?: number }
 }
 
 export function BookCard({ book }: BookCardProps) {
@@ -22,13 +21,13 @@ export function BookCard({ book }: BookCardProps) {
     <div className='group relative cursor-pointer' onClick={handleClick}>
       <div className='relative aspect-[3/4] overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow'>
         <img
-          src={book.cover}
+          src={book.coverUrl || '/placeholder-book.jpg'}
           alt={book.title}
           className='w-full h-full object-cover'
         />
         <div className='absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity'>
           <div className='absolute bottom-0 left-0 right-0 p-4'>
-            {book.progress > 0 && book.progress < 100 && (
+            {book.progress && book.progress > 0 && book.progress < 100 && (
               <div className='text-white text-sm font-medium mb-2'>
                 {book.progress}%
               </div>
@@ -59,7 +58,7 @@ export function BookCard({ book }: BookCardProps) {
         </p>
       </div>
       {/* Progress bar for reading books */}
-      {book.progress > 0 && book.progress < 100 && (
+      {book.progress && book.progress > 0 && book.progress < 100 && (
         <div className='mt-2 px-1'>
           <div className='h-1 bg-neutral-200 dark:bg-neutral-800 rounded-full overflow-hidden'>
             <div

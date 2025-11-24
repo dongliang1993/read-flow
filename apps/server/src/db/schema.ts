@@ -6,6 +6,16 @@ import {
   integer,
   jsonb,
 } from 'drizzle-orm/pg-core'
+import type {
+  Book,
+  NewBook,
+  ReadingProgress,
+  NewReadingProgress,
+  ChatMessage,
+  NewChatMessage,
+  Annotation,
+  NewAnnotation,
+} from '@read-flow/types'
 
 export const books = pgTable('books', {
   id: serial('id').primaryKey(),
@@ -52,11 +62,13 @@ export const annotations = pgTable('annotations', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 })
 
-export type Book = typeof books.$inferSelect
-export type NewBook = typeof books.$inferInsert
-export type ReadingProgress = typeof readingProgress.$inferSelect
-export type NewReadingProgress = typeof readingProgress.$inferInsert
-export type ChatMessage = typeof chatHistory.$inferSelect
-export type NewChatMessage = typeof chatHistory.$inferInsert
-export type Annotation = typeof annotations.$inferSelect
-export type NewAnnotation = typeof annotations.$inferInsert
+export type {
+  Book,
+  NewBook,
+  ReadingProgress,
+  NewReadingProgress,
+  ChatMessage,
+  NewChatMessage,
+  Annotation,
+  NewAnnotation,
+}
