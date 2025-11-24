@@ -59,6 +59,11 @@ booksRoute.get('/:id/file', async (c) => {
 booksRoute.get('/:id', async (c) => {
   try {
     const id = parseInt(c.req.param('id'))
+    // 添加验证
+    if (isNaN(id)) {
+      return c.json({ error: 'Invalid book ID' }, 400)
+    }
+
     const [book] = await db.select().from(books).where(eq(books.id, id))
 
     if (!book) {
@@ -114,19 +119,24 @@ booksRoute.post('/upload', async (c) => {
       return c.json({ error: 'Title is required' }, 400)
     }
 
-    let originalFileName = file.name || 'book.epub'
+    // 🔧 修复：生成安全的文件名（只使用 .epub 扩展名）
+    const timestamp = Date.now()
+    const randomStr = Math.random().toString(36).substring(2, 8)
+    const safeFileName = `${timestamp}-${randomStr}.epub`
 
-    // 确保文件名有 .epub 扩展名
-    if (!originalFileName.toLowerCase().endsWith('.epub')) {
-      originalFileName = `${originalFileName}.epub`
-    }
+    console.log('📦 生成安全文件名:', safeFileName)
 
-    const fileName = `${Date.now()}-${originalFileName}`
     const fileBuffer = await file.arrayBuffer()
+
+    console.log('📦 准备上传到 Supabase Storage:', {
+      fileName: safeFileName,
+      bufferSize: fileBuffer.byteLength,
+      bucket: 'books',
+    })
 
     const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
       .from('books')
-      .upload(fileName, fileBuffer, {
+      .upload(safeFileName, fileBuffer, {
         contentType: 'application/epub+zip',
         cacheControl: '3600',
         upsert: false,
@@ -139,7 +149,7 @@ booksRoute.post('/upload', async (c) => {
 
     const {
       data: { publicUrl },
-    } = supabaseAdmin.storage.from('books').getPublicUrl(fileName)
+    } = supabaseAdmin.storage.from('books').getPublicUrl(safeFileName)
 
     const [newBook] = await db
       .insert(books)
