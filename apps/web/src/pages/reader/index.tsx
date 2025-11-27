@@ -19,16 +19,21 @@ export function Reader() {
   const navigate = useNavigate()
   const [location, setLocation] = useState<string>('')
   const [fontSize, setFontSize] = useState(100)
-  const [epubUrl, setEpubUrl] = useState<string | null>(null)
+  const [epubBuffer, setEpubBuffer] = useState<ArrayBuffer | null>(null)
 
   const { data: book, isLoading, error } = useBook(Number(bookId))
 
   useEffect(() => {
     if (book?.id) {
       // 使用服务器代理，返回完整文件流
-      const fileUrl = booksApi.getFileUrl(book.id)
-      console.log('fileUrl', fileUrl)
-      setEpubUrl(fileUrl)
+      booksApi
+        .downloadBook(book.id)
+        .then((data) => {
+          setEpubBuffer(data)
+        })
+        .catch((error) => {
+          console.error('Failed to get download URL:', error)
+        })
     }
   }, [book?.id])
 
@@ -65,7 +70,7 @@ export function Reader() {
     )
   }
 
-  if (!epubUrl) {
+  if (!epubBuffer) {
     return (
       <div className='flex items-center justify-center min-h-screen p-8 bg-neutral-50 dark:bg-neutral-950'>
         <Card className='max-w-md'>
@@ -102,7 +107,7 @@ export function Reader() {
         <main className='flex-1 overflow-hidden'>
           <div className='h-full max-w-6xl'>
             <EpubReader
-              url={epubUrl}
+              epubBuffer={epubBuffer}
               fontSize={fontSize}
               onLocationChange={setLocation}
             />

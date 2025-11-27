@@ -250,14 +250,23 @@ booksRoute.get('/:id/download', async (c) => {
 
     const { data, error } = await supabaseAdmin.storage
       .from('books')
-      .createSignedUrl(book.filePath, 3600)
+      .download(book.filePath)
 
     if (error) {
       console.error('Failed to generate download URL:', error)
       return c.json({ error: 'Failed to generate download URL' }, 500)
     }
 
-    return c.json({ downloadUrl: data.signedUrl })
+    const encodedFilename = encodeURIComponent(`${book.title}.epub`)
+
+    return new Response(data, {
+      headers: {
+        'Content-Disposition': `attachment; filename*=UTF-8''${encodedFilename}`,
+        'Content-Type': 'application/epub+zip',
+        'Access-Control-Allow-Origin': '*',
+        'Cache-Control': 'public, max-age=3600',
+      },
+    })
   } catch (error) {
     console.error('Download error:', error)
     return c.json({ error: 'Internal server error' }, 500)

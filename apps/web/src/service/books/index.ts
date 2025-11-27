@@ -66,14 +66,16 @@ export const booksApi = {
     }
   },
 
-  async getDownloadUrl(id: number): Promise<{ downloadUrl: string }> {
+  async downloadBook(id: number): Promise<ArrayBuffer> {
     const response = await fetch(
       `${env.apiBaseUrl}/api/v1/books/${id}/download`
     )
+
+    console.log('response', `${env.apiBaseUrl}/api/v1/books/${id}/download`)
     if (!response.ok) {
       throw new Error('Failed to get download URL')
     }
-    return response.json()
+    return response.arrayBuffer()
   },
 
   getFileUrl(id: number): string {
