@@ -65,12 +65,15 @@ booksRoute.get('/:id', async (c) => {
     }
 
     const [book] = await db.select().from(books).where(eq(books.id, id))
+    const {
+      data: { publicUrl },
+    } = supabaseAdmin.storage.from('books').getPublicUrl(book?.filePath || '')
 
     if (!book) {
       return c.json({ error: 'Book not found' }, 404)
     }
 
-    return c.json({ book })
+    return c.json({ book: { ...book, fileUrl: publicUrl } })
   } catch (error) {
     console.error('Get book error:', error)
     return c.json({ error: 'Failed to fetch book' }, 500)

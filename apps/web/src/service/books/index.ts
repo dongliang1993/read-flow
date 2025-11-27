@@ -1,12 +1,16 @@
 import { env } from '../../config/env'
 import type { Book } from '@read-flow/types'
 
+export type BookInfoWithUrl = Book & {
+  fileUrl: string
+}
+
 export interface BooksResponse {
-  books: Book[]
+  books: BookInfoWithUrl[]
 }
 
 export interface BookResponse {
-  book: Book
+  book: BookInfoWithUrl
 }
 
 export interface UploadBookResponse {
@@ -78,7 +82,12 @@ export const booksApi = {
     return response.arrayBuffer()
   },
 
-  getFileUrl(id: number): string {
-    return `${env.apiBaseUrl}/api/v1/books/${id}/file`
+  async getBookInfo(id: number): Promise<BookResponse> {
+    const response = await fetch(`${env.apiBaseUrl}/api/v1/books/${id}`)
+    if (!response.ok) {
+      throw new Error('Failed to get book info')
+    }
+
+    return response.json()
   },
 }

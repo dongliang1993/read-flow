@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { Button } from '../../components/ui/button'
 import HeaderBar from './components/header-bar'
@@ -12,30 +12,14 @@ import {
 } from '../../components/ui/card'
 import { EpubReader } from './epub-reader'
 import { useBook } from '../../hooks/use-books'
-import { booksApi } from '../../service/books'
 
 export function Reader() {
   const { bookId } = useParams<{ bookId: string }>()
   const navigate = useNavigate()
   const [location, setLocation] = useState<string>('')
   const [fontSize, setFontSize] = useState(100)
-  const [epubBuffer, setEpubBuffer] = useState<ArrayBuffer | null>(null)
 
   const { data: book, isLoading, error } = useBook(Number(bookId))
-
-  useEffect(() => {
-    if (book?.id) {
-      // 使用服务器代理，返回完整文件流
-      booksApi
-        .downloadBook(book.id)
-        .then((data) => {
-          setEpubBuffer(data)
-        })
-        .catch((error) => {
-          console.error('Failed to get download URL:', error)
-        })
-    }
-  }, [book?.id])
 
   if (isLoading) {
     return (
@@ -70,7 +54,7 @@ export function Reader() {
     )
   }
 
-  if (!epubBuffer) {
+  if (!book.fileUrl) {
     return (
       <div className='flex items-center justify-center min-h-screen p-8 bg-neutral-50 dark:bg-neutral-950'>
         <Card className='max-w-md'>
@@ -107,7 +91,7 @@ export function Reader() {
         <main className='flex-1 overflow-hidden'>
           <div className='h-full max-w-6xl'>
             <EpubReader
-              epubBuffer={epubBuffer}
+              url={book.fileUrl}
               fontSize={fontSize}
               onLocationChange={setLocation}
             />

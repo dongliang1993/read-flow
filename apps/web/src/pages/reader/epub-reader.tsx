@@ -5,13 +5,13 @@ import { useAsyncEffect } from 'ahooks'
 import { Button } from '../../components/ui/button'
 
 interface EpubReaderProps {
-  epubBuffer: ArrayBuffer | null
+  url: string
   fontSize: number
   onLocationChange?: (location: string) => void
 }
 
 export function EpubReader({
-  epubBuffer,
+  url,
   fontSize,
   onLocationChange,
 }: EpubReaderProps) {
@@ -22,20 +22,10 @@ export function EpubReader({
   const [isLoading, setIsLoading] = useState(false)
 
   useAsyncEffect(async () => {
-    if (!viewerRef.current || !epubBuffer) return
+    if (!viewerRef.current || !url) return
 
-    // const book = Epub('https://s3.amazonaws.com/moby-dick/moby-dick.epub', {
-    //   encoding: 'utf-8',
-    // })
-
-    const book = Epub(
-      'https://gtzrdfqjiyebwrygltvk.supabase.co/storage/v1/object/public/books/1763987161176-j5kvcf.epub',
-      {
-        encoding: 'utf-8',
-      }
-    )
+    const book = Epub(url)
     bookRef.current = book
-    // await book.opened
 
     console.log('Book is ready, rendering...')
 
@@ -47,123 +37,15 @@ export function EpubReader({
 
     renditionRef.current = rendition
 
-    rendition.on('started', () => {
-      console.log('started')
-    })
-    rendition.on('attached', () => {
-      console.log('attached')
-    })
-    rendition.on('displayed', () => {
-      console.log('-----------------------')
-    })
-    rendition.on('displayError', () => {
-      console.log('displayError')
-    })
-    rendition.on('rendered', () => {
-      console.log('rendered')
-    })
-
     rendition.on('relocated', (location: any) => {
-      console.log('locationChanged start', location.start.cfi)
-
-      // const cfi = location.start.cfi
-      // setCurrentLocation(cfi)
-      // onLocationChange?.(cfi)
+      console.log('📍 位置变化:', location)
+      const locationString = location.start.cfi
+      setCurrentLocation(locationString)
+      onLocationChange?.(locationString)
     })
 
-    rendition.display()
-  }, [epubBuffer])
-
-  // useEffect(() => {
-  //   if (!viewerRef.current || !url) return
-
-  //   setIsLoading(true)
-
-  //   // 通过 fetch 下载为 ArrayBuffer，然后传给 epub.js
-  //   fetch(url)
-  //     .then((response) => {
-  //       if (!response.ok) {
-  //         throw new Error(`HTTP error! status: ${response.status}`)
-  //       }
-  //       return response.arrayBuffer()
-  //     })
-  //     .then(async (arrayBuffer) => {
-  //       console.log('📦 ArrayBuffer 大小:', arrayBuffer.byteLength)
-
-  //       // 🧪 测试：可以切换这两种模式
-  //       // 模式1：从服务器加载的 ArrayBuffer
-  //       // const book = ePub('/test.epub')
-  //       const book = ePub(arrayBuffer)
-
-  //       console.log('📖 Book 对象创建:', book)
-  //       bookRef.current = book
-
-  //       // ⭐ 等待解析完成
-  //       await book.opened
-
-  //       // // ✅ 等待 book 打开和解析
-  //       // return book.opened.then(() => {
-  //       //   console.log('✅ Book 已打开，准备渲染')
-
-  //       //   const rendition = book.renderTo(viewerRef.current as HTMLElement, {
-  //       //     width: '100%',
-  //       //     height: '100%',
-  //       //     spread: 'none',
-  //       //   })
-  //       //   console.log('🎨 Rendition 对象创建:', rendition)
-
-  //       //   renditionRef.current = rendition
-
-  //       //   rendition.on('relocated', (location: any) => {
-  //       //     console.log('📍 位置变化:', location)
-  //       //     const locationString = location.start.cfi
-  //       //     setCurrentLocation(locationString)
-  //       //     onLocationChange?.(locationString)
-  //       //   })
-
-  //       //   console.log('🎬 开始调用 display()')
-  //       //   return rendition.display()
-  //       // })
-
-  //       const rendition = book.renderTo(viewerRef.current as HTMLElement, {
-  //         width: '100%',
-  //         height: '100%',
-  //         spread: 'none',
-  //       })
-  //       console.log('🎨 Rendition 对象创建:', rendition)
-
-  //       renditionRef.current = rendition
-
-  //       rendition.on('relocated', (location: any) => {
-  //         console.log('📍 位置变化:', location)
-  //         const locationString = location.start.cfi
-  //         setCurrentLocation(locationString)
-  //         onLocationChange?.(locationString)
-  //       })
-
-  //       console.log('🎬 开始调用 display()')
-  //       const displayPromise = rendition.display()
-  //       console.log('🎬 display() 返回值:', displayPromise)
-  //       return displayPromise
-  //     })
-  //     .then(() => {
-  //       console.log('✅ EPUB 渲染成功!')
-  //       setIsLoading(false)
-  //     })
-  //     .catch((error) => {
-  //       console.error('Failed to load EPUB:', error)
-  //       setIsLoading(false)
-  //     })
-
-  //   return () => {
-  //     if (renditionRef.current) {
-  //       renditionRef.current.destroy()
-  //     }
-  //     if (bookRef.current) {
-  //       bookRef.current.destroy()
-  //     }
-  //   }
-  // }, [url, onLocationChange])
+    await rendition.display()
+  }, [url])
 
   useEffect(() => {
     if (renditionRef.current) {
