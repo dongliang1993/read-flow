@@ -5,6 +5,7 @@ import { useShallow } from 'zustand/react/shallow'
 import HeaderBar from './components/header-bar'
 import { Card, CardDescription, CardHeader } from '@/components/ui/card'
 import { ReadContent } from './components/read-content'
+import { FooterBar } from './components/foot-bar'
 import { useReaderStore } from '@/store/reader-store'
 
 export function Reader() {
@@ -53,6 +54,7 @@ export function Reader() {
     <div className='flex flex-col h-screen bg-neutral-50 dark:bg-neutral-950'>
       <HeaderBar />
       <ReadContent />
+      <FooterBar />
     </div>
   )
 }

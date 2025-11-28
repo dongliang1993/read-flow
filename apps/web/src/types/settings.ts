@@ -1,6 +1,4 @@
-export type BookFont = {
-  defaultFontSize: number
-}
+import type { BookFont, BookLayout, ViewConfig } from '@/types/book'
 
 export type ReadSettings = {
   sideBarWidth: string
@@ -12,7 +10,7 @@ export type ReadSettings = {
   translateTargetLang: string
 }
 
-export type ViewSettings = BookFont
+export type ViewSettings = BookFont & BookLayout & ViewConfig
 
 export type SystemSettings = {
   globalViewSettings: ViewSettings

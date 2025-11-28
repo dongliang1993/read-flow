@@ -137,17 +137,8 @@ export interface BookFont {
 }
 
 export interface ViewConfig {
-  sideBarTab: string
-  uiLanguage: string
-  sortedTOC: boolean
-
-  doubleBorder: boolean
-  borderColor: string
-
   showHeader: boolean
   showFooter: boolean
-  showRemainingTime: boolean
-  showRemainingPages: boolean
   showPageNumber: boolean
   showBarsOnScroll: boolean
 }
