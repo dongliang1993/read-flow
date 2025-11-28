@@ -18,10 +18,9 @@ import { ChatMessages } from './chat-messages'
 
 type SideChatProps = {
   bookId: string
-  minWidth: number
 }
 
-const SideChat = ({ minWidth }: SideChatProps) => {
+export const SideChat = ({}: SideChatProps) => {
   const { input, setInput, handleSubmit, status, messages } = useChat()
 
   const quickActions = [
@@ -63,10 +62,7 @@ const SideChat = ({ minWidth }: SideChatProps) => {
   )
 
   return (
-    <div
-      className='flex flex-col h-full dark:bg-neutral-900 px-6 py-3'
-      style={{ width: `${minWidth}px` }}
-    >
+    <div className='flex flex-col h-full dark:bg-neutral-900 px-6 py-3'>
       <div className='flex-1'>
         {/* Header */}
         <div className='pb-1 dark:border-neutral-800'>
@@ -140,5 +136,3 @@ const SideChat = ({ minWidth }: SideChatProps) => {
     </div>
   )
 }
-
-export default SideChat

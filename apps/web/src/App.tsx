@@ -6,14 +6,14 @@ import { LibraryLayout } from './pages/library/layout'
 import { AllBooks } from './pages/library/all-books'
 import { Reading } from './pages/library/reading'
 import { Finished } from './pages/library/finished'
-import { Reader } from './pages/reader'
+import { ReaderLayout } from './pages/reader/index'
 import './App.css'
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path='/reader/:bookId' element={<Reader />} />
+        <Route path='/reader/:bookId' element={<ReaderLayout />} />
         <Route path='/' element={<Layout />}>
           <Route index element={<Home />} />
           <Route path='dashboard' element={<Dashboard />} />

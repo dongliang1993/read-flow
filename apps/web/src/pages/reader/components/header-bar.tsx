@@ -12,7 +12,7 @@ const HeaderBar = ({}: HeaderBarProps) => {
   const bookData = useReaderStore((state) => state.bookData)
 
   return (
-    <header className='w-full flex-shrink-0 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 px-4 py-1'>
+    <header className='w-full flex-shrink-0 px-4 py-1'>
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-4'>
           <Button
