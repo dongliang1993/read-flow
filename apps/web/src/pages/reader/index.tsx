@@ -11,20 +11,20 @@ import { useReaderStore } from '@/store/reader-store'
 export function Reader() {
   const { bookId } = useParams<{ bookId: string }>()
 
-  const { initBook, loading, error, book } = useReaderStore(
+  const { initBook, loading, error, bookData } = useReaderStore(
     useShallow((state) => ({
       initBook: state.initBook,
       loading: state.loading,
       error: state.error,
-      book: state.activeBook,
+      bookData: state.bookData,
     }))
   )
 
   useEffect(() => {
-    if (bookId) {
+    if (bookId && !bookData) {
       initBook(bookId)
     }
-  }, [bookId])
+  }, [bookId, bookData])
 
   if (loading) {
     return (
@@ -39,19 +39,22 @@ export function Reader() {
       <div className='flex items-center justify-center min-h-screen p-8 bg-neutral-50 dark:bg-neutral-950'>
         <Card className='max-w-md'>
           <CardHeader>
-            <CardDescription>加载失败：{error.message}</CardDescription>
+            <CardDescription>加载失败：{error}</CardDescription>
           </CardHeader>
         </Card>
       </div>
     )
   }
 
-  if (!book) {
+  if (!bookData) {
     return null
   }
 
   return (
-    <div className='flex flex-col h-screen bg-neutral-50 dark:bg-neutral-950'>
+    <div
+      id={`reader-${bookData.id}`}
+      className='flex flex-col h-full w-full bg-background'
+    >
       <HeaderBar />
       <ReadContent />
       <FooterBar />

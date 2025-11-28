@@ -9,7 +9,7 @@ type HeaderBarProps = {}
 
 const HeaderBar = ({}: HeaderBarProps) => {
   const navigate = useNavigate()
-  const book = useReaderStore((state) => state.activeBook)
+  const bookData = useReaderStore((state) => state.bookData)
 
   return (
     <header className='w-full flex-shrink-0 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 px-4 py-1'>
@@ -26,7 +26,7 @@ const HeaderBar = ({}: HeaderBarProps) => {
         </div>
         <div className='flex-1'>
           <h1 className='text-sm font-medium text-neutral-900 dark:text-neutral-100 text-center'>
-            {book?.title}
+            {bookData?.book?.title}
           </h1>
         </div>
         <SettingsDropdown />

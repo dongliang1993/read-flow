@@ -5,15 +5,14 @@ import { useReaderStore } from '@/store/reader-store'
 import { useFoliateViewer } from '@/service/foliate-viewer/use-foliate-viewer'
 
 export const ReadContent = () => {
-  const { bookId, bookData, config } = useReaderStore(
+  const { bookData, config } = useReaderStore(
     useShallow((state) => ({
       bookData: state.bookData,
-      bookId: state.activeBookId,
       config: state.config,
     }))
   )
 
-  console.log('ReadContent', { bookData, bookId, config })
+  const bookId = useMemo(() => bookData?.id, [bookData])
 
   const contentInsets = useMemo(() => {
     return {
@@ -25,15 +24,23 @@ export const ReadContent = () => {
   }, [])
 
   const foliateViewer = useFoliateViewer(
-    bookId!,
+    bookData?.id!,
     bookData?.bookDoc!,
     config!,
     contentInsets
   )
 
-  if (!bookData) {
+  if (!bookData?.bookDoc || !config) {
     return null
   }
 
-  return <div ref={foliateViewer.containerRef} className='flex-1' />
+  console.log('[ReaderContent] Rendering foliate viewer for bookId:', bookData)
+
+  return (
+    <div
+      ref={foliateViewer.containerRef}
+      data-book-id={bookId}
+      className='flex-1'
+    />
+  )
 }

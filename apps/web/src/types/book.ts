@@ -207,17 +207,7 @@ export interface BookSearchResult {
 }
 
 export interface BookConfig {
-  bookHash?: string
-  progress?: [number, number] // [current pagenum, total pagenum], 1-based page number
-  location?: string
-  booknotes?: BookNote[]
-  searchConfig?: Partial<BookSearchConfig>
   viewSettings?: Partial<ViewSettings>
-
-  lastSyncedAtConfig?: number
-  lastSyncedAtNotes?: number
-
-  updatedAt: number
 }
 
 export interface BookDataRecord {

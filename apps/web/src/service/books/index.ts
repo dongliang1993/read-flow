@@ -1,5 +1,7 @@
 import { env } from '../../config/env'
 import type { Book } from '@read-flow/types'
+import type { SystemSettings } from '@/types/settings'
+import type { BookConfig } from '@/types/book'
 
 export type BookInfoWithUrl = Book & {
   fileUrl: string
@@ -90,4 +92,15 @@ export const booksApi = {
 
     return response.json()
   },
+}
+
+export async function loadBookConfig(
+  bookId: string,
+  settings: SystemSettings
+): Promise<BookConfig> {
+  const { globalViewSettings } = settings
+
+  return {
+    viewSettings: globalViewSettings,
+  }
 }

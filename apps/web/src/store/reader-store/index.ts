@@ -2,7 +2,8 @@ import { create } from 'zustand'
 import { queryClient } from '@/lib/query-client'
 
 import { DocumentLoader } from '@/lib/document'
-import { booksApi } from '@/service/books'
+import { booksApi, loadBookConfig } from '@/service/books'
+import { useAppSettingsStore } from '@/store/app-settings-store'
 
 import type { Book } from '@read-flow/types'
 import type { FoliateView } from '@/types/view'
@@ -17,6 +18,7 @@ export type BookData = {
   id: string
   book: IBook | null
   file: File | null
+  config: BookConfig | null
   bookDoc: BookDoc | null
 }
 
@@ -27,11 +29,12 @@ type ReaderStore = {
   activeBook: IBook | null
   bookData: BookData | null
   loading: boolean
-  error: Error | null
+  error: string | null
   openDropdown: OpenDropdown | null
   view: FoliateView | null
   config: BookConfig | null
 
+  getBookById: (bookId: string) => Promise<IBook | null>
   setActiveBookId: (bookId: string) => void
   initBook: (bookId: string) => Promise<void>
   setOpenDropdown: (dropdown: OpenDropdown) => void
@@ -73,15 +76,41 @@ export const useReaderStore = create<ReaderStore>((set, get) => ({
     }
   },
 
+  getBookById: async (bookId: string) => {
+    try {
+      const book = await queryClient.fetchQuery({
+        queryKey: ['book', bookId],
+        queryFn: async () => {
+          const { book } = await booksApi.getById(Number(bookId))
+          return book
+        },
+      })
+
+      return book
+    } catch (error) {
+      console.error(`Failed to fetch book ${bookId}:`, error)
+      return null
+    }
+  },
+
   initBook: async (bookId: string) => {
     try {
       set({ loading: true, error: null })
-      const { setActiveBookId } = get()
 
-      await setActiveBookId(bookId)
+      const { settings } = useAppSettingsStore.getState()
+      const { getBookById } = get()
 
-      const { activeBook } = get()
-      const fileUrl = activeBook?.fileUrl || ''
+      const book = await getBookById(bookId)
+
+      if (!book) {
+        throw new Error(`Book ${bookId} not found`)
+      }
+
+      if (!book.filePath) {
+        throw new Error('Book file path is missing')
+      }
+
+      const fileUrl = book?.fileUrl
       const response = await fetch(fileUrl)
 
       if (!response.ok) {
@@ -91,25 +120,29 @@ export const useReaderStore = create<ReaderStore>((set, get) => ({
       }
 
       const arrayBuffer = await response.arrayBuffer()
-      const filename =
-        (activeBook?.title || '') + '.' + fileUrl?.split('.').pop()
+      const filename = book.title + '.' + fileUrl.split('.').pop()
       const file = new File([arrayBuffer], filename, {
         type: 'application/epub+zip',
       })
 
+      const config = await loadBookConfig(bookId, settings)
       const { book: bookDoc } = await new DocumentLoader(file).open()
 
       const bookData: BookData = {
         id: bookId,
-        book: activeBook,
+        book,
         file,
+        config,
         bookDoc,
       }
 
-      set({ loading: false, bookData })
+      set({ loading: false, bookData, config })
     } catch (error) {
       console.error(`Failed to init book ${bookId}:`, error)
-      set({ loading: false, error: error as Error })
+      set({
+        loading: false,
+        error: error instanceof Error ? error.message : String(error),
+      })
     }
   },
   setView: (view: FoliateView) => set({ view }),
