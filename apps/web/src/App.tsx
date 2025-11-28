@@ -7,6 +7,7 @@ import { AllBooks } from './pages/library/all-books'
 import { Reading } from './pages/library/reading'
 import { Finished } from './pages/library/finished'
 import { Reader } from './pages/reader'
+import './App.css'
 
 function App() {
   return (

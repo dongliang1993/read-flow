@@ -3,27 +3,17 @@ import { useNavigate } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'
 import SettingsDropdown from './settings-dropdown'
+import { useReaderStore } from '@/store/reader-store'
 
-import type { Book } from '@read-flow/types'
+type HeaderBarProps = {}
 
-type HeaderBarProps = {
-  book: Book
-  fontSize: number
-  decreaseFontSize: () => void
-  increaseFontSize: () => void
-}
-
-const HeaderBar = ({
-  book,
-  fontSize,
-  decreaseFontSize,
-  increaseFontSize,
-}: HeaderBarProps) => {
+const HeaderBar = ({}: HeaderBarProps) => {
   const navigate = useNavigate()
+  const book = useReaderStore((state) => state.activeBook)
 
   return (
-    <header className='flex-shrink-0 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 px-6 py-4'>
-      <div className='flex items-center justify-between max-w-7xl mx-auto'>
+    <header className='w-full flex-shrink-0 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 px-4 py-1'>
+      <div className='flex items-center justify-between'>
         <div className='flex items-center gap-4'>
           <Button
             variant='ghost'
@@ -36,14 +26,10 @@ const HeaderBar = ({
         </div>
         <div className='flex-1'>
           <h1 className='text-sm font-medium text-neutral-900 dark:text-neutral-100 text-center'>
-            {book.title}
+            {book?.title}
           </h1>
         </div>
-        <SettingsDropdown
-          fontSize={fontSize}
-          decreaseFontSize={decreaseFontSize}
-          increaseFontSize={increaseFontSize}
-        />
+        <SettingsDropdown />
       </div>
     </header>
   )
