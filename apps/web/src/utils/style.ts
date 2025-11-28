@@ -249,10 +249,71 @@ const getScrollbarStyles = () => {
   return scrollbarStyles
 }
 
+const getFontStyles = (
+  serif: string,
+  sansSerif: string,
+  monospace: string,
+  defaultFont: string,
+  defaultCJKFont: string,
+  fontSize: number,
+  minFontSize: number,
+  fontWeight: number,
+  overrideFont: boolean
+) => {
+  // 为了确保字体正确应用，我们直接使用指定的字体
+  // CJK 字体通过 defaultCJKFont 单独处理
+  const fontStyles = `
+    html {
+      --serif-font: "${serif}", serif;
+      --sans-serif-font: "${sansSerif}", sans-serif;
+      --monospace-font: "${monospace}", monospace;
+      --cjk-font: "${defaultCJKFont}", sans-serif;
+    }
+    html, body {
+      font-family: ${
+        defaultFont.toLowerCase() === 'serif' ? `"${serif}"` : `"${sansSerif}"`
+      }, "${defaultCJKFont}", ${
+    defaultFont.toLowerCase() === 'serif' ? 'serif' : 'sans-serif'
+  } ${overrideFont ? '!important' : ''};
+      font-size: ${fontSize}px !important;
+      font-weight: ${fontWeight};
+      -webkit-text-size-adjust: none;
+      text-size-adjust: none;
+    }
+    font[size="1"] {
+      font-size: ${minFontSize}px;
+    }
+    font[size="2"] {
+      font-size: ${minFontSize * 1.5}px;
+    }
+    font[size="3"] {
+      font-size: ${fontSize}px;
+    }
+    font[size="4"] {
+      font-size: ${fontSize * 1.2}px;
+    }
+    font[size="5"] {
+      font-size: ${fontSize * 1.5}px;
+    }
+    font[size="6"] {
+      font-size: ${fontSize * 2}px;
+    }
+    font[size="7"] {
+      font-size: ${fontSize * 3}px;
+    }
+    /* hardcoded inline font size */
+    [style*="font-size: 16px"], [style*="font-size:16px"] {
+      font-size: 1rem !important;
+    }
+    body * {
+      ${overrideFont ? 'font-family: revert !important;' : ''}
+    }
+    
+  `
+  return fontStyles
+}
+
 export const getStyles = (viewSettings: ViewSettings) => {
-  //   if (!themeCode) {
-  //     themeCode = getThemeCode();
-  //   }
   const layoutStyles = getLayoutStyles(
     viewSettings.overrideLayout!,
     viewSettings.paragraphMargin!,
@@ -267,22 +328,22 @@ export const getStyles = (viewSettings: ViewSettings) => {
     viewSettings.vertical!
   )
 
-  //   const fontStyles = getFontStyles(
-  //     viewSettings.serifFont!,
-  //     viewSettings.sansSerifFont!,
-  //     viewSettings.monospaceFont!,
-  //     viewSettings.defaultFont!,
-  //     viewSettings.defaultCJKFont!,
-  //     viewSettings.defaultFontSize!,
-  //     viewSettings.minimumFontSize!,
-  //     viewSettings.fontWeight!,
-  //     viewSettings.overrideFont!,
-  //   );
+  const fontStyles = getFontStyles(
+    viewSettings.serifFont!,
+    viewSettings.sansSerifFont!,
+    viewSettings.monospaceFont!,
+    viewSettings.defaultFont! || 'serif',
+    viewSettings.defaultCJKFont!,
+    viewSettings.defaultFontSize!,
+    viewSettings.minimumFontSize!,
+    viewSettings.fontWeight!,
+    viewSettings.overrideFont!
+  )
   //   const colorStyles = getColorStyles(viewSettings.overrideColor!, viewSettings.invertImgColorInDark!, themeCode);
   //   const translationStyles = getTranslationStyles(viewSettings.showTranslateSource!);
   const scrollbarStyles = getScrollbarStyles()
-  //   const userStylesheet = viewSettings.userStylesheet!;
+  const userStylesheet = viewSettings.userStylesheet!
   //   return `${layoutStyles}\n${fontStyles}\n${colorStyles}\n${translationStyles}\n${scrollbarStyles}\n${userStylesheet}`;
 
-  return `${layoutStyles}\n${scrollbarStyles}`
+  return `${layoutStyles}\n${fontStyles}\n${scrollbarStyles}\n${userStylesheet}`
 }

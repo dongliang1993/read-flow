@@ -1,6 +1,7 @@
 import { EventManager } from './event-manager'
 import { StyleManager } from './style-manager'
 import { wrappedFoliateView } from '@/types/view'
+import { getDirection } from '@/lib/document'
 
 import type { ViewSettings } from '@/types/settings'
 import type { FoliateView } from '@/types/view'
@@ -17,6 +18,17 @@ export interface FoliateViewerManagerConfig {
   onViewCreated?: (view: FoliateView) => void
 }
 
+export interface ProgressData {
+  location: string
+  sectionHref: string
+  sectionLabel: string
+  sectionId: number
+  section: number
+  pageinfo: any
+  timeinfo: any
+  range: any
+}
+
 export class FoliateViewerManager {
   private eventManager: EventManager
   private isInitialized = false
@@ -24,6 +36,8 @@ export class FoliateViewerManager {
   private config: FoliateViewerManagerConfig
   private view: FoliateView | null = null
   private styleManager: StyleManager | null = null
+  private onProgressUpdate?: (progress: ProgressData, bookId: string) => void
+  private onViewSettingsUpdate?: (settings: ViewSettings) => void
 
   constructor(config: FoliateViewerManagerConfig) {
     this.config = config
@@ -67,19 +81,120 @@ export class FoliateViewerManager {
   }
 
   private handleLoad = (event: CustomEvent) => {
-    console.log('handleLoad', event)
+    const { doc } = event.detail
+    if (!doc) return
+
+    const writingDir = this.view?.renderer.setStyles && getDirection(doc)
+    const { bookDoc, globalViewSettings } = this.config
+
+    // Update view settings based on document
+    const updatedSettings = {
+      ...globalViewSettings,
+      vertical:
+        writingDir?.vertical ||
+        globalViewSettings.writingMode?.includes('vertical') ||
+        false,
+      rtl:
+        writingDir?.rtl ||
+        globalViewSettings.writingMode?.includes('rl') ||
+        false,
+    }
+
+    this.onViewSettingsUpdate?.(updatedSettings)
   }
 
   private handleRelocate = (event: CustomEvent) => {
-    console.log('handleRelocate', event)
+    const detail = event.detail
+    this.onProgressUpdate?.(
+      {
+        location: detail.cfi,
+        sectionHref: detail.tocItem?.href || '',
+        sectionLabel: detail.tocItem?.label || '',
+        sectionId: detail.tocItem?.id ?? 0,
+        section: detail.section,
+        pageinfo: detail.location,
+        timeinfo: detail.time,
+        range: detail.range,
+      },
+      this.config.bookId
+    )
   }
 
   private handleRendererRelocate = (event: CustomEvent) => {
-    console.log('handleRendererRelocate', event)
+    const detail = event.detail
+    if (detail.reason !== 'scroll' && detail.reason !== 'page') return
   }
 
   private handleResize = (bookIds: string[]) => {
-    console.log('handleResize', bookIds)
+    if (this.styleManager) {
+      const dimensions = this.getContainerDimensions()
+      this.styleManager.updateLayout(dimensions)
+    }
+    this.checkLayoutStability()
+  }
+
+  private checkLayoutStability(): void {
+    const foliateView = document.getElementById(
+      `foliate-view-${this.config.bookId}`
+    )
+    if (!foliateView) {
+      this.dispatchStableEvent()
+      return
+    }
+
+    let frameCount = 0
+    let lastLayout: {
+      scrollWidth: number
+      scrollHeight: number
+      childCount: number
+    } | null = null
+    let stableFrames = 0
+
+    const checkFrame = () => {
+      frameCount++
+
+      const currentLayout = {
+        scrollWidth: foliateView.scrollWidth,
+        scrollHeight: foliateView.scrollHeight,
+        childCount: foliateView.children.length,
+      }
+
+      if (lastLayout) {
+        const isStable =
+          currentLayout.scrollWidth === lastLayout.scrollWidth &&
+          currentLayout.scrollHeight === lastLayout.scrollHeight &&
+          currentLayout.childCount === lastLayout.childCount
+
+        if (isStable) {
+          stableFrames++
+
+          if (stableFrames >= 5) {
+            setTimeout(() => this.dispatchStableEvent(), 150)
+            return
+          }
+        } else {
+          stableFrames = 0
+        }
+      }
+
+      lastLayout = currentLayout
+
+      if (frameCount < 15) {
+        requestAnimationFrame(checkFrame)
+      } else {
+        setTimeout(() => this.dispatchStableEvent(), 100)
+      }
+    }
+
+    setTimeout(() => requestAnimationFrame(checkFrame), 150)
+  }
+
+  private dispatchStableEvent(): void {
+    window.dispatchEvent(
+      new CustomEvent('foliate-layout-stable', {
+        detail: { bookIds: [this.config.bookId] },
+      })
+    )
   }
 
   private handleMessage = (event: MessageEvent) => {
@@ -132,6 +247,16 @@ export class FoliateViewerManager {
 
   getView(): FoliateView | null {
     return this.view
+  }
+
+  setProgressCallback(
+    callback: (progress: ProgressData, bookId: string) => void
+  ): void {
+    this.onProgressUpdate = callback
+  }
+
+  setViewSettingsCallback(callback: (settings: ViewSettings) => void): void {
+    this.onViewSettingsUpdate = callback
   }
 
   destroy(): void {

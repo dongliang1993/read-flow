@@ -1,5 +1,6 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useShallow } from 'zustand/react/shallow'
+import { useMemo } from 'react'
 
 import { useReaderStore } from '@/store/reader-store'
 import { useAppSettingsStore } from '@/store/app-settings-store'
@@ -31,17 +32,18 @@ export const viewPagination = (
 }
 
 export const FooterBar = () => {
-  const { view } = useReaderStore(
+  const { view, progress } = useReaderStore(
     useShallow((state) => ({
       view: state.view,
+      progress: state.progress,
     }))
   )
 
   const settings = useAppSettingsStore((state) => state.settings)
   const globalViewSettings = settings.globalViewSettings
+  const isScrolledMode = globalViewSettings?.scrolled
 
   const handleGoPrevPage = () => {
-    const isScrolledMode = globalViewSettings?.scrolled
     if (isScrolledMode) {
       if (view) {
         view.renderer.prevSection?.()
@@ -64,6 +66,19 @@ export const FooterBar = () => {
     }
   }
 
+  const isVertical = globalViewSettings?.vertical
+  const pageInfo = progress?.pageinfo
+
+  const progressContent = useMemo(() => {
+    return pageInfo && pageInfo.current >= 0 && pageInfo.total > 0
+      ? isVertical
+        ? `${pageInfo.current + 1} · ${pageInfo.total}`
+        : `第 ${pageInfo.current + 1} / ${pageInfo.total} 页`
+      : ''
+  }, [pageInfo])
+
+  console.log('progress', progress)
+
   return (
     <footer className='w-full h-10 pointer-events-auto px-2 flex items-center'>
       <div className='flex w-full items-center justify-between'>
@@ -72,13 +87,13 @@ export const FooterBar = () => {
           size='icon'
           className={`size-7 rounded-full transition-opacity duration-300`}
           onClick={handleGoPrevPage}
-          title={'上一页'}
+          title={isScrolledMode ? '上一章' : '上一页'}
         >
           <ChevronLeft className='size-5' />
         </Button>
 
         <div className='flex justify-center'>
-          <span className='text-center text-sm'>{11}</span>
+          <span className='text-center text-sm'>{progressContent}</span>
         </div>
 
         <Button
@@ -86,7 +101,7 @@ export const FooterBar = () => {
           size='icon'
           className={`size-7 rounded-full transition-opacity duration-300`}
           onClick={handleGoNextPage}
-          title={'下一页'}
+          title={isScrolledMode ? '下一章' : '下一页'}
         >
           <ChevronRight className='size-5' />
         </Button>

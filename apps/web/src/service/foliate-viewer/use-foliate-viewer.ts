@@ -6,6 +6,8 @@ import { useAppSettingsStore } from '@/store/app-settings-store'
 import type { FoliateView } from '@/types/view'
 import type { BookConfig, BookDoc } from '@/types/book'
 import type { Insets } from '@/types/misc'
+import type { ProgressData } from './index'
+import type { ViewSettings } from '@/types/settings'
 
 export const useFoliateViewer = (
   bookId: string,
@@ -19,9 +21,11 @@ export const useFoliateViewer = (
   const isInitialized = useRef(false)
   const [, forceUpdate] = useState({})
   const setView = useReaderStore((state) => state.setView)
+  const setProgress = useReaderStore((state) => state.setProgress)
+  const setLocation = useReaderStore((state) => state.setLocation)
   const settings = useAppSettingsStore((state) => state.settings)
+  const setSettings = useAppSettingsStore((state) => state.setSettings)
 
-  console.log('settings', settings)
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     if (isInitialized.current || !containerRef.current) {
@@ -48,6 +52,18 @@ export const useFoliateViewer = (
         setView(view)
         viewRef.current = view
       },
+    })
+
+    manager.setProgressCallback((progress: ProgressData) => {
+      setProgress(progress)
+      setLocation(progress.location)
+    })
+
+    manager.setViewSettingsCallback((updatedSettings: ViewSettings) => {
+      setSettings({
+        ...settings,
+        globalViewSettings: updatedSettings,
+      })
     })
 
     managerRef.current = manager

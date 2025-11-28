@@ -7,7 +7,7 @@ import { useAppSettingsStore } from '@/store/app-settings-store'
 
 import type { Book } from '@read-flow/types'
 import type { FoliateView } from '@/types/view'
-import type { BookConfig } from '@/types/book'
+import type { BookConfig, BookProgress } from '@/types/book'
 import type { BookDoc } from '@/lib/document'
 
 export type IBook = Book & {
@@ -33,6 +33,8 @@ type ReaderStore = {
   openDropdown: OpenDropdown | null
   view: FoliateView | null
   config: BookConfig | null
+  progress: BookProgress | null
+  location: string | null
 
   getBookById: (bookId: string) => Promise<IBook | null>
   setActiveBookId: (bookId: string) => void
@@ -40,6 +42,8 @@ type ReaderStore = {
   setOpenDropdown: (dropdown: OpenDropdown) => void
   setView: (view: FoliateView) => void
   setConfig: (config: BookConfig) => void
+  setProgress: (progress: BookProgress) => void
+  setLocation: (location: string) => void
 }
 
 export const useReaderStore = create<ReaderStore>((set, get) => ({
@@ -51,6 +55,8 @@ export const useReaderStore = create<ReaderStore>((set, get) => ({
   openDropdown: null,
   view: null,
   config: null,
+  progress: null,
+  location: null,
 
   setActiveBookId: async (bookId: string) => {
     const currentBookId = get().activeBookId
@@ -75,6 +81,9 @@ export const useReaderStore = create<ReaderStore>((set, get) => ({
       }
     }
   },
+
+  setProgress: (progress: BookProgress) => set({ progress }),
+  setLocation: (location: string) => set({ location }),
 
   getBookById: async (bookId: string) => {
     try {

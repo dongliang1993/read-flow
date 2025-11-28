@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { FontSizeSlider } from './font-size-slider'
 import { useReaderStore } from '@/store/reader-store'
 import { useAppSettingsStore } from '@/store/app-settings-store'
+import { getStyles } from '@/utils/style'
 
 const FONT_SIZE_MIN = 12
 const FONT_SIZE_MAX = 32
@@ -18,6 +19,7 @@ const FONT_SIZE_STEP = 2
 const SettingsDropdown = () => {
   const setOpenDropdown = useReaderStore((state) => state.setOpenDropdown)
   const openDropdown = useReaderStore((state) => state.openDropdown)
+  const view = useReaderStore((state) => state.view)
 
   const settings = useAppSettingsStore((state) => state.settings)
   const setSettings = useAppSettingsStore((state) => state.setSettings)
@@ -39,9 +41,12 @@ const SettingsDropdown = () => {
         ...currentSettings,
         globalViewSettings: updatedSettings,
       })
+
+      const currentView = view
+      currentView?.renderer.setStyles?.(getStyles(updatedSettings))
       return updatedSettings
     },
-    [setSettings]
+    [setSettings, view]
   )
 
   const globalViewSettings = settings.globalViewSettings
