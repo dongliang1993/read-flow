@@ -21,6 +21,7 @@ export const useFoliateViewer = (
   const setView = useReaderStore((state) => state.setView)
   const settings = useAppSettingsStore((state) => state.settings)
 
+  console.log('settings', settings)
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     if (isInitialized.current || !containerRef.current) {

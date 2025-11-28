@@ -1,4 +1,4 @@
-import { DEFAULT_BOOK_FONT } from '@/constants/reader'
+import { DEFAULT_BOOK_FONT, DEFAULT_BOOK_LAYOUT } from '@/constants/reader'
 import type { SystemSettings } from '@/types/settings'
 import { create } from 'zustand'
 import {
@@ -17,7 +17,10 @@ export const useAppSettingsStore = create<AppSettingsState>()(
     persist(
       (set) => ({
         settings: {
-          globalViewSettings: DEFAULT_BOOK_FONT,
+          globalViewSettings: {
+            ...DEFAULT_BOOK_LAYOUT,
+            ...DEFAULT_BOOK_FONT,
+          },
         } as SystemSettings,
         setSettings: (settings: SystemSettings) => set({ settings }),
       }),

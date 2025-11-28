@@ -126,13 +126,7 @@ export interface BookStyle {
 }
 
 export interface BookFont {
-  serifFont: string
-  sansSerifFont: string
-  monospaceFont: string
-  defaultFont: string
-  defaultCJKFont: string
   defaultFontSize: number
-  minimumFontSize: number
   fontWeight: number
 }
 

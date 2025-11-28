@@ -1,11 +1,12 @@
 import { EventManager } from './event-manager'
+import { StyleManager } from './style-manager'
 import { wrappedFoliateView } from '@/types/view'
 
 import type { ViewSettings } from '@/types/settings'
 import type { FoliateView } from '@/types/view'
 import type { BookConfig, BookDoc } from '@/types/book'
 import type { Insets } from '@/types/misc'
-
+import type { LayoutDimensions } from './style-manager'
 export interface FoliateViewerManagerConfig {
   bookId: string
   bookDoc: BookDoc
@@ -22,6 +23,7 @@ export class FoliateViewerManager {
   private isDestroyed = false
   private config: FoliateViewerManagerConfig
   private view: FoliateView | null = null
+  private styleManager: StyleManager | null = null
 
   constructor(config: FoliateViewerManagerConfig) {
     this.config = config
@@ -37,6 +39,7 @@ export class FoliateViewerManager {
       await this.createFoliateView()
       await this.setupEventHandlers()
       await this.openBook()
+      await this.initializeStyles()
       await this.navigateToInitialPosition()
 
       this.isInitialized = true
@@ -84,7 +87,9 @@ export class FoliateViewerManager {
   }
 
   private async setupEventHandlers(): Promise<void> {
-    if (!this.view) return
+    if (!this.view) {
+      return
+    }
 
     this.eventManager.setupFoliateEventHandlers({
       onLoad: this.handleLoad,
@@ -104,6 +109,19 @@ export class FoliateViewerManager {
     const { bookDoc } = this.config
 
     await this.view.open(bookDoc)
+  }
+
+  private async initializeStyles(): Promise<void> {
+    if (!this.view) {
+      return
+    }
+
+    const { globalViewSettings } = this.config
+    const dimensions = this.getContainerDimensions()
+
+    this.styleManager = new StyleManager(this.view, globalViewSettings)
+    this.styleManager.updateLayout(dimensions)
+    this.styleManager.applyStyles()
   }
 
   private async navigateToInitialPosition(): Promise<void> {
@@ -128,6 +146,15 @@ export class FoliateViewerManager {
     } catch (error) {
       console.error('[FoliateViewerManager] Destruction failed:', error)
       throw error
+    }
+  }
+
+  private getContainerDimensions(): LayoutDimensions {
+    const { container, insets } = this.config
+    const rect = container.getBoundingClientRect()
+    return {
+      width: rect.width - insets.left - insets.right,
+      height: rect.height - insets.top - insets.bottom,
     }
   }
 }

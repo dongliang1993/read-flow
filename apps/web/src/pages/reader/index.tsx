@@ -24,9 +24,9 @@ export const ReaderLayout = () => {
       defaultSize={DEFAULT_SIZE}
       className='h-full'
       minWidth={320}
-      maxWidth={580}
+      maxWidth={540}
       enable={{
-        right: true,
+        right: false,
         top: false,
         bottom: false,
         left: true,
@@ -50,9 +50,6 @@ export const ReaderLayout = () => {
       }}
       handleComponent={{
         left: <div className='custom-resize-handle' />,
-        right: (
-          <div className='custom-resize-handle custom-resize-handle-left' />
-        ),
       }}
     >
       <SideChat bookId={bookId} />
