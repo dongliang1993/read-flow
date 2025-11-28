@@ -1,7 +1,13 @@
 import { create } from 'zustand'
-import type { Book } from '@read-flow/types'
-import { queryClient } from '@/lib/query-client' // 你的 QueryClient 实例
+import { queryClient } from '@/lib/query-client'
+
+import { DocumentLoader } from '@/lib/document'
 import { booksApi } from '@/service/books'
+
+import type { Book } from '@read-flow/types'
+import type { FoliateView } from '@/types/view'
+import type { BookConfig } from '@/types/book'
+import type { BookDoc } from '@/lib/document'
 
 export type IBook = Book & {
   fileUrl: string
@@ -11,6 +17,7 @@ export type BookData = {
   id: string
   book: IBook | null
   file: File | null
+  bookDoc: BookDoc | null
 }
 
 export type OpenDropdown = 'toc' | 'search' | 'settings' | null
@@ -22,10 +29,14 @@ type ReaderStore = {
   loading: boolean
   error: Error | null
   openDropdown: OpenDropdown | null
+  view: FoliateView | null
+  config: BookConfig | null
 
   setActiveBookId: (bookId: string) => void
   initBook: (bookId: string) => Promise<void>
   setOpenDropdown: (dropdown: OpenDropdown) => void
+  setView: (view: FoliateView) => void
+  setConfig: (config: BookConfig) => void
 }
 
 export const useReaderStore = create<ReaderStore>((set, get) => ({
@@ -35,6 +46,8 @@ export const useReaderStore = create<ReaderStore>((set, get) => ({
   loading: false,
   error: null,
   openDropdown: null,
+  view: null,
+  config: null,
 
   setActiveBookId: async (bookId: string) => {
     const currentBookId = get().activeBookId
@@ -84,10 +97,13 @@ export const useReaderStore = create<ReaderStore>((set, get) => ({
         type: 'application/epub+zip',
       })
 
+      const { book: bookDoc } = await new DocumentLoader(file).open()
+
       const bookData: BookData = {
         id: bookId,
         book: activeBook,
         file,
+        bookDoc,
       }
 
       set({ loading: false, bookData })
@@ -96,6 +112,7 @@ export const useReaderStore = create<ReaderStore>((set, get) => ({
       set({ loading: false, error: error as Error })
     }
   },
-
+  setView: (view: FoliateView) => set({ view }),
   setOpenDropdown: (dropdown) => set({ openDropdown: dropdown }),
+  setConfig: (config) => set({ config }),
 }))
