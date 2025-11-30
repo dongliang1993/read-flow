@@ -111,65 +111,92 @@ booksRoute.post('/upload', async (c) => {
   try {
     const formData = await c.req.formData()
     const file = formData.get('file') as File
-    const title = formData.get('title') as string
+    const fileName = formData.get('title') as string
     const author = formData.get('author') as string
+    const format = formData.get('format') as string
+    const fileSize = formData.get('fileSize') as string
+    const coverFile = formData.get('cover') as File
+    const coverFileName = coverFile?.name
+    const language = formData.get('language') as string
 
     if (!file) {
       return c.json({ error: 'File is required' }, 400)
     }
 
-    if (!title) {
+    if (!fileName) {
       return c.json({ error: 'Title is required' }, 400)
     }
 
-    // 🔧 修复：生成安全的文件名（只使用 .epub 扩展名）
-    const timestamp = Date.now()
-    const randomStr = Math.random().toString(36).substring(2, 8)
-    const safeFileName = `${timestamp}-${randomStr}.epub`
-
-    console.log('📦 生成安全文件名:', safeFileName)
+    console.log('📦 文件名:', fileName)
 
     const fileBuffer = await file.arrayBuffer()
+    const coverFileBuffer = await coverFile.arrayBuffer()
 
     console.log('📦 准备上传到 Supabase Storage:', {
-      fileName: safeFileName,
+      fileName,
       bufferSize: fileBuffer.byteLength,
       bucket: 'books',
     })
 
-    const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
-      .from('books')
-      .upload(safeFileName, fileBuffer, {
-        contentType: 'application/epub+zip',
-        cacheControl: '3600',
-        upsert: false,
-      })
+    const uploadResults = await Promise.allSettled(
+      [
+        supabaseAdmin.storage.from('books').upload(fileName, fileBuffer, {
+          contentType: 'application/epub+zip',
+          cacheControl: '3600',
+          upsert: false,
+        }),
+        coverFileBuffer
+          ? supabaseAdmin.storage
+              .from('book-cover')
+              .upload(coverFileName, coverFileBuffer, {
+                cacheControl: '3600',
+                upsert: false,
+              })
+          : null,
+      ].filter(Boolean)
+    )
 
-    if (uploadError) {
-      console.error('Upload error:', uploadError)
+    const [bookUploadResult, coverUploadResult] = uploadResults
+
+    if (bookUploadResult.status === 'rejected') {
+      console.error('Upload error:', bookUploadResult.reason)
+      return c.json({ error: 'Failed to upload file' }, 500)
+    }
+
+    if (coverUploadResult.status === 'rejected') {
+      console.error('Upload error:', coverUploadResult.reason)
       return c.json({ error: 'Failed to upload file' }, 500)
     }
 
     const {
       data: { publicUrl },
-    } = supabaseAdmin.storage.from('books').getPublicUrl(safeFileName)
+    } = supabaseAdmin.storage.from('books').getPublicUrl(fileName)
+    const { data: coverPublicUrl } = supabaseAdmin.storage
+      .from('book-cover')
+      .getPublicUrl(fileName)
 
     const [newBook] = await db
       .insert(books)
       .values({
-        title,
+        title: fileName,
         author: author || null,
-        filePath: uploadData.path,
-        coverUrl: null,
+        filePath: bookUploadResult.value?.data?.path,
+        coverUrl: coverUploadResult.value?.data?.path,
         fileSize: file.size,
         status: 'unread',
+        format: format,
+        language: language || null,
+        coverPath: coverUploadResult.value?.data?.path,
       })
       .returning()
 
     return c.json(
       {
-        book: newBook,
-        fileUrl: publicUrl,
+        book: {
+          ...newBook,
+          fileUrl: publicUrl,
+          coverUrl: coverPublicUrl,
+        },
       },
       201
     )

@@ -27,6 +27,9 @@ export const books = pgTable('books', {
   status: text('status').default('unread'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  format: text('format').notNull(),
+  language: text('language'),
+  coverPath: text('cover_path'),
 })
 
 export const readingProgress = pgTable('reading_progress', {

@@ -8,4 +8,5 @@ export type {
   MessageContent,
   Annotation,
   NewAnnotation,
+  BookFormat,
 } from './book'

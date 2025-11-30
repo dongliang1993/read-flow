@@ -1,5 +1,7 @@
-import { env } from '../../config/env'
-import type { Book } from '@read-flow/types'
+import { env } from '@/config/env'
+import { DocumentLoader } from '@/lib/document'
+
+import type { Book, BookFormat } from '@read-flow/types'
 import type { SystemSettings } from '@/types/settings'
 import type { BookConfig } from '@/types/book'
 
@@ -17,7 +19,57 @@ export interface BookResponse {
 
 export interface UploadBookResponse {
   book: Book
-  fileUrl: string
+}
+
+export const getFileExtension = (fileName: string) => {
+  return fileName.split('.').pop()?.toLowerCase()
+}
+
+function getFileMimeType(fileName: string): string {
+  const ext = getFileExtension(fileName)
+  switch (ext) {
+    case 'epub':
+      return 'application/epub+zip'
+    case 'pdf':
+      return 'application/pdf'
+    case 'mobi':
+      return 'application/x-mobipocket-ebook'
+    case 'cbz':
+      return 'application/vnd.comicbook+zip'
+    case 'fb2':
+      return 'application/x-fictionbook+xml'
+    case 'fbz':
+      return 'application/x-zip-compressed-fb2'
+    default:
+      return 'application/octet-stream'
+  }
+}
+
+export async function parseEpubFile(fileData: ArrayBuffer, fileName: string) {
+  const file = new File([fileData], fileName, {
+    type: getFileMimeType(fileName),
+  })
+  const loader = new DocumentLoader(file)
+  const { book } = await loader.open()
+
+  return book
+}
+
+function getBookFormat(fileName: string): BookFormat {
+  const ext = getFileExtension(fileName)
+
+  switch (ext) {
+    case 'epub':
+      return 'EPUB'
+    case 'pdf':
+      return 'PDF'
+    case 'mobi':
+      return 'MOBI'
+    case 'azw3':
+      return 'AZW3'
+    default:
+      return 'EPUB'
+  }
 }
 
 export const booksApi = {
@@ -37,16 +89,46 @@ export const booksApi = {
     return response.json()
   },
 
-  async upload(
-    file: File,
-    title: string,
-    author?: string
-  ): Promise<UploadBookResponse> {
+  async uploadBook(file: File): Promise<UploadBookResponse> {
+    const format: BookFormat = getBookFormat(file.name)
+
+    debugger
+    if (!['EPUB', 'PDF', 'MOBI', 'AZW3', 'AZW'].includes(format)) {
+      throw new Error(`不支持的文件格式: ${format}`)
+    }
+
+    const timestamp = Date.now()
+    const randomStr = Math.random().toString(36).substring(2, 8)
+    const tempFileName = `${timestamp}-${randomStr}.${format.toLowerCase()}`
+    const coverFileName = `${timestamp}-${randomStr}-cover.jpg`
     const formData = new FormData()
+    const fileData = await file.arrayBuffer()
+    const author = 'Unknown'
+    let coverTempFile: File | null = null
+
+    if (format === 'EPUB' || format === 'AZW3') {
+      try {
+        // 需要提取出来封面，一起上传
+        const bookDoc = await parseEpubFile(fileData, file.name)
+        const coverBlob = await bookDoc.getCover()
+        const coverArrayBuffer = (await coverBlob?.arrayBuffer()) || null
+
+        if (coverArrayBuffer) {
+          coverTempFile = new File([coverArrayBuffer], coverFileName)
+        }
+      } catch (error) {
+        console.error('Failed to parse epub file:', error)
+      }
+    }
+
     formData.append('file', file)
-    formData.append('title', title)
-    if (author) {
-      formData.append('author', author)
+    formData.append('title', tempFileName)
+    formData.append('format', format)
+    formData.append('fileSize', file.size.toString())
+    formData.append('author', author)
+
+    if (coverTempFile) {
+      formData.append('cover', coverTempFile)
     }
 
     const response = await fetch(`${env.apiBaseUrl}/api/v1/books/upload`, {

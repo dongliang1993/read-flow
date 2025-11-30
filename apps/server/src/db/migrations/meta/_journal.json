@@ -15,6 +15,13 @@
       "when": 1763985619488,
       "tag": "0001_next_justice",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1764501568859,
+      "tag": "0002_neat_veda",
+      "breakpoints": true
     }
   ]
 }

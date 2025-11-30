@@ -8,6 +8,9 @@ export interface Book {
   status: string
   createdAt: string
   updatedAt: string
+  format: BookFormat
+  language: string | null
+  coverPath: string | null
 }
 
 export interface NewBook {
@@ -74,3 +77,5 @@ export interface NewAnnotation {
   note?: string | null
   color?: string
 }
+
+export type BookFormat = 'EPUB' | 'PDF' | 'MOBI' | 'AZW3' | 'AZW'

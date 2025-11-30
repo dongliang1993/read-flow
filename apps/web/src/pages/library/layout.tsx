@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import { Upload, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useUploadBook } from '@/hooks/use-books'
+import { useBookUpload } from '@/hooks/use-book-upload'
 
 export function LibraryLayout() {
   const [isUploadOpen, setIsUploadOpen] = useState(false)
@@ -10,7 +10,7 @@ export function LibraryLayout() {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
 
-  const uploadMutation = useUploadBook()
+  const { triggerFileSelect } = useBookUpload()
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0]
@@ -43,7 +43,8 @@ export function LibraryLayout() {
         <div className='max-w-7xl mx-auto px-4 py-2 flex justify-end'>
           <Button
             size='sm'
-            onClick={() => setIsUploadOpen(true)}
+            onClick={triggerFileSelect}
+            // onClick={() => setIsUploadOpen(true)}
             className='flex items-center gap-2'
           >
             <Upload className='h-4 w-4' />
