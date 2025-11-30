@@ -168,8 +168,8 @@ export interface BookProgress {
   sectionId: number
   sectionHref: string
   sectionLabel: string
-  pageinfo: PageInfo
-  timeinfo: TimeInfo
+  pageInfo: PageInfo
+  timeInfo: TimeInfo
   range: Range
 }
 

@@ -24,8 +24,8 @@ export interface ProgressData {
   sectionLabel: string
   sectionId: number
   section: number
-  pageinfo: any
-  timeinfo: any
+  pageInfo: any
+  timeInfo: any
   range: any
 }
 
@@ -112,8 +112,8 @@ export class FoliateViewerManager {
         sectionLabel: detail.tocItem?.label || '',
         sectionId: detail.tocItem?.id ?? 0,
         section: detail.section,
-        pageinfo: detail.location,
-        timeinfo: detail.time,
+        pageInfo: detail.location,
+        timeInfo: detail.time,
         range: detail.range,
       },
       this.config.bookId
@@ -197,9 +197,7 @@ export class FoliateViewerManager {
     )
   }
 
-  private handleMessage = (event: MessageEvent) => {
-    console.log('handleMessage', event)
-  }
+  private handleMessage = (event: MessageEvent) => {}
 
   private async setupEventHandlers(): Promise<void> {
     if (!this.view) {

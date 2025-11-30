@@ -67,7 +67,7 @@ export const FooterBar = () => {
   }
 
   const isVertical = globalViewSettings?.vertical
-  const pageInfo = progress?.pageinfo
+  const pageInfo = progress?.pageInfo
 
   const progressContent = useMemo(() => {
     return pageInfo && pageInfo.current >= 0 && pageInfo.total > 0
