@@ -9,8 +9,26 @@ const booksRoute = new Hono()
 booksRoute.get('/', async (c) => {
   try {
     const allBooks = await db.select().from(books)
-    // .orderBy(desc(books.createdAt))
-    return c.json({ books: allBooks })
+    const allBooksWithCovers = [...allBooks]
+
+    for (const book of allBooksWithCovers) {
+      if (!book.coverPath) {
+        continue
+      }
+
+      const { data: signedUrlData, error } = await supabaseAdmin.storage
+        .from('book-cover')
+        .createSignedUrl(book.coverPath || '', 3600)
+
+      if (error || !signedUrlData) {
+        console.error('Failed to create signed URL for cover:', error)
+        continue
+      }
+
+      book.coverUrl = signedUrlData.signedUrl
+    }
+
+    return c.json({ books: allBooksWithCovers })
   } catch (error) {
     console.error('Get books error:', error)
     return c.json({ error: 'Failed to fetch books' }, 500)

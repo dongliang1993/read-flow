@@ -14,8 +14,6 @@ SUPPORTED_FILE_EXTS.forEach((ext) => {
 export const useBookUpload = () => {
   const [isUploading, setIsUploading] = useState(false)
 
-  const [files, setFiles] = useState<File[]>([])
-
   const uploadBooks = useMemoizedFn(async (files: File[]) => {
     try {
       setIsUploading(true)

@@ -1,24 +1,8 @@
 import { BookCard } from './components/book-card'
-import { useBooks } from '@/hooks/use-books'
+import { useLibraryStore } from '@/store/library-store'
 
 export function AllBooks() {
-  const { data: books, isLoading, error } = useBooks()
-
-  if (isLoading) {
-    return (
-      <div className='flex items-center justify-center p-8'>
-        <div className='text-neutral-600'>加载中...</div>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className='flex items-center justify-center p-8'>
-        <div className='text-red-600'>加载失败：{error.message}</div>
-      </div>
-    )
-  }
+  const { books } = useLibraryStore()
 
   return (
     <div className='p-8'>

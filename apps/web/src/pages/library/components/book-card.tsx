@@ -19,13 +19,13 @@ export function BookCard({ book }: BookCardProps) {
 
   return (
     <div className='group relative cursor-pointer' onClick={handleClick}>
-      <div className='relative aspect-[3/4] overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow'>
+      <div className='relative aspect-3/4 overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow'>
         <img
           src={book.coverUrl || '/placeholder-book.jpg'}
           alt={book.title}
           className='w-full h-full object-cover'
         />
-        <div className='absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity'>
+        <div className='absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity'>
           <div className='absolute bottom-0 left-0 right-0 p-4'>
             {book.progress && book.progress > 0 && book.progress < 100 && (
               <div className='text-white text-sm font-medium mb-2'>
