@@ -1,8 +1,14 @@
-import { mockBooks } from '../../data/books'
+import { useMemo } from 'react'
+
 import { BookCard } from './components/book-card'
+import { useLibraryStore } from '@/store/library-store'
 
 export function Finished() {
-  const finishedBooks = mockBooks.filter((book) => book.status === 'finished')
+  const { books } = useLibraryStore()
+  const finishedBooks = useMemo(
+    () => books.filter((book) => book.status === 'finished'),
+    [books]
+  )
 
   return (
     <div className='p-8'>

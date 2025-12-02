@@ -1,3 +1,4 @@
+export type BookStatus = 'reading' | 'finished' | 'unread'
 export interface Book {
   id: number
   title: string
@@ -5,7 +6,7 @@ export interface Book {
   coverUrl: string | null
   filePath: string | null
   fileSize: number | null
-  status: string
+  status: BookStatus
   createdAt: string
   updatedAt: string
   format: BookFormat

@@ -9,4 +9,5 @@ export type {
   Annotation,
   NewAnnotation,
   BookFormat,
+  BookStatus,
 } from './book'
