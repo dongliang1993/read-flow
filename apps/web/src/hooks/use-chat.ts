@@ -1,6 +1,6 @@
 import { useChat as useAIChat } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai'
-import { useCallback, useState, useEffect } from 'react'
+import { useCallback, useState, useEffect, useRef } from 'react'
 import { useMemoizedFn } from 'ahooks'
 import { env } from '@/config/env'
 
@@ -20,19 +20,28 @@ export const useChat = (options: UseChatOptions) => {
   const { activeBookId } = chatContext
 
   const [input, setInput] = useState('')
+  const contextRef = useRef<string | null>(null)
 
-  const buildMessageParts = useCallback((question: string) => {
-    const parts: any[] = []
+  const buildMessageParts = useCallback(
+    (question: string, context?: string) => {
+      const parts: any[] = []
 
-    if (question.trim()) {
-      parts.push({
-        type: 'text',
-        text: question.trim(),
-      })
-    }
+      if (context) {
+        parts.push({
+          type: 'text',
+          text: `以下是当前章节的内容：\n\n${context}\n\n---\n\n用户问题：${question.trim()}`,
+        })
+      } else if (question.trim()) {
+        parts.push({
+          type: 'text',
+          text: question.trim(),
+        })
+      }
 
-    return parts
-  }, [])
+      return parts
+    },
+    []
+  )
 
   const { messages, status, error, stop, sendMessage, setMessages } = useAIChat(
     {
@@ -54,43 +63,46 @@ export const useChat = (options: UseChatOptions) => {
     }
   )
 
-  const handleSubmit = useMemoizedFn(async (outInput: string) => {
-    if (status !== 'ready') {
-      return
+  const handleSubmit = useMemoizedFn(
+    async (outInput: string, context?: string) => {
+      if (status !== 'ready') {
+        return
+      }
+
+      const trimmedInput = (outInput || input).trim()
+      const messageParts = buildMessageParts(trimmedInput, context)
+
+      try {
+        setInput('')
+        contextRef.current = null
+        await sendMessage({ parts: messageParts })
+
+        setMessages((prev) => {
+          if (!Array.isArray(prev) || prev.length === 0) {
+            return prev
+          }
+
+          const nextMessages = [...prev]
+
+          for (let i = nextMessages.length - 1; i >= 0; i--) {
+            const message = nextMessages[i]
+            if (message?.role !== 'user') {
+              continue
+            }
+
+            nextMessages[i] = {
+              ...message,
+              parts: buildMessageParts(trimmedInput),
+              metadata: {},
+            }
+            break
+          }
+
+          return nextMessages
+        })
+      } catch (error) {}
     }
-
-    const trimmedInput = (outInput || input).trim()
-    const messageParts = buildMessageParts(trimmedInput)
-
-    try {
-      setInput('')
-      await sendMessage({ parts: messageParts })
-
-      setMessages((prev) => {
-        if (!Array.isArray(prev) || prev.length === 0) {
-          return prev
-        }
-
-        const nextMessages = [...prev]
-
-        for (let i = nextMessages.length - 1; i >= 0; i--) {
-          const message = nextMessages[i]
-          if (message?.role !== 'user') {
-            continue
-          }
-
-          nextMessages[i] = {
-            ...message,
-            parts: messageParts,
-            metadata: {},
-          }
-          break
-        }
-
-        return nextMessages
-      })
-    } catch (error) {}
-  })
+  )
 
   const initializeThread = useMemoizedFn(async () => {
     if (activeBookId) {

@@ -43,7 +43,7 @@ chat.get('/history/:bookId', async (c) => {
       .orderBy(desc(chatHistory.createdAt))
       .limit(limit)
 
-    return c.json({ messages: convertHistoryToUIMessages(messages) })
+    return c.json({ messages: convertHistoryToUIMessages(messages).reverse() })
   } catch (error) {
     console.error('Get chat history error:', error)
     return c.json({ error: 'Failed to fetch chat history' }, 500)
@@ -64,7 +64,6 @@ chat.post('/', async (c) => {
     }
 
     const validBookId = bookId ? parseInt(bookId) : null
-    debugger
 
     // 从数据库查询之前的消息历史
     let previousMessages: UIMessage[] = []

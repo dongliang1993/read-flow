@@ -95,7 +95,7 @@ export const ChatMessages = ({ messages }: ChatMessagesProps) => {
   }
 
   return (
-    <div className='flex flex-col gap-4 p-4'>
+    <div className='flex flex-col gap-4 p-4 overflow-y-auto'>
       {messages.map((message) => {
         const isAssistant = message.role === 'assistant'
         const messageId = message.id
