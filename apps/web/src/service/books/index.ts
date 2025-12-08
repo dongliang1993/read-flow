@@ -92,7 +92,6 @@ export const booksApi = {
   async uploadBook(file: File): Promise<UploadBookResponse> {
     const format: BookFormat = getBookFormat(file.name)
 
-    debugger
     if (!['EPUB', 'PDF', 'MOBI', 'AZW3', 'AZW'].includes(format)) {
       throw new Error(`不支持的文件格式: ${format}`)
     }
