@@ -9,6 +9,8 @@ import chat from './routes/chat'
 import books from './routes/books'
 import { env } from './config/env'
 
+import { errorHandler } from './middlewares/error-handler'
+
 const app = new Hono()
 
 app.use('/*', cors())
@@ -38,7 +40,7 @@ console.log(`🚀 Server is running on http://localhost:${port}`)
 console.log(`📝 Environment: ${env.nodeEnv}`)
 
 // Error handler
-// app.onError(errorHandler);
+app.onError(errorHandler)
 
 serve({
   fetch: app.fetch,

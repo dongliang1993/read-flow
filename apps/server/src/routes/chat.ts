@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { convertToModelMessages, streamText, UIMessage, ModelMessage } from 'ai'
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
+import { eq, desc } from 'drizzle-orm'
 
 import {
   textToParts,
@@ -11,7 +12,6 @@ import type { UpdateChatMessagesRequest } from '@read-flow/types'
 import { env } from '../config/env'
 import { db } from '../db'
 import { chatHistory } from '../db/schema'
-import { eq, desc } from 'drizzle-orm'
 
 const openai = createOpenAICompatible({
   apiKey: env.openai.apiKey,
@@ -46,12 +46,12 @@ chat.get('/history/:bookId', async (c) => {
 
 /**
  * 保存聊天记录
- * 发送消息
- *
+ * Post /api/v1/chat/messages
+ * Body: UpdateChatMessagesRequest
  */
 chat.post('/', async (c) => {
   try {
-    const body: UpdateChatMessagesRequest = await c.req.json()
+    const body = await c.req.json<UpdateChatMessagesRequest>()
     const { messages, bookId } = body
 
     if (!messages || !Array.isArray(messages)) {
