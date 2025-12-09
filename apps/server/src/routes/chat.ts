@@ -5,7 +5,8 @@ import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
 import {
   textToParts,
   convertHistoryToUIMessages,
-} from '../utils/chat-transformer'
+} from '../lib/chat-transformer'
+import type { UpdateChatMessagesRequest } from '@read-flow/types'
 
 import { env } from '../config/env'
 import { db } from '../db'
@@ -23,13 +24,6 @@ const openai = createOpenAICompatible({
 })
 
 const chat = new Hono()
-
-interface ChatRequest {
-  messages: UIMessage[]
-  bookId?: string
-  context?: string
-  model?: string
-}
 
 chat.get('/history/:bookId', async (c) => {
   try {
@@ -50,9 +44,14 @@ chat.get('/history/:bookId', async (c) => {
   }
 })
 
+/**
+ * 保存聊天记录
+ * 发送消息
+ *
+ */
 chat.post('/', async (c) => {
   try {
-    const body: ChatRequest = await c.req.json()
+    const body: UpdateChatMessagesRequest = await c.req.json()
     const { messages, bookId } = body
 
     if (!messages || !Array.isArray(messages)) {
