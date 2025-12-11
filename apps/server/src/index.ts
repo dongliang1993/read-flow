@@ -9,6 +9,7 @@ import chat from './routes/chat'
 import books from './routes/books'
 import summarize from './routes/summarize'
 import readingSession from './routes/reading-session'
+import readingStats from './routes/reading-stats'
 import { env } from './config/env'
 
 import { errorHandler } from './middlewares/error-handler'
@@ -38,6 +39,7 @@ app.route('/api/v1/chat', chat)
 app.route('/api/v1/books', books)
 app.route('/api/v1/summarize', summarize)
 app.route('/api/v1/reading-session', readingSession)
+app.route('/api/v1/reading-stats', readingStats)
 
 const port = env.port
 console.log(`🚀 Server is running on http://localhost:${port}`)
