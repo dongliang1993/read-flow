@@ -1,6 +1,5 @@
 import { Hono } from 'hono'
 import { convertToModelMessages, streamText, UIMessage, ModelMessage } from 'ai'
-import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
 import { eq, desc } from 'drizzle-orm'
 
 import {
@@ -8,20 +7,11 @@ import {
   convertHistoryToUIMessages,
 } from '../lib/chat-transformer'
 import type { UpdateChatMessagesRequest } from '@read-flow/types'
+import { promptService } from '../services/prompt'
 
-import { env } from '../config/env'
 import { db } from '../db'
 import { chatHistory } from '../db/schema'
-
-const openai = createOpenAICompatible({
-  apiKey: env.openai.apiKey,
-  baseURL: env.openai.baseURL,
-  includeUsage: true,
-  name: 'OpenAI Compatible',
-  headers: {
-    Authorization: `Bearer ${env.openai.apiKey}`,
-  },
-})
+import { modelsService } from '../services/model-service'
 
 const chat = new Hono()
 
@@ -52,7 +42,7 @@ chat.get('/history/:bookId', async (c) => {
 chat.post('/', async (c) => {
   try {
     const body = await c.req.json<UpdateChatMessagesRequest>()
-    const { messages, bookId } = body
+    const { messages, bookId, chatContext } = body
 
     if (!messages || !Array.isArray(messages)) {
       return c.json({ error: 'Messages array is required' }, 400)
@@ -97,8 +87,40 @@ chat.post('/', async (c) => {
       ...currentMessages,
     ]
 
+    if (chatContext?.quickPromptType) {
+      const prompt = await promptService.buildReadingPrompt(chatContext)
+      const messages = currentMessages.slice(-1)
+
+      const result = await streamText({
+        model: modelsService.getModel('openai')('gpt-4'),
+        system: prompt,
+        messages,
+        providerOptions: {
+          store: {
+            store: false,
+            include: ['reasoning.encrypted_content'],
+          },
+        },
+        onFinish: async ({ text }) => {
+          try {
+            await db.insert(chatHistory).values({
+              bookId: validBookId,
+              userId: 'default-user',
+              role: 'assistant',
+              content: textToParts(text),
+            })
+            console.log('✅ AI response saved to database')
+          } catch (error) {
+            console.error('Failed to save AI response:', error)
+          }
+        },
+      })
+
+      return result.toUIMessageStreamResponse()
+    }
+
     const result = await streamText({
-      model: openai(env.openai.model),
+      model: modelsService.getModel('openai')('gpt-4'),
       system:
         'You are a helpful reading assistant for books. Help users understand and analyze the content they are reading.',
       messages: allMessages,

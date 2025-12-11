@@ -55,6 +55,7 @@ export const useFoliateViewer = (
     })
 
     manager.setProgressCallback((progress: ProgressData) => {
+      console.log('progress', progress)
       setProgress(progress)
       setLocation(progress.location)
     })

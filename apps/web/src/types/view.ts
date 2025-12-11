@@ -1,5 +1,6 @@
+import type { BookDoc } from '@/lib/document'
 export interface FoliateView extends HTMLElement {
-  open: (book: any) => Promise<void>
+  open: (book: BookDoc) => Promise<void>
   close: () => void
   init: (options: { lastLocation: string }) => void
   goTo: (href: string) => void
@@ -24,7 +25,7 @@ export interface FoliateView extends HTMLElement {
   setSearchIndicator: (type: string, options: any) => void
   select: (target: string | number | { fraction: number }) => void
   deselect: () => void
-  book: any
+  book: BookDoc
   language: {
     locale?: string
     isCJK?: boolean

@@ -7,6 +7,7 @@ import { cors } from 'hono/cors'
 
 import chat from './routes/chat'
 import books from './routes/books'
+import summarize from './routes/summarize'
 import { env } from './config/env'
 
 import { errorHandler } from './middlewares/error-handler'
@@ -34,6 +35,7 @@ app.get('/api', (c) => {
 
 app.route('/api/v1/chat', chat)
 app.route('/api/v1/books', books)
+app.route('/api/v1/summarize', summarize)
 
 const port = env.port
 console.log(`🚀 Server is running on http://localhost:${port}`)

@@ -65,6 +65,20 @@ export const annotations = pgTable('annotations', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 })
 
+export const chapterSummaries = pgTable('chapter_summaries', {
+  id: serial('id').primaryKey(),
+  bookId: integer('book_id')
+    .references(() => books.id)
+    .notNull(),
+  chapterIndex: integer('chapter_index').notNull(),
+  chapterHref: text('chapter_href').notNull(),
+  chapterTitle: text('chapter_title'),
+  contentHash: text('content_hash').notNull(),
+  summaryType: text('summary_type').notNull().default('brief'),
+  summaryContent: text('summary_content').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+})
+
 export type {
   Book,
   NewBook,

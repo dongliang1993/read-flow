@@ -105,6 +105,7 @@ export class FoliateViewerManager {
 
   private handleRelocate = (event: CustomEvent) => {
     const detail = event.detail
+
     this.onProgressUpdate?.(
       {
         location: detail.cfi,

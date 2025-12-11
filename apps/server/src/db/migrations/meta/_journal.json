@@ -22,6 +22,13 @@
       "when": 1764501568859,
       "tag": "0002_neat_veda",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1765269605230,
+      "tag": "0003_dashing_sentry",
+      "breakpoints": true
     }
   ]
 }

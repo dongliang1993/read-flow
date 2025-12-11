@@ -7,17 +7,19 @@ import {
   Pencil,
 } from 'lucide-react'
 
+import type { QuickPromptType } from '@read-flow/types'
+
 const quickActions = [
-  { icon: FileText, label: '总结这一页的内容', needsContext: true },
-  { icon: Lightbulb, label: '解释这个概念', needsContext: true },
+  { icon: FileText, label: '总结这一页的内容', quickPromptType: 'summary' },
+  { icon: Lightbulb, label: '解释这个概念', quickPromptType: 'analysis' },
   { icon: Users, label: '分析作者的观点', needsContext: true },
-  { icon: Search, label: '找出关键信息', needsContext: true },
-  { icon: HelpCircle, label: '提出相关问题', needsContext: true },
-  { icon: Pencil, label: '生成学习笔记', needsContext: true },
+  { icon: Search, label: '找出关键信息', quickPromptType: 'question' },
+  { icon: HelpCircle, label: '提出相关问题', quickPromptType: 'question' },
+  { icon: Pencil, label: '生成学习笔记', quickPromptType: 'note' },
 ]
 
 type QuickActionsProps = {
-  onSelect: (prompt: string, needsContext: boolean) => void
+  onSelect: (prompt: string, quickPromptType: QuickPromptType) => void
 }
 
 export const QuickActions = ({ onSelect }: QuickActionsProps) => {
@@ -40,7 +42,7 @@ export const QuickActions = ({ onSelect }: QuickActionsProps) => {
           {quickActions.map((action) => (
             <button
               key={action.label}
-              onClick={() => onSelect(action.label, action.needsContext)}
+              onClick={() => onSelect(action.label, action.quickPromptType)}
               className='w-full flex items-center gap-3 py-1.5 px-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors text-left group'
             >
               <action.icon className='h-5 w-5 text-neutral-600 dark:text-neutral-400' />

@@ -2,6 +2,8 @@ import { env } from '@/config/env'
 import { DocumentLoader } from '@/lib/document'
 
 import type { Book, BookFormat } from '@read-flow/types'
+
+export * from './book-service'
 import type { SystemSettings } from '@/types/settings'
 import type { BookConfig } from '@/types/book'
 
