@@ -1,16 +1,17 @@
 import { BookOpen, BarChart3, Network } from 'lucide-react'
+import { useMemoizedFn } from 'ahooks'
 
-import { useChat } from '@/hooks/use-chat'
 import { Button } from '@/components/ui/button'
 import { ChatInput } from './chat-input'
 import { ChatMessages } from './chat-messages'
 import { QuickActions } from './quick-actions'
+import { ScrollContainer } from './scroll-container'
+
+import { useChat } from '@/hooks/use-chat'
+import { useReaderStore } from '@/store/reader-store'
 import { createBookService } from '@/service/books/book-service'
 
 import type { QuickPromptType } from '@read-flow/types'
-import { useReaderStore } from '@/store/reader-store'
-
-import { useMemoizedFn } from 'ahooks'
 
 type SideChatProps = {
   bookId: string
@@ -94,7 +95,9 @@ export const SideChat = ({ bookId }: SideChatProps) => {
       {messages.length === 0 ? (
         <QuickActions onSelect={handleQuickPrompt} />
       ) : (
-        <ChatMessages messages={messages} />
+        <ScrollContainer className='relative flex-1' autoScroll>
+          <ChatMessages messages={messages} />
+        </ScrollContainer>
       )}
 
       <div className='py-3'>
