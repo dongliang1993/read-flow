@@ -77,8 +77,6 @@ export const FooterBar = () => {
       : ''
   }, [pageInfo])
 
-  console.log('progress', progress)
-
   return (
     <footer className='w-full h-10 pointer-events-auto px-2 flex items-center'>
       <div className='flex w-full items-center justify-between'>

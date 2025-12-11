@@ -79,6 +79,23 @@ export const chapterSummaries = pgTable('chapter_summaries', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 })
 
+export const readingSessions = pgTable('reading_sessions', {
+  id: serial('id').primaryKey(),
+  bookId: integer('book_id')
+    .references(() => books.id, { onDelete: 'cascade' })
+    .notNull(),
+  userId: text('user_id').notNull().default('default-user'),
+  startedAt: timestamp('started_at', { withTimezone: true }).notNull(),
+  endedAt: timestamp('ended_at', { withTimezone: true }),
+  durationSeconds: integer('duration_seconds').notNull().default(0),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+})
+
 export type {
   Book,
   NewBook,

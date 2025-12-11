@@ -31,3 +31,37 @@ export interface CreateChapterSummaryRequest {
   contentHash: string
   summaryType?: 'brief' | 'detailed'
 }
+
+export type ReadingSession = {
+  id: number
+  bookId: string
+  startedAt: number
+  endedAt?: number
+  durationSeconds: number
+  createdAt: number
+  updatedAt: number
+}
+
+export type CreateReadingSessionRequest = {
+  bookId: string
+  startedAt: number
+}
+
+// 会话状态枚举
+export enum SessionState {
+  ACTIVE = 'active', // 正在阅读
+  PAUSED = 'paused', // 暂停（失焦/长时间无活动）
+  STOPPED = 'stopped', // 已结束
+}
+
+// 会话统计数据
+export interface SessionStats {
+  totalActiveTime: number // 总活跃时间（毫秒）
+  sessionStartTime: number // 会话开始时间
+  lastActivityTime: number // 最后活动时间
+  currentState: SessionState // 当前状态
+}
+
+export interface UpdateReadingSessionRequest {
+  durationSeconds: number
+}

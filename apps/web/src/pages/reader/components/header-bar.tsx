@@ -2,20 +2,19 @@ import { ArrowLeft } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'
-import SettingsDropdown from './settings-dropdown'
+import { SettingsDropdown } from './settings-dropdown'
 import { TOCViewDropdown } from './toc-view'
+
 import { useReaderStore } from '@/store/reader-store'
 
-type HeaderBarProps = {}
-
-const HeaderBar = ({}: HeaderBarProps) => {
+const HeaderBar = () => {
   const navigate = useNavigate()
   const bookData = useReaderStore((state) => state.bookData)
 
   return (
     <header className='w-full shrink-0 px-4 py-1'>
       <div className='flex items-center justify-between'>
-        {/* 目录按钮 */}
+        {/* 操作按钮区 */}
         <div className='flex items-center gap-1'>
           <Button
             variant='ghost'

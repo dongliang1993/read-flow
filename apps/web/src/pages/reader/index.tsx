@@ -7,9 +7,10 @@ import { Card, CardDescription, CardHeader } from '@/components/ui/card'
 import { Reader } from './components/reader'
 import { SideChat } from './components/side-chat'
 import { useReaderStore } from '@/store/reader-store'
+import { useReadingSession } from './hooks/use-reading-session'
 
 const DEFAULT_SIZE = {
-  width: 370,
+  width: 400,
   height: '100%',
 }
 
@@ -25,9 +26,9 @@ const RESIZE_ENABLE = {
 }
 
 export const ReaderLayout = () => {
-  const [isChatVisible, setIsChatVisible] = useState(true)
+  const [isChatVisible] = useState(true)
   const [showOverlay, setShowOverlay] = useState(false)
-  const { bookId } = useParams<{ bookId: string }>()
+  const { bookId = '' } = useParams<{ bookId: string }>()
 
   const { initBook, loading, error, bookData } = useReaderStore(
     useShallow((state) => ({
@@ -37,6 +38,12 @@ export const ReaderLayout = () => {
       bookData: state.bookData,
     }))
   )
+
+  const { currentSession, sessionStats } = useReadingSession(bookId, {
+    onSession: (session, sessionStats) => {
+      console.log('Session:', session, sessionStats)
+    },
+  })
 
   useEffect(() => {
     if (bookId && !bookData) {
@@ -99,6 +106,7 @@ export const ReaderLayout = () => {
   return (
     <div className='flex h-full w-full p-2'>
       <div className='relative flex-1 rounded-md border shadow-around overflow-hidden'>
+        {/* 阅读器 */}
         <Reader bookId={bookData.id} />
 
         {/* 遮罩层 */}

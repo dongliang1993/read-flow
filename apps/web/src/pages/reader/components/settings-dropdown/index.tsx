@@ -16,7 +16,7 @@ const FONT_SIZE_MIN = 12
 const FONT_SIZE_MAX = 32
 const FONT_SIZE_STEP = 2
 
-const SettingsDropdown = () => {
+export const SettingsDropdown = () => {
   const setOpenDropdown = useReaderStore((state) => state.setOpenDropdown)
   const openDropdown = useReaderStore((state) => state.openDropdown)
   const view = useReaderStore((state) => state.view)
@@ -145,5 +145,3 @@ const SettingsDropdown = () => {
     </DropdownMenu>
   )
 }
-
-export default SettingsDropdown
