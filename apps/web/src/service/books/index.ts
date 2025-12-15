@@ -226,7 +226,9 @@ export async function loadBookConfig(
       progress: [bookStatus.progressCurrent, bookStatus.progressTotal],
       location: bookStatus.currentLocation || undefined,
       viewSettings: globalViewSettings,
-      updatedAt: bookStatus.lastReadAt || Date.now(),
+      updatedAt: bookStatus.lastReadAt
+        ? new Date(bookStatus.lastReadAt).getTime()
+        : Date.now(),
     }
   }
 

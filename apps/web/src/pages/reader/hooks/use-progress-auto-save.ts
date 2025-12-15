@@ -1,6 +1,5 @@
-import { useEffect, useCallback } from 'react'
-import { throttle } from 'lodash-es'
-import { useMemoizedFn } from 'ahooks'
+import { useEffect } from 'react'
+import { useMemoizedFn, useThrottleFn } from 'ahooks'
 
 import { useReaderStore } from '@/store/reader-store'
 import { booksApi } from '@/service/books'
@@ -10,6 +9,7 @@ export const useProgressAutoSave = (bookId: string) => {
   const progress = useReaderStore((state) => state.progress)
   const location = useReaderStore((state) => state.location)
 
+  console.log('progress', progress)
   const updateBookProgress = useMemoizedFn(async () => {
     const currentProgress = progress
     if (!currentProgress || !currentProgress.pageInfo || !location) {
@@ -48,20 +48,20 @@ export const useProgressAutoSave = (bookId: string) => {
       }
 
       await booksApi.updateBookStatus(bookId, updateData)
-
-      console.log('updateBookProgress')
     } catch (error) {}
   })
 
-  const saveProgress = useCallback(throttle(updateBookProgress, 5000), [
-    updateBookProgress,
-  ])
+  const { run: saveProgress } = useThrottleFn(updateBookProgress, {
+    wait: 5000,
+  })
 
   useEffect(() => {
     saveProgress()
+  }, [progress, bookId, saveProgress])
 
+  useEffect(() => {
     return () => {
       updateBookProgress()
     }
-  }, [progress, bookId, saveProgress])
+  }, [])
 }

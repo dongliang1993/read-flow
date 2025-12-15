@@ -7,6 +7,7 @@ import { readingProgress } from '../db/schema'
 import type {
   UpdateReadingProgressRequest,
   ReadingProgress,
+  BookStatus,
 } from '@read-flow/types'
 
 const progressRoute = new Hono()

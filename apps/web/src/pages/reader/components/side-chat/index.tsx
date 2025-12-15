@@ -88,10 +88,7 @@ export const SideChat = ({ bookId }: SideChatProps) => {
   )
 
   return (
-    <div
-      id='side-chat'
-      className='flex flex-col h-full overflow-hidden px-3 py-3'
-    >
+    <div id='side-chat' className='flex flex-col h-full overflow-hidden'>
       {messages.length === 0 ? (
         <QuickActions onSelect={handleQuickPrompt} />
       ) : (

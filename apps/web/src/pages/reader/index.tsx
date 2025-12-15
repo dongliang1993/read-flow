@@ -4,12 +4,13 @@ import { useParams } from 'react-router-dom'
 import { useShallow } from 'zustand/react/shallow'
 
 import { Card, CardDescription, CardHeader } from '@/components/ui/card'
+import { Studio } from './components/studio'
 import { Reader } from './components/reader'
 import { SideChat } from './components/side-chat'
 import { useReaderStore } from '@/store/reader-store'
 
 const DEFAULT_SIZE = {
-  width: 400,
+  width: 450,
   height: '100%',
 }
 
@@ -72,8 +73,8 @@ export const ReaderLayout = () => {
     <Resizable
       defaultSize={DEFAULT_SIZE}
       className='h-full'
-      minWidth={320}
-      maxWidth={540}
+      minWidth={420}
+      maxWidth={620}
       enable={RESIZE_ENABLE}
       onResize={() => {
         if (!showOverlay) {
@@ -92,13 +93,21 @@ export const ReaderLayout = () => {
         left: <div className='custom-resize-handle' />,
       }}
     >
-      <SideChat bookId={bookData.id} />
+      <Studio>
+        {(tab) => {
+          return tab === 'chat' ? (
+            <SideChat bookId={bookData.id} />
+          ) : (
+            <div>Notes</div>
+          )
+        }}
+      </Studio>
     </Resizable>
   )
 
   return (
-    <div className='flex h-full w-full p-2'>
-      <div className='relative flex-1 rounded-md border shadow-around overflow-hidden'>
+    <div className='flex h-full w-full p-2 bg-accent'>
+      <div className='relative flex-1 rounded-3xl border shadow-around overflow-hidden'>
         {/* 阅读器 */}
         <Reader bookId={bookData.id} />
 
