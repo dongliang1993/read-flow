@@ -1,13 +1,16 @@
 import type { UIMessage, UIMessagePart } from 'ai'
-import { Bot, User } from 'lucide-react'
+import { Bot } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
+import { cn } from '@/lib/utils'
+
 type ChatMessagesProps = {
   messages: UIMessage[]
+  className?: string
 }
 
-export const ChatMessages = ({ messages }: ChatMessagesProps) => {
+export const ChatMessages = ({ messages, className }: ChatMessagesProps) => {
   const renderMessagePart = (
     part: UIMessagePart<any, any>,
     messageId: string,
@@ -24,7 +27,11 @@ export const ChatMessages = ({ messages }: ChatMessagesProps) => {
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={{
-              p: ({ children }) => <p className='mb-2 last:mb-0'>{children}</p>,
+              p: ({ children }) => (
+                <p className='mb-2 last:mb-0 text-black font-normal'>
+                  {children}
+                </p>
+              ),
               ul: ({ children }) => (
                 <ul className='mb-2 last:mb-0 list-disc pl-4'>{children}</ul>
               ),
@@ -95,18 +102,18 @@ export const ChatMessages = ({ messages }: ChatMessagesProps) => {
   }
 
   return (
-    <div className='flex flex-col gap-4 p-4 overflow-y-auto'>
+    <div className={cn('flex flex-col gap-4 overflow-y-auto', className)}>
       {messages.map((message) => {
         const isAssistant = message.role === 'assistant'
         const messageId = message.id
 
         if (isAssistant) {
           return (
-            <div key={message.id} className='flex gap-3 items-start'>
-              <div className='flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center'>
+            <div key={message.id} className='flex flex-col gap-3 items-start'>
+              <div className='shrink-0 w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center'>
                 <Bot className='w-5 h-5 text-blue-600 dark:text-blue-400' />
               </div>
-              <div className='flex-1 bg-neutral-100 dark:bg-neutral-800 rounded-2xl rounded-tl-sm px-4 py-3 max-w-[85%]'>
+              <div className='flex-1 py-2'>
                 {message.parts.map((part, index) =>
                   renderMessagePart(part, `${messageId}-${index}`, true)
                 )}
@@ -117,13 +124,10 @@ export const ChatMessages = ({ messages }: ChatMessagesProps) => {
 
         return (
           <div key={message.id} className='flex gap-3 items-start justify-end'>
-            <div className='flex-1 bg-blue-600 dark:bg-blue-700 rounded-2xl rounded-tr-sm px-4 py-3 max-w-[85%] ml-auto'>
+            <div className='flex-1 bg-gray-100 rounded-lg rounded-tr-sm px-4 py-3 max-w-[85%] ml-auto'>
               {message.parts.map((part, index) =>
                 renderMessagePart(part, `${messageId}-${index}`, false)
               )}
-            </div>
-            <div className='flex-shrink-0 w-8 h-8 rounded-full bg-neutral-200 dark:bg-neutral-700 flex items-center justify-center'>
-              <User className='w-5 h-5 text-neutral-600 dark:text-neutral-300' />
             </div>
           </div>
         )

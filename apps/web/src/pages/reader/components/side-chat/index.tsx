@@ -88,23 +88,23 @@ export const SideChat = ({ bookId }: SideChatProps) => {
   )
 
   return (
-    <div id='side-chat' className='flex flex-col h-full overflow-hidden'>
+    <div id='side-chat' className='flex flex-col h-full'>
       {messages.length === 0 ? (
         <QuickActions onSelect={handleQuickPrompt} />
       ) : (
-        <ScrollContainer className='relative flex-1' autoScroll>
-          <ChatMessages messages={messages} />
+        <ScrollContainer className='relative flex-1 mx-[-14px]' autoScroll>
+          <ChatMessages className='px-4' messages={messages} />
         </ScrollContainer>
       )}
 
-      <div className='py-3'>
-        <div className='flex gap-2 mb-3'>
+      <div className='my-2.5'>
+        <div className='flex gap-2'>
           {bottomActions.map((action, index) => (
             <Button
               key={index}
               variant='outline'
               size='sm'
-              className='flex-1 gap-2 text-xs'
+              className='flex-1 gap-2 text-xs rounded-3xl'
               onClick={() =>
                 handleQuickPrompt(action.prompt, action.quickPromptType)
               }
