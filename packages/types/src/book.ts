@@ -28,8 +28,10 @@ export interface ReadingProgress {
   bookId: number
   userId: string
   currentLocation: string | null
-  progress: number
+  progressCurrent: number
+  progressTotal: number
   lastReadAt: string
+  status: BookStatus
 }
 
 export interface NewReadingProgress {

@@ -7,7 +7,6 @@ import { Card, CardDescription, CardHeader } from '@/components/ui/card'
 import { Reader } from './components/reader'
 import { SideChat } from './components/side-chat'
 import { useReaderStore } from '@/store/reader-store'
-import { useReadingSession } from './hooks/use-reading-session'
 
 const DEFAULT_SIZE = {
   width: 400,
@@ -38,12 +37,6 @@ export const ReaderLayout = () => {
       bookData: state.bookData,
     }))
   )
-
-  const { currentSession, sessionStats } = useReadingSession(bookId, {
-    onSession: (session, sessionStats) => {
-      console.log('Session:', session, sessionStats)
-    },
-  })
 
   useEffect(() => {
     if (bookId && !bookData) {

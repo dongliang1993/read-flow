@@ -6,6 +6,10 @@ import type { Book, BookFormat } from '@read-flow/types'
 export * from './book-service'
 import type { SystemSettings } from '@/types/settings'
 import type { BookConfig } from '@/types/book'
+import type {
+  ReadingProgress,
+  UpdateReadingProgressRequest,
+} from '@read-flow/types'
 
 export type BookInfoWithUrl = Book & {
   fileUrl: string
@@ -175,6 +179,38 @@ export const booksApi = {
 
     return response.json()
   },
+
+  async getBookStatus(id: string): Promise<ReadingProgress> {
+    const response = await fetch(
+      `${env.apiBaseUrl}/api/v1/progress/${id}/status`
+    )
+
+    if (!response.ok) {
+      throw new Error('Failed to get book status')
+    }
+
+    const data = await response.json()
+    return data.progress as ReadingProgress
+  },
+
+  async updateBookStatus(
+    id: string,
+    data: UpdateReadingProgressRequest
+  ): Promise<void> {
+    const response = await fetch(
+      `${env.apiBaseUrl}/api/v1/progress/${id}/progress`,
+      {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      }
+    )
+
+    if (!response.ok) {
+      throw new Error('Failed to update book status')
+    }
+
+    return response.json()
+  },
 }
 
 export async function loadBookConfig(
@@ -182,6 +218,17 @@ export async function loadBookConfig(
   settings: SystemSettings
 ): Promise<BookConfig> {
   const { globalViewSettings } = settings
+
+  const bookStatus = await booksApi.getBookStatus(bookId)
+
+  if (bookStatus) {
+    return {
+      progress: [bookStatus.progressCurrent, bookStatus.progressTotal],
+      location: bookStatus.currentLocation || undefined,
+      viewSettings: globalViewSettings,
+      updatedAt: bookStatus.lastReadAt || Date.now(),
+    }
+  }
 
   return {
     viewSettings: globalViewSettings,

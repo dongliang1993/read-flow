@@ -1,4 +1,5 @@
 import type { UIMessage } from 'ai'
+import type { BookStatus } from './book'
 
 export type QuickPromptType =
   | 'summary'
@@ -64,4 +65,13 @@ export interface SessionStats {
 
 export interface UpdateReadingSessionRequest {
   durationSeconds: number
+}
+
+export type UpdateReadingProgressRequest = {
+  userId: string
+  status: BookStatus
+  progressCurrent: number
+  progressTotal: number
+  location: string
+  lastReadAt: number
 }

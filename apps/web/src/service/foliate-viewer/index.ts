@@ -241,7 +241,13 @@ export class FoliateViewerManager {
   private async navigateToInitialPosition(): Promise<void> {
     if (!this.view) return
 
-    await this.view.goToFraction(0)
+    const { config } = this.config
+
+    if (config.location) {
+      await this.view.init({ lastLocation: config.location })
+    } else {
+      await this.view.goToFraction(0)
+    }
   }
 
   getView(): FoliateView | null {

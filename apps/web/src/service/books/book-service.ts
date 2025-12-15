@@ -55,7 +55,13 @@ function smartTruncate(content: string, maxLength: number = 8000): string {
 
 export class BookService {
   private bookDoc: BookDoc
-  private sectionMap: Map<string, SectionItem> | null = null
+  private sectionMap: Map<
+    string,
+    SectionItem & {
+      content: string
+      contentHash: string
+    }
+  > | null = null
 
   constructor(bookDoc: BookDoc) {
     this.bookDoc = bookDoc
@@ -106,34 +112,88 @@ export class BookService {
   }
 
   // 懒加载创建 Map
-  private getSectionMap(): Map<string, SectionItem> {
+  private getSectionMap(): Map<
+    string,
+    SectionItem & { content: string; contentHash: string }
+  > {
     if (!this.sectionMap) {
       const sections = this.getSections()
-      this.sectionMap = new Map(sections.map((s) => [s.id, s]))
+      this.sectionMap = new Map(
+        sections.map((s) => [s.id, { ...s, content: '', contentHash: '' }])
+      )
     }
+
     return this.sectionMap
   }
 
   async getChapterContent(sectionHref: string): Promise<ChapterContent | null> {
-    const sectionMap = this.getSectionMap()
-    const section = sectionMap.get(sectionHref)
-
-    if (!section) {
-      return null
-    }
-
     try {
-      // @ts-ignore - createDocument exists on section
-      const doc = await section.createDocument()
-      const content = doc?.body?.innerText || ''
-      const contentHash = await hashContent(content)
-
+      const sections = this.getSections()
       const toc = this.getTOC()
+      const sectionMap = this.getSectionMap()
+      const section = sectionMap.get(sectionHref)
+
+      if (!section) {
+        return null
+      }
+
+      // 如果有缓存，直接使用
+      if (section.content && section.contentHash) {
+        const tocItem = this.findTocItemByHref(toc, section.id)
+
+        return {
+          href: section.id,
+          title: tocItem?.label || '',
+          content: section.content,
+          contentHash: section.contentHash,
+        }
+      }
+
+      // 找到当前 section 的索引
+      const startIndex = sections.findIndex((s) => s.id === sectionHref)
+      if (startIndex === -1) {
+        return null
+      }
+
+      // 找出所有 TOC 项对应的 section id（作为边界）
+      const tocHrefs = new Set(
+        this.flattenToc(toc).map((item) => {
+          const [baseHref] = this.bookDoc.splitTOCHref(item.href)
+          return baseHref
+        })
+      )
+
+      // 从 startIndex 开始，收集内容直到遇到下一个 TOC 边界
+      let content = ''
+      for (let i = startIndex; i < sections.length; i++) {
+        const section = sections[i]
+
+        // 如果是下一个 TOC 项的开始，停止
+        if (i > startIndex && tocHrefs.has(section.id)) {
+          break
+        }
+
+        // @ts-ignore
+        const doc = await section.createDocument()
+        content += (doc?.body?.innerText || '') + '\n'
+      }
+
+      const contentHash = await hashContent(content)
       const tocItem = this.findTocItemByHref(toc, section.id)
+
+      // 更新 sectionMap
+      for (let i = startIndex; i < sections.length; i++) {
+        const section = sections[i]
+        sectionMap.set(section.id, {
+          ...section,
+          content,
+          contentHash,
+        })
+      }
 
       return {
         href: section.id,
-        title: tocItem?.label,
+        title: tocItem?.label || '',
         content,
         contentHash,
       }
@@ -198,6 +258,18 @@ export class BookService {
   findSectionIndexByTocItem(tocItem: TOCItem): number {
     const [href] = this.bookDoc.splitTOCHref(tocItem.href)
     return this.findSectionIndexByHref(href)
+  }
+
+  // 辅助方法：扁平化 TOC
+  private flattenToc(items: TOCItem[]): TOCItem[] {
+    const result: TOCItem[] = []
+    for (const item of items) {
+      result.push(item)
+      if (item.subitems) {
+        result.push(...this.flattenToc(item.subitems))
+      }
+    }
+    return result
   }
 }
 

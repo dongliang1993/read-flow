@@ -202,6 +202,9 @@ export interface BookSearchResult {
 
 export interface BookConfig {
   viewSettings?: Partial<ViewSettings>
+  progress?: [number, number]
+  location?: string
+  updatedAt?: number
 }
 
 export interface BookDataRecord {

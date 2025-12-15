@@ -39,7 +39,9 @@ export const readingProgress = pgTable('reading_progress', {
     .notNull(),
   userId: text('user_id').notNull(),
   currentLocation: text('current_location'),
-  progress: integer('progress').default(0),
+  progressCurrent: integer('progress_current').default(0),
+  progressTotal: integer('progress_total').default(0),
+  status: text('status').default('unread'),
   lastReadAt: timestamp('last_read_at').defaultNow().notNull(),
 })
 

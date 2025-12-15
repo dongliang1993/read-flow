@@ -1,12 +1,21 @@
 import HeaderBar from './header-bar'
 import { ReadContent } from './read-content'
 import { FooterBar } from './foot-bar'
+import { useProgressAutoSave } from '../hooks/use-progress-auto-save'
+// import { useReadingSession } from '../hooks/use-reading-session'
 
 type ReaderProps = {
   bookId: string
 }
 
 export function Reader({ bookId }: ReaderProps) {
+  useProgressAutoSave(bookId)
+  // const { currentSession, sessionStats } = useReadingSession(bookId, {
+  //   onSession: (session, sessionStats) => {
+  //     console.log('Session:', session, sessionStats)
+  //   },
+  // })
+
   return (
     <div
       id={`reader-${bookId}`}
