@@ -1,6 +1,7 @@
 import HeaderBar from './header-bar'
 import { ReadContent } from './read-content'
 import { FooterBar } from './foot-bar'
+import { Annotator } from './annotator'
 import { useProgressAutoSave } from '../hooks/use-progress-auto-save'
 // import { useReadingSession } from '../hooks/use-reading-session'
 
@@ -24,6 +25,7 @@ export function Reader({ bookId }: ReaderProps) {
       <HeaderBar />
       <ReadContent />
       <FooterBar />
+      <Annotator />
     </div>
   )
 }

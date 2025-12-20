@@ -34,8 +34,6 @@ export const ReadContent = () => {
     return null
   }
 
-  console.log('[ReaderContent] Rendering foliate viewer for bookId:', bookData)
-
   return (
     <div
       ref={foliateViewer.containerRef}

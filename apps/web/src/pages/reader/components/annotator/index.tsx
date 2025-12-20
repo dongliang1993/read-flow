@@ -1,0 +1,63 @@
+import { useMemo, useEffect } from 'react'
+import 'tippy.js/dist/tippy.css'
+import 'tippy.js/themes/light-border.css'
+
+import { useAnnotator } from '../../hooks/use-annotator'
+import { useTextSelector } from '../../hooks/use-text-selector'
+import { useFoliateEvents } from '../../hooks/use-foliate-events'
+import { AnnotatorPopup, type PopupButtonProps } from './annotator-popup'
+import { useReaderStore } from '@/store/reader-store'
+import { PickIcon } from '@/components/icon/pick'
+
+export const Annotator = () => {
+  const view = useReaderStore((state) => state.view)
+  const bookId = useReaderStore((state) => state.bookData)?.id!
+
+  const { setSelection, selection, showTippy, handleDismissPopup } =
+    useAnnotator(bookId)
+
+  const { handleScroll, handleMouseUp } = useTextSelector(
+    bookId,
+    setSelection,
+    handleDismissPopup
+  )
+
+  const buttons: PopupButtonProps[] = [
+    {
+      label: '摘录',
+      key: 'pick',
+      icon: <PickIcon size={16} />,
+      onClick: () => {
+        console.log('摘录')
+      },
+    },
+  ]
+
+  const handlers = useMemo(
+    () => ({
+      onLoad: (event: Event) => {
+        const detail = (event as CustomEvent).detail
+        const { doc, index } = detail
+
+        view?.renderer?.addEventListener('scroll', handleScroll)
+
+        if (detail.doc) {
+          detail.doc.addEventListener('mouseup', () => {
+            handleMouseUp(doc, index)
+          })
+        }
+      },
+    }),
+    [view, handleScroll]
+  )
+
+  useFoliateEvents(view, handlers)
+
+  useEffect(() => {
+    if (selection) {
+      showTippy(selection.range, <AnnotatorPopup buttons={buttons} />)
+    }
+  }, [selection])
+
+  return <div id='chat-select-pop' className='fixed'></div>
+}
