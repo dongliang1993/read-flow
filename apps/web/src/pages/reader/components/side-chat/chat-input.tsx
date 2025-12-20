@@ -46,6 +46,8 @@ export const ChatInput = ({
     }
   })
 
+  const disabled = value.trim() === ''
+
   return (
     <div className='relative border rounded-md'>
       <Textarea
@@ -57,14 +59,15 @@ export const ChatInput = ({
         autoCorrect='off'
         autoCapitalize='off'
         placeholder='Ask anything'
-        className='border-none outline-none text-primary focus-visible:ring-0 focus-visible:ring-offset-0 max-h-50 pb-10'
+        className='border-none outline-none text-primary focus-visible:ring-0 focus-visible:ring-offset-0 h-30 max-h-60 pb-10 resize-none'
         rows={1}
       />
       <div className='absolute bottom-2 right-0 w-full flex justify-end px-2'>
         <Button
           type='submit'
           size='icon'
-          className='size-7'
+          className='size-7 cursor-pointer rounded-full'
+          disabled={disabled}
           onClick={handleSubmit}
         >
           {status === 'ready' ? (

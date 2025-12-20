@@ -1,26 +1,12 @@
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import {
-  Library,
-  LayoutDashboard,
-  Home,
-  Clock,
-  CheckCircle2,
-} from 'lucide-react'
+import { Library, LayoutDashboard, Clock, CheckCircle2 } from 'lucide-react'
 import { Resizable } from 're-resizable'
-import { cn } from '../../lib/utils'
+
+import { cn } from '@/lib/utils'
 
 export function Sidebar() {
   const [width, setWidth] = useState(260)
-  const navItems = [
-    {
-      title: '主页',
-      href: '/',
-      icon: Home,
-      exact: true,
-    },
-  ]
-
   const librarySection = {
     title: '书库',
     items: [
@@ -78,26 +64,7 @@ export function Sidebar() {
       {/* Navigation */}
       <nav className='flex-1 p-3 space-y-1 overflow-y-auto'>
         {/* Main Nav */}
-        <div className='space-y-1 mb-4'>
-          {navItems.map((item) => (
-            <NavLink
-              key={item.href}
-              to={item.href}
-              end={item.exact}
-              className={({ isActive }) =>
-                cn(
-                  'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-                  isActive
-                    ? 'bg-neutral-200 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100'
-                    : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200/50 dark:hover:bg-neutral-800/50 hover:text-neutral-900 dark:hover:text-neutral-100'
-                )
-              }
-            >
-              <item.icon className='h-5 w-5' />
-              {item.title}
-            </NavLink>
-          ))}
-        </div>
+        <div className='space-y-1 mb-4'></div>
 
         {/* Library Section */}
         <div className='space-y-1 mb-4'>

@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Layout } from './components/layout/layout'
-import { Home } from './pages/home'
 import { Dashboard } from './pages/dashboard'
 import { LibraryLayout } from './pages/library'
 import { AllBooks } from './pages/library/all-books'
@@ -15,14 +14,13 @@ function App() {
       <Routes>
         <Route path='/reader/:bookId' element={<ReaderLayout />} />
         <Route path='/' element={<Layout />}>
-          <Route index element={<Home />} />
-          <Route path='dashboard' element={<Dashboard />} />
           <Route path='library' element={<LibraryLayout />}>
             <Route path='all' element={<AllBooks />} />
             <Route path='reading' element={<Reading />} />
             <Route path='finished' element={<Finished />} />
             <Route index element={<Navigate to='/library/all' replace />} />
           </Route>
+          <Route path='dashboard' element={<Dashboard />} />
           <Route path='*' element={<Navigate to='/' replace />} />
         </Route>
       </Routes>

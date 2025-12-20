@@ -89,6 +89,9 @@ export const SideChat = ({ bookId }: SideChatProps) => {
 
   return (
     <div id='side-chat' className='flex flex-col h-full'>
+      <div className='flex items-center justify-between h-6'>
+        <h2 className='text-sm font-medium'>对话</h2>
+      </div>
       {messages.length === 0 ? (
         <QuickActions onSelect={handleQuickPrompt} />
       ) : (

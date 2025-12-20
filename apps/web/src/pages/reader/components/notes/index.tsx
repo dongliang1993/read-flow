@@ -16,7 +16,7 @@ export const Notes = ({ bookId }: NotesProps) => {
   return (
     <div className='flex h-full flex-col'>
       {/* 头部 */}
-      <div className='flex items-center justify-between'>
+      <div className='flex items-center justify-between h-6'>
         <h2 className='text-sm font-medium'>摘录</h2>
         <div className='flex items-center gap-2'>
           <Button className='size-7 cursor-pointer' variant='ghost' size='icon'>
