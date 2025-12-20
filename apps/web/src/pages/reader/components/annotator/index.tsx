@@ -1,6 +1,5 @@
 import { useMemo, useEffect } from 'react'
-import 'tippy.js/dist/tippy.css'
-import 'tippy.js/themes/light-border.css'
+import { BotMessageSquare, Copy } from 'lucide-react'
 
 import { useAnnotator } from '../../hooks/use-annotator'
 import { useTextSelector } from '../../hooks/use-text-selector'
@@ -26,9 +25,26 @@ export const Annotator = () => {
     {
       label: '摘录',
       key: 'pick',
-      icon: <PickIcon size={16} />,
+      icon: <PickIcon size={16} className='text-black' />,
       onClick: () => {
         console.log('摘录')
+      },
+    },
+    {
+      label: '复制',
+      key: 'copy',
+      icon: <Copy size={16} className='text-black' />,
+      onClick: () => {
+        console.log('注释')
+      },
+    },
+    {
+      label: 'Chat with AI',
+      key: 'delete',
+      icon: <BotMessageSquare size={16} className='text-black' />,
+      dividerBefore: true,
+      onClick: () => {
+        console.log('删除')
       },
     },
   ]

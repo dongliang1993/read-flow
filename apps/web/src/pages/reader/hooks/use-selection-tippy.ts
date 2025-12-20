@@ -4,7 +4,6 @@ import tippy, { Instance as TippyInstance } from 'tippy.js'
 import { useMemoizedFn } from 'ahooks'
 import { createRoot } from 'react-dom/client'
 import type { Root } from 'react-dom/client'
-import 'tippy.js/dist/tippy.css'
 
 export const useSelectionTippy = () => {
   const tippyRef = useRef<TippyInstance | null>(null)
@@ -30,6 +29,8 @@ export const useSelectionTippy = () => {
     hideTippy()
 
     const container = document.createElement('div')
+    container.className =
+      'flex items-center h-8 px-3 border rounded-full shadow-md bg-card'
     rootRef.current = createRoot(container)
     rootRef.current.render(content)
 
@@ -68,7 +69,6 @@ export const useSelectionTippy = () => {
       trigger: 'manual',
       placement: 'top',
       arrow: false,
-      theme: 'light-border',
       onHide: () => {
         setSelection(null)
       },

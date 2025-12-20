@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import {
   Tooltip,
   TooltipContent,
@@ -11,6 +10,7 @@ export type PopupButtonProps = {
   label: string
   icon: React.ReactNode
   onClick: () => void
+  dividerBefore?: boolean
 }
 
 type AnnotatorPopupProps = {
@@ -22,9 +22,9 @@ export const PopupButton = ({ label, icon, onClick }: PopupButtonProps) => {
     <TooltipProvider delayDuration={100}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <div className='flex items-center justify-center'>
+          <div className='flex items-center justify-center h-full'>
             <button
-              className='flex items-center justify-center cursor-pointer hover:bg-neutral-100 w-6 h-6 rounded px-1'
+              className='flex items-center justify-center cursor-pointer hover:bg-neutral-100 w-6 rounded px-1 h-full'
               onClick={onClick}
             >
               {icon}
@@ -41,9 +41,12 @@ export const PopupButton = ({ label, icon, onClick }: PopupButtonProps) => {
 
 export const AnnotatorPopup = ({ buttons }: AnnotatorPopupProps) => {
   return (
-    <div className='flex items-center justify-center'>
+    <div className='flex items-center justify-center gap-1.5 py-1 h-full'>
       {buttons.map((button) => (
-        <PopupButton {...button} />
+        <>
+          {button.dividerBefore && <div className='w-px h-3 bg-neutral-200' />}
+          <PopupButton {...button} />
+        </>
       ))}
     </div>
   )
