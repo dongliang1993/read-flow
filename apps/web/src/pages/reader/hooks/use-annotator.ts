@@ -1,8 +1,11 @@
 import { useEffect, useState, useCallback } from 'react'
+import { useMemoizedFn } from 'ahooks'
+import { toast } from 'sonner'
 
 import { useAppSettingsStore } from '@/store/app-settings-store'
 import { useSelectionTippy } from './use-selection-tippy'
-
+import { useReaderStore } from '@/store/reader-store'
+import { noteService } from '@/service/note'
 import {
   getPosition,
   getPopupPosition,
@@ -16,15 +19,13 @@ const annotatorPopupHeight = 36
 export const useAnnotator = (bookId: string) => {
   const { settings } = useAppSettingsStore()
   const { showTippy, hideTippy } = useSelectionTippy()
-
-  const globalViewSettings = settings.globalViewSettings
-
+  const bookData = useReaderStore((state) => state.bookData)
   const [showAnnotatorPopup, setShowAnnotatorPopup] = useState(false)
   const [annotatorPopupPosition, setAnnotatorPopupPosition] =
     useState<Position | null>(null)
-
-  // 状态管理
   const [selection, setSelection] = useState<TextSelection | null>(null)
+
+  const globalViewSettings = settings.globalViewSettings
 
   const annotatorPopupWidth = Math.min(
     globalViewSettings?.vertical ? 320 : 280,
@@ -37,6 +38,39 @@ export const useAnnotator = (bookId: string) => {
     setShowAnnotatorPopup(false)
     hideTippy()
   }, [])
+
+  /**
+   * 创建摘录
+   */
+  const createPick = useMemoizedFn(async () => {
+    if (!selection || !selection.text) {
+      return
+    }
+
+    try {
+      const content = selection.text.trim()
+
+      if (!bookData?.book) {
+        toast.error('无法获取书籍信息')
+        return
+      }
+
+      const bookNote = {
+        title: bookData.book.title,
+        author: bookData.book.author,
+        bookId: bookData.book.id.toString(),
+        source: {
+          bookId: bookData.book.id.toString(),
+          plain: content,
+          raw: content,
+        },
+      }
+
+      await noteService.createNote(bookNote)
+      handleDismissPopup()
+      toast.success('摘录已保存')
+    } catch (error) {}
+  })
 
   // Popup 位置计算
   useEffect(() => {
@@ -100,5 +134,6 @@ export const useAnnotator = (bookId: string) => {
     showAnnotatorPopup,
     setShowAnnotatorPopup,
     handleDismissPopup,
+    createPick,
   }
 }

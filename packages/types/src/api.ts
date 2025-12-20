@@ -1,5 +1,6 @@
 import type { UIMessage } from 'ai'
 import type { BookStatus } from './book'
+import type { Note } from './note'
 
 export type QuickPromptType =
   | 'summary'
@@ -74,4 +75,11 @@ export type UpdateReadingProgressRequest = {
   progressTotal: number
   location: string
   lastReadAt: number
+}
+
+export type CreateNoteRequest = {
+  title: string
+  author: string | null
+  bookId?: string
+  source: Note
 }

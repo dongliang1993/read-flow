@@ -98,6 +98,24 @@ export const readingSessions = pgTable('reading_sessions', {
     .notNull(),
 })
 
+export const notes = pgTable('notes', {
+  id: serial('id').primaryKey(),
+  bookId: integer('book_id').references(() => books.id, {
+    onDelete: 'cascade',
+  }),
+  userId: text('user_id').notNull().default('default-user'),
+  title: text('title').notNull(),
+  author: text('author'),
+  sourcePlain: text('source_plain').notNull(),
+  sourceRaw: text('source_raw').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+})
+
 export type {
   Book,
   NewBook,

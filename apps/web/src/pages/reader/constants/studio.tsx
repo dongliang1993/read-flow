@@ -1,4 +1,5 @@
-import { MessageCircle, FileText } from 'lucide-react'
+import { MessageCircle } from 'lucide-react'
+import { PickIcon } from '@/components/icon/pick'
 
 export type StudioTab = 'chat' | 'notes'
 
@@ -17,6 +18,6 @@ export const STUDIO_TABS: StudioTabItem[] = [
   {
     id: 'notes',
     label: '摘录',
-    icon: <FileText size={20} />,
+    icon: <PickIcon size={20} />,
   },
 ]

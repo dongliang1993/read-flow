@@ -12,8 +12,14 @@ export const Annotator = () => {
   const view = useReaderStore((state) => state.view)
   const bookId = useReaderStore((state) => state.bookData)?.id!
 
-  const { setSelection, selection, showTippy, handleDismissPopup } =
-    useAnnotator(bookId)
+  const {
+    setSelection,
+    selection,
+    showTippy,
+    handleDismissPopup,
+    showAnnotatorPopup,
+    createPick,
+  } = useAnnotator(bookId)
 
   const { handleScroll, handleMouseUp } = useTextSelector(
     bookId,
@@ -26,9 +32,7 @@ export const Annotator = () => {
       label: '摘录',
       key: 'pick',
       icon: <PickIcon size={16} className='text-black' />,
-      onClick: () => {
-        console.log('摘录')
-      },
+      onClick: createPick,
     },
     {
       label: '复制',
@@ -70,10 +74,10 @@ export const Annotator = () => {
   useFoliateEvents(view, handlers)
 
   useEffect(() => {
-    if (selection) {
+    if (selection && showAnnotatorPopup) {
       showTippy(selection.range, <AnnotatorPopup buttons={buttons} />)
     }
-  }, [selection])
+  }, [selection, showAnnotatorPopup])
 
   return <div id='chat-select-pop' className='fixed'></div>
 }

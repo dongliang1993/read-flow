@@ -7,6 +7,7 @@ import { Card, CardDescription, CardHeader } from '@/components/ui/card'
 import { Studio } from './components/studio'
 import { Reader } from './components/reader'
 import { SideChat } from './components/side-chat'
+import { Notes } from './components/notes'
 import { useReaderStore } from '@/store/reader-store'
 
 const DEFAULT_SIZE = {
@@ -98,7 +99,7 @@ export const ReaderLayout = () => {
           return tab === 'chat' ? (
             <SideChat bookId={bookData.id} />
           ) : (
-            <div>Notes</div>
+            <Notes bookId={bookData.id} />
           )
         }}
       </Studio>

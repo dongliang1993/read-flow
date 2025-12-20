@@ -33,6 +33,7 @@
     "ai": "^5.0.72",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
     "epubjs": "0.3.93",
     "foliate-js": "workspace:*",
     "lodash-es": "^4.17.21",
