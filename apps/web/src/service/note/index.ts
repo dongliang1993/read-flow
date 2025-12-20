@@ -22,7 +22,7 @@ class NoteService {
   }
 
   async getNotes(bookId: string, page: number) {
-    const response = await fetch(`${env.apiBaseUrl}/api/v1/note`, {
+    const response = await fetch(`${env.apiBaseUrl}/api/v1/note/listNotes`, {
       method: 'POST',
       body: JSON.stringify({ bookId, page }),
     })

@@ -6,7 +6,7 @@ import type { CreateNoteRequest } from '@read-flow/types'
 
 const noteRoute = new Hono()
 
-noteRoute.post('/', async (c) => {
+noteRoute.post('/listNotes', async (c) => {
   try {
     const body = (await c.req.json()) as CreateNoteRequest
     const bookId = body.bookId ? parseInt(body.bookId) : null
@@ -32,27 +32,36 @@ noteRoute.post('/', async (c) => {
 noteRoute.post('/', async (c) => {
   try {
     const body = (await c.req.json()) as CreateNoteRequest
+    const bookId = body.bookId ? parseInt(body.bookId) : null
+    const title = body.title || ''
+    const author = body.author || ''
+    const sourcePlain = body.source?.plain || ''
+    const sourceRaw = body.source?.raw || ''
 
-    if (!body.title) {
+    if (!bookId) {
+      return c.json({ error: 'Book ID is required' }, 400)
+    }
+
+    if (!title) {
       return c.json({ error: 'Title is required' }, 400)
     }
 
-    if (!body.source?.plain || !body.source?.raw) {
+    if (!sourcePlain || !sourceRaw) {
       return c.json({ error: 'Source content is required' }, 400)
     }
 
     const [newNote] = await db
       .insert(notes)
       .values({
-        bookId: body.bookId ? parseInt(body.bookId) : null,
-        title: body.title,
-        author: body.author,
-        sourcePlain: body.source.plain,
-        sourceRaw: body.source.raw,
+        bookId,
+        title,
+        author,
+        sourcePlain,
+        sourceRaw,
       })
       .returning()
 
-    return c.json({ note: newNote }, 201)
+    return c.json({ note: newNote })
   } catch (error) {
     console.error('Create note error:', error)
     return c.json({ error: 'Failed to create note' }, 500)
