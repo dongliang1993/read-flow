@@ -56,7 +56,7 @@ export const ChatInput = ({
         autoComplete='off'
         autoCorrect='off'
         autoCapitalize='off'
-        placeholder='问我任何问题...'
+        placeholder='Ask anything'
         className='border-none outline-none text-primary focus-visible:ring-0 focus-visible:ring-offset-0 max-h-50 pb-10'
         rows={1}
       />

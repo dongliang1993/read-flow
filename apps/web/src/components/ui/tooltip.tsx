@@ -62,4 +62,6 @@ function TooltipContent({
   )
 }
 
-export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider }
+const TooltipRoot = TooltipPrimitive.Root
+
+export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider, TooltipRoot }

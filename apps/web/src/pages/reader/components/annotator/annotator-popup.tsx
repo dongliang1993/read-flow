@@ -1,7 +1,7 @@
 import {
-  Tooltip,
   TooltipContent,
   TooltipTrigger,
+  TooltipRoot,
   TooltipProvider,
 } from '@/components/ui/tooltip'
 
@@ -19,35 +19,37 @@ type AnnotatorPopupProps = {
 
 export const PopupButton = ({ label, icon, onClick }: PopupButtonProps) => {
   return (
-    <TooltipProvider delayDuration={100}>
-      <Tooltip>
+    <TooltipRoot>
+      <div className='flex items-center justify-center h-full hover:bg-neutral-100 rounded'>
         <TooltipTrigger asChild>
-          <div className='flex items-center justify-center h-full'>
-            <button
-              className='flex items-center justify-center cursor-pointer hover:bg-neutral-100 w-6 rounded px-1 h-full'
-              onClick={onClick}
-            >
-              {icon}
-            </button>
-          </div>
+          <button
+            className='flex items-center justify-center cursor-pointer w-6'
+            onClick={onClick}
+          >
+            {icon}
+          </button>
         </TooltipTrigger>
-        <TooltipContent arrow={false} className='z-999'>
-          <div className='flex items-center justify-center'>{label}</div>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+      </div>
+      <TooltipContent arrow={false} className='z-9999'>
+        <div className='flex items-center justify-center'>{label}</div>
+      </TooltipContent>
+    </TooltipRoot>
   )
 }
 
 export const AnnotatorPopup = ({ buttons }: AnnotatorPopupProps) => {
   return (
-    <div className='flex items-center justify-center gap-1.5 py-1 h-full'>
-      {buttons.map((button) => (
-        <>
-          {button.dividerBefore && <div className='w-px h-3 bg-neutral-200' />}
-          <PopupButton {...button} />
-        </>
-      ))}
-    </div>
+    <TooltipProvider delayDuration={100} skipDelayDuration={0}>
+      <div className='flex items-center justify-center gap-1.5 py-1 h-full'>
+        {buttons.map((button) => (
+          <>
+            {button.dividerBefore && (
+              <div className='w-px h-3 bg-neutral-200' />
+            )}
+            <PopupButton {...button} />
+          </>
+        ))}
+      </div>
+    </TooltipProvider>
   )
 }
