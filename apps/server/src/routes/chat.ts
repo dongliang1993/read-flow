@@ -62,7 +62,7 @@ chat.post('/', async (c) => {
         .from(chatHistory)
         .where(eq(chatHistory.bookId, validBookId))
         .orderBy(chatHistory.createdAt)
-        .limit(20) // 限制历史消息数量，避免 token 超限
+        .limit(10) // 限制历史消息数量，避免 token 超限
 
       previousMessages = convertHistoryToUIMessages(history)
     }
@@ -123,7 +123,7 @@ chat.post('/', async (c) => {
       model: modelsService.getModel('openai')('gpt-4'),
       system:
         'You are a helpful reading assistant for books. Help users understand and analyze the content they are reading.',
-      messages: allMessages,
+      messages: allMessages.slice(-10),
       providerOptions: {
         store: {
           store: false,

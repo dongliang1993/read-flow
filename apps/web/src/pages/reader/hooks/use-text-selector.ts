@@ -17,7 +17,7 @@ const POPUP_DEBOUNCE_TIME = 300
 
 export const useTextSelector = (
   bookId: string,
-  setSelection: React.Dispatch<React.SetStateAction<TextSelection | null>>,
+  setSelection: (selection: TextSelection | null) => void,
   handleDismissPopup: () => void
 ) => {
   const { settings } = useAppSettingsStore()

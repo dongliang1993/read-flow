@@ -9,6 +9,7 @@ import { ScrollContainer } from './scroll-container'
 
 import { useChat } from '@/hooks/use-chat'
 import { useReaderStore } from '@/store/reader-store'
+import { useSelectionToReferences } from '../../hooks/use-selection-to-references'
 import { createBookService } from '@/service/books/book-service'
 
 import type { QuickPromptType } from '@read-flow/types'
@@ -20,6 +21,7 @@ type SideChatProps = {
 export const SideChat = ({ bookId }: SideChatProps) => {
   const view = useReaderStore((state) => state.view)
   const progress = useReaderStore((state) => state.progress)
+  const selection = useReaderStore((state) => state.selection)
 
   const {
     input,
@@ -29,9 +31,17 @@ export const SideChat = ({ bookId }: SideChatProps) => {
     messages,
     stop,
     setChatContext,
+    references,
+    setReferences,
   } = useChat({
     chatContext: {
       activeBookId: bookId,
+    },
+  })
+
+  useSelectionToReferences(selection, {
+    afterTransform: (refs) => {
+      setReferences(refs)
     },
   })
 
@@ -124,6 +134,8 @@ export const SideChat = ({ bookId }: SideChatProps) => {
         onChange={setInput}
         onSubmit={handleSubmit}
         onStop={stop}
+        references={references}
+        setReferences={setReferences}
       />
     </div>
   )

@@ -82,3 +82,8 @@ export interface NewAnnotation {
 }
 
 export type BookFormat = 'EPUB' | 'PDF' | 'MOBI' | 'AZW3' | 'AZW'
+
+export type ChatReference = {
+  id: string
+  text: string
+}

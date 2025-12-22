@@ -20,10 +20,11 @@ export const useAnnotator = (bookId: string) => {
   const { settings } = useAppSettingsStore()
   const { showTippy, hideTippy } = useSelectionTippy()
   const bookData = useReaderStore((state) => state.bookData)
+  const setSelection = useReaderStore((state) => state.setSelection)
   const [showAnnotatorPopup, setShowAnnotatorPopup] = useState(false)
   const [annotatorPopupPosition, setAnnotatorPopupPosition] =
     useState<Position | null>(null)
-  const [selection, setSelection] = useState<TextSelection | null>(null)
+  const [selection, setSelectionState] = useState<TextSelection | null>(null)
 
   const globalViewSettings = settings.globalViewSettings
 
@@ -32,8 +33,16 @@ export const useAnnotator = (bookId: string) => {
     window.innerWidth - 2 * popupPadding
   )
 
+  const handleSetSelection = useMemoizedFn(
+    (selection: TextSelection | null) => {
+      setSelectionState(selection)
+      setSelection(selection)
+    }
+  )
+
   // Popup 相关函数
   const handleDismissPopup = useCallback(() => {
+    setSelectionState(null)
     setSelection(null)
     setShowAnnotatorPopup(false)
     hideTippy()
@@ -130,7 +139,7 @@ export const useAnnotator = (bookId: string) => {
   return {
     showTippy,
     selection,
-    setSelection,
+    setSelection: handleSetSelection,
     showAnnotatorPopup,
     setShowAnnotatorPopup,
     handleDismissPopup,

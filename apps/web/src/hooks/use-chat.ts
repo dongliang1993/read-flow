@@ -2,10 +2,14 @@ import { useChat as useAIChat } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai'
 import { useCallback, useState, useEffect, useRef } from 'react'
 import { useMemoizedFn } from 'ahooks'
+import { cloneDeep } from 'lodash-es'
+
 import { env } from '@/config/env'
 
 import { getChatHistory, saveChatHistory } from '@/service/chat'
-import type { ChatContext } from '@read-flow/types'
+import { processQuoteMessages } from '@/service/ai/utils'
+import type { ChatContext, ChatReference } from '@read-flow/types'
+import type { UIMessage } from 'ai'
 
 export type { ChatStatus } from 'ai'
 
@@ -13,36 +17,67 @@ type UseChatOptions = {
   chatContext: ChatContext
 }
 
+export const createReferenceId = () => {
+  const cryptoObj =
+    typeof globalThis !== 'undefined' ? (globalThis as any).crypto : undefined
+  if (cryptoObj && typeof cryptoObj.randomUUID === 'function') {
+    return cryptoObj.randomUUID() as string
+  }
+  return `ref-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+}
+
 export const useChat = (options: UseChatOptions) => {
   const { chatContext } = options
   const { activeBookId } = chatContext
 
   const [input, setInput] = useState('')
+  const [references, setReferences] = useState<ChatReference[]>([])
   const contextRef = useRef<ChatContext>(chatContext)
   contextRef.current = chatContext
 
-  const buildMessageParts = useCallback((question: string) => {
-    const parts: any[] = []
+  const messagesRef = useRef<UIMessage[]>([])
 
-    if (question.trim()) {
-      parts.push({
-        type: 'text',
-        text: question.trim(),
+  const buildMessageParts = useCallback(
+    (question: string, references: ChatReference[]) => {
+      const parts: any[] = []
+
+      references.forEach((reference, index) => {
+        parts.push({
+          type: 'quote',
+          text: reference.text,
+          source: `引用${index + 1}`,
+          id: reference.id,
+        })
       })
-    }
 
-    return parts
-  }, [])
+      if (question.trim()) {
+        parts.push({
+          type: 'text',
+          text: question.trim(),
+        })
+      }
+
+      return parts
+    },
+    []
+  )
 
   const { messages, status, error, stop, sendMessage, setMessages } = useAIChat(
     {
       transport: new DefaultChatTransport({
         api: `${env.apiBaseUrl}/api/v1/chat`,
-        body: () => ({
-          bookId: activeBookId,
-          messages: messages.slice(0, -1),
-          chatContext: contextRef.current,
-        }),
+        prepareSendMessagesRequest: ({ messages, body }) => {
+          const processedMessages = processQuoteMessages(messages)
+
+          return {
+            body: {
+              ...body,
+              bookId: activeBookId,
+              messages: processedMessages.slice(-1),
+              chatContext: contextRef.current,
+            },
+          }
+        },
       }),
       experimental_throttle: 50,
       onError: (error) => {
@@ -61,10 +96,12 @@ export const useChat = (options: UseChatOptions) => {
     }
 
     const trimmedInput = (outInput || input).trim()
-    const messageParts = buildMessageParts(trimmedInput)
+    const referenceSnapshot = cloneDeep(references)
+    const messageParts = buildMessageParts(trimmedInput, referenceSnapshot)
 
     try {
       setInput('')
+      setReferences([])
       await sendMessage({ parts: messageParts })
 
       setMessages((prev) => {
@@ -82,11 +119,15 @@ export const useChat = (options: UseChatOptions) => {
 
           nextMessages[i] = {
             ...message,
-            parts: buildMessageParts(trimmedInput),
-            metadata: {},
+            parts: messageParts,
+            metadata: {
+              references: referenceSnapshot,
+            },
           }
           break
         }
+
+        messagesRef.current = nextMessages
 
         return nextMessages
       })
@@ -122,5 +163,9 @@ export const useChat = (options: UseChatOptions) => {
     input,
     setInput,
     setChatContext,
+
+    // references
+    references,
+    setReferences,
   }
 }

@@ -9,6 +9,7 @@ import type { Book } from '@read-flow/types'
 import type { FoliateView } from '@/types/view'
 import type { BookConfig, BookProgress } from '@/types/book'
 import type { BookDoc } from '@/lib/document'
+import type { TextSelection } from '@/utils/position'
 
 export type IBook = Book & {
   fileUrl: string
@@ -35,6 +36,7 @@ type ReaderStore = {
   config: BookConfig | null
   progress: BookProgress | null
   location: string | null
+  selection: TextSelection | null
 
   getBookById: (bookId: string) => Promise<IBook | null>
   setActiveBookId: (bookId: string) => void
@@ -44,6 +46,7 @@ type ReaderStore = {
   setConfig: (config: BookConfig) => void
   setProgress: (progress: BookProgress) => void
   setLocation: (location: string) => void
+  setSelection: (selection: TextSelection | null) => void
 }
 
 export const useReaderStore = create<ReaderStore>((set, get) => ({
@@ -57,6 +60,7 @@ export const useReaderStore = create<ReaderStore>((set, get) => ({
   config: null,
   progress: null,
   location: null,
+  selection: null,
 
   setActiveBookId: async (bookId: string) => {
     const currentBookId = get().activeBookId
@@ -157,4 +161,5 @@ export const useReaderStore = create<ReaderStore>((set, get) => ({
   setView: (view: FoliateView) => set({ view }),
   setOpenDropdown: (dropdown) => set({ openDropdown: dropdown }),
   setConfig: (config) => set({ config }),
+  setSelection: (selection: TextSelection | null) => set({ selection }),
 }))
