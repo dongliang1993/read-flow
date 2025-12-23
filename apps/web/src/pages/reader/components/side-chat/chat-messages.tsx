@@ -2,15 +2,40 @@ import type { UIMessage, UIMessagePart } from 'ai'
 import { Bot } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { useState, useCallback } from 'react'
 
 import { cn } from '@/lib/utils'
+import { MessageTools } from './message-tools'
+import { ShareCardDialog } from './share-card-dialog'
 
 type ChatMessagesProps = {
   messages: UIMessage[]
   className?: string
 }
 
+const getMarkdownContent = (message: UIMessage) => {
+  return message.parts
+    .filter((part) => part.type === 'text')
+    .map((part) => (part as { type: 'text'; text: string }).text)
+    .join('\n')
+}
+
+const getPlainText = (message: UIMessage) => {
+  return getMarkdownContent(message)
+    .replace(/[#*`_~\[\]]/g, '')
+    .replace(/\n+/g, '\n')
+    .trim()
+}
+
 export const ChatMessages = ({ messages, className }: ChatMessagesProps) => {
+  const [showShareDialog, setShowShareDialog] = useState(false)
+  const [shareContent, setShareContent] = useState('')
+
+  const handleShareOpen = useCallback((content: string) => {
+    setShowShareDialog(true)
+    setShareContent(content)
+  }, [])
+
   const renderMessagePart = (
     part: UIMessagePart<any, any>,
     messageId: string,
@@ -118,6 +143,11 @@ export const ChatMessages = ({ messages, className }: ChatMessagesProps) => {
                   renderMessagePart(part, `${messageId}-${index}`, true)
                 )}
               </div>
+              <MessageTools
+                onShareOpen={handleShareOpen}
+                content={getMarkdownContent(message)}
+                plainText={getPlainText(message)}
+              />
             </div>
           )
         }
@@ -132,6 +162,12 @@ export const ChatMessages = ({ messages, className }: ChatMessagesProps) => {
           </div>
         )
       })}
+
+      <ShareCardDialog
+        open={showShareDialog}
+        onOpenChange={setShowShareDialog}
+        content={shareContent}
+      />
     </div>
   )
 }
