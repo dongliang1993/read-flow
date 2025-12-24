@@ -3,5 +3,5 @@ export interface LanguageMap {
 }
 
 export interface Contributor {
-  name: LanguageMap
+  name: string
 }

@@ -10,6 +10,7 @@ import type {
   ReadingProgress,
   UpdateReadingProgressRequest,
 } from '@read-flow/types'
+import type { Contributor } from '@/utils/book'
 
 export interface BooksResponse {
   books: Book[]
@@ -25,6 +26,14 @@ export interface UploadBookResponse {
 
 export const getFileExtension = (fileName: string) => {
   return fileName.split('.').pop()?.toLowerCase()
+}
+
+function getAuthor(author: string | Contributor): string {
+  if (typeof author === 'string') {
+    return author
+  }
+
+  return author.name
 }
 
 function getFileMimeType(fileName: string): string {
@@ -100,19 +109,22 @@ export const booksApi = {
 
     const timestamp = Date.now()
     const randomStr = Math.random().toString(36).substring(2, 8)
-    const tempFileName = `${timestamp}-${randomStr}.${format.toLowerCase()}`
+    const fileName = file.name
     const coverFileName = `${timestamp}-${randomStr}-cover.jpg`
     const formData = new FormData()
     const fileData = await file.arrayBuffer()
-    const author = 'Unknown'
+    let author: string | Contributor = 'Unknown'
+    let language: string | string[] = 'Unknown'
     let coverTempFile: File | null = null
 
-    if (format === 'EPUB' || format === 'AZW3') {
+    if (['EPUB', 'AZW3', 'AZW'].includes(format)) {
       try {
         // 需要提取出来封面，一起上传
         const bookDoc = await parseEpubFile(fileData, file.name)
         const coverBlob = await bookDoc.getCover()
         const coverArrayBuffer = (await coverBlob?.arrayBuffer()) || null
+        author = getAuthor(bookDoc.metadata.author)
+        language = bookDoc.metadata.language || 'Unknown'
 
         if (coverArrayBuffer) {
           coverTempFile = new File([coverArrayBuffer], coverFileName)
@@ -123,10 +135,17 @@ export const booksApi = {
     }
 
     formData.append('file', file)
-    formData.append('title', tempFileName)
+    formData.append('title', fileName)
     formData.append('format', format)
     formData.append('fileSize', file.size.toString())
-    formData.append('author', author)
+    formData.append(
+      'author',
+      typeof author === 'string' ? author : JSON.stringify(author)
+    )
+    formData.append(
+      'language',
+      typeof language === 'string' ? language : JSON.stringify(language)
+    )
 
     if (coverTempFile) {
       formData.append('cover', coverTempFile)

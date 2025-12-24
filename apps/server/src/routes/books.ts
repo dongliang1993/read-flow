@@ -9,10 +9,20 @@ import type { Book, BookStatus, BookFormat } from '@read-flow/types'
 
 const booksRoute = new Hono()
 
+/**
+ * 获取所有书籍
+ * GET /api/v1/books
+ */
 booksRoute.get('/', async (c) => {
   try {
     const allBooks = await db.select().from(books)
-    const allBooksWithCovers = [...allBooks]
+    const allBooksWithCovers: Book[] = [...allBooks].map((book) => ({
+      ...book,
+      status: book.status as BookStatus | null,
+      format: book.format as BookFormat,
+      createdAt: book.createdAt.toISOString(),
+      updatedAt: book.updatedAt.toISOString(),
+    }))
 
     for (const book of allBooksWithCovers) {
       if (!book.coverPath) {
@@ -55,7 +65,7 @@ booksRoute.get('/:id', async (c) => {
 
     const [book] = await db.select().from(books).where(eq(books.id, id))
 
-    if (!book || !book.filePath) {
+    if (!book) {
       return c.json({ error: 'Book not found' }, 404)
     }
 
@@ -79,32 +89,10 @@ booksRoute.get('/:id', async (c) => {
   }
 })
 
-booksRoute.post('/', async (c) => {
-  try {
-    const body = await c.req.json()
-
-    if (!body.title) {
-      return c.json({ error: 'Title is required' }, 400)
-    }
-
-    const [newBook] = await db
-      .insert(books)
-      .values({
-        title: body.title,
-        author: body.author,
-        coverUrl: body.coverUrl,
-        filePath: body.filePath,
-        fileSize: body.fileSize,
-        status: body.status || 'unread',
-      })
-      .returning()
-
-    return c.json({ book: newBook }, 201)
-  } catch (error) {
-    console.error('Create book error:', error)
-    return c.json({ error: 'Failed to create book' }, 500)
-  }
-})
+/**
+ * 上传书籍
+ * POST /api/v1/books/upload
+ */
 
 booksRoute.post('/upload', async (c) => {
   try {
@@ -116,6 +104,9 @@ booksRoute.post('/upload', async (c) => {
     const coverFile = formData.get('cover') as File
     const coverFileName = coverFile?.name
     const language = formData.get('language') as string
+    const tempFilename = `${Date.now()}-${Math.random()
+      .toString(36)
+      .substring(2, 8)}.${format.toLowerCase()}`
 
     if (!file) {
       return c.json({ error: 'File is required' }, 400)
@@ -125,20 +116,14 @@ booksRoute.post('/upload', async (c) => {
       return c.json({ error: 'Title is required' }, 400)
     }
 
-    console.log('📦 文件名:', fileName)
+    console.log('📦 文件名:', { fileName, tempFilename })
 
     const fileBuffer = await file.arrayBuffer()
     const coverFileBuffer = await coverFile.arrayBuffer()
 
-    console.log('📦 准备上传到 Supabase Storage:', {
-      fileName,
-      bufferSize: fileBuffer.byteLength,
-      bucket: 'books',
-    })
-
     const uploadResults = await Promise.allSettled(
       [
-        supabaseAdmin.storage.from('books').upload(fileName, fileBuffer, {
+        supabaseAdmin.storage.from('books').upload(tempFilename, fileBuffer, {
           contentType: 'application/epub+zip',
           cacheControl: '3600',
           upsert: false,
@@ -209,6 +194,33 @@ booksRoute.post('/upload', async (c) => {
   } catch (error) {
     console.error('Upload error:', error)
     return c.json({ error: 'Internal server error' }, 500)
+  }
+})
+
+booksRoute.post('/', async (c) => {
+  try {
+    const body = await c.req.json()
+
+    if (!body.title) {
+      return c.json({ error: 'Title is required' }, 400)
+    }
+
+    const [newBook] = await db
+      .insert(books)
+      .values({
+        title: body.title,
+        author: body.author,
+        coverUrl: body.coverUrl,
+        filePath: body.filePath,
+        fileSize: body.fileSize,
+        status: body.status || 'unread',
+      })
+      .returning()
+
+    return c.json({ book: newBook }, 201)
+  } catch (error) {
+    console.error('Create book error:', error)
+    return c.json({ error: 'Failed to create book' }, 500)
   }
 })
 
