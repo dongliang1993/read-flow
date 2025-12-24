@@ -18,14 +18,17 @@ export function BookCard({ book }: BookCardProps) {
   }
 
   return (
-    <div className='group relative cursor-pointer' onClick={handleClick}>
-      <div className='relative aspect-3/4 overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow'>
+    <div
+      className='group relative cursor-pointer rounded-2xl hover:shadow-prompt-input border border-shade-04 p-2 transition-shadow'
+      onClick={handleClick}
+    >
+      <div className='relative aspect-3/4 overflow-hidden rounded-2xl'>
         <img
           src={book.coverUrl || '/placeholder-book.jpg'}
           alt={book.title}
           className='w-full h-full object-cover'
         />
-        <div className='absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity'>
+        <div className='absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity'>
           <div className='absolute bottom-0 left-0 right-0 p-4'>
             {book.progress && book.progress > 0 && book.progress < 100 && (
               <div className='text-white text-sm font-medium mb-2'>
@@ -34,11 +37,6 @@ export function BookCard({ book }: BookCardProps) {
             )}
             {book.status === 'finished' && (
               <div className='text-white text-sm font-medium mb-2'>已读完</div>
-            )}
-            {book.status === 'unread' && (
-              <div className='inline-block px-2 py-1 text-xs font-medium text-white bg-blue-500 rounded mb-2'>
-                新增
-              </div>
             )}
           </div>
         </div>
@@ -49,11 +47,11 @@ export function BookCard({ book }: BookCardProps) {
           <MoreHorizontal className='h-4 w-4 text-neutral-700 dark:text-neutral-300' />
         </button>
       </div>
-      <div className='mt-2 px-1'>
-        <h3 className='text-sm font-medium text-neutral-900 dark:text-neutral-100 truncate'>
+      <div className='mt-2 px-1 pb-1'>
+        <h3 className='text-sm font-medium text-neutral-900 dark:text-neutral-100 truncate mb-1'>
           {book.title}
         </h3>
-        <p className='text-xs text-neutral-500 dark:text-neutral-500 truncate'>
+        <p className='text-xs text-neutral-500 dark:text-muted-foreground truncate'>
           {book.author}
         </p>
       </div>

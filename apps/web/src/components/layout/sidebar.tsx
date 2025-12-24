@@ -11,34 +11,77 @@ import { Resizable } from 're-resizable'
 
 import { cn } from '@/lib/utils'
 
+import type { LucideProps } from 'lucide-react'
+
 const dashboardItem = {
   title: '仪表盘',
   href: '/dashboard',
   icon: LayoutDashboard,
 }
 
+const librarySection = {
+  title: '书库',
+  items: [
+    {
+      title: '全部',
+      href: '/library/all',
+      icon: Library,
+    },
+    {
+      title: '正在阅读',
+      href: '/library/reading',
+      icon: Clock,
+    },
+    {
+      title: '已读完',
+      href: '/library/finished',
+      icon: CheckCircle2,
+    },
+  ],
+}
+
+type NavItemProps = {
+  href: string
+  icon: React.ForwardRefExoticComponent<
+    Omit<LucideProps, 'ref'> & React.RefAttributes<SVGSVGElement>
+  >
+  title: string
+}
+
+const NavItem = ({ href, icon, title }: NavItemProps) => {
+  const Icon = icon
+
+  return (
+    <NavLink
+      to={href}
+      className={({ isActive }) =>
+        cn(
+          'flex items-center gap-3 p-1 rounded-xl text-sm font-medium transition-colors border',
+          isActive
+            ? 'bg-shade-03 text-neutral-900 border border-shade-04'
+            : 'text-neutral-600 hover:bg-shade-03 border-transparent'
+        )
+      }
+    >
+      {({ isActive }) => (
+        <>
+          <div
+            className={cn(
+              'size-8 flex items-center justify-center rounded-md',
+              isActive ? 'bg-shade-01 shadow-sm' : ''
+            )}
+          >
+            <Icon size={16} />
+          </div>
+          {title}
+        </>
+      )}
+    </NavLink>
+  )
+}
+
 export function Sidebar() {
   const [width, setWidth] = useState(260)
-  const librarySection = {
-    title: '书库',
-    items: [
-      {
-        title: '全部',
-        href: '/library/all',
-        icon: Library,
-      },
-      {
-        title: '正在阅读',
-        href: '/library/reading',
-        icon: Clock,
-      },
-      {
-        title: '已读完',
-        href: '/library/finished',
-        icon: CheckCircle2,
-      },
-    ],
-  }
 
   return (
     <Resizable
@@ -58,13 +101,11 @@ export function Sidebar() {
         bottomLeft: false,
         topLeft: false,
       }}
-      className='h-screen bg-neutral-100 dark:bg-neutral-900 border-r border-neutral-200 dark:border-neutral-800 flex flex-col'
+      className='h-screen bg-shade-01 dark:bg-neutral-900 border-r border-neutral-200 dark:border-neutral-800 flex flex-col'
     >
       {/* Header */}
-      <div className='p-4 border-b border-neutral-200 dark:border-neutral-800'>
-        <h1 className='text-xl font-bold text-neutral-900 dark:text-neutral-100'>
-          Read Flow
-        </h1>
+      <div className='p-4'>
+        <h1 className='text-xl font-bold text-neutral-900'>Read Flow</h1>
       </div>
 
       {/* Navigation */}
@@ -75,21 +116,12 @@ export function Sidebar() {
             {librarySection.title}
           </div>
           {librarySection.items.map((item) => (
-            <NavLink
+            <NavItem
               key={item.href}
-              to={item.href}
-              className={({ isActive }) =>
-                cn(
-                  'flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors',
-                  isActive
-                    ? 'bg-neutral-200 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100'
-                    : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200/50 dark:hover:bg-neutral-800/50 hover:text-neutral-900 dark:hover:text-neutral-100'
-                )
-              }
-            >
-              <item.icon size={16} />
-              {item.title}
-            </NavLink>
+              href={item.href}
+              icon={item.icon}
+              title={item.title}
+            />
           ))}
         </div>
       </nav>

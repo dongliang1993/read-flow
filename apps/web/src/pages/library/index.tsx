@@ -1,15 +1,13 @@
 import { Outlet } from 'react-router-dom'
-import { Upload } from 'lucide-react'
+import { CloudUpload } from 'lucide-react'
 import { useRef, useEffect } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { useBookUpload } from '@/hooks/use-book-upload'
 import { useLibraryStore } from '@/store/library-store'
 
-export function LibraryLayout() {
+const Library = ({ className }: { className?: string }) => {
   const isInitiating = useRef(false)
-
-  const { triggerFileSelect, isUploading } = useBookUpload()
   const { refreshBooks, isLoading, error } = useLibraryStore()
 
   useEffect(() => {
@@ -47,14 +45,24 @@ export function LibraryLayout() {
   }
 
   return (
-    <div className='min-h-screen bg-neutral-50'>
-      <header className='bg-white border-b border-neutral-200 dark:border-neutral-800'>
+    <main className={className}>
+      <Outlet />
+    </main>
+  )
+}
+
+export function LibraryLayout() {
+  const { triggerFileSelect, isUploading } = useBookUpload()
+
+  return (
+    <div className='min-h-screen bg-shade-01 flex flex-col'>
+      <header className='border-b border-neutral-200'>
         <div className='max-w-7xl mx-auto px-4 py-2 flex justify-end'>
           <Button
             size='sm'
             variant='secondary'
             onClick={triggerFileSelect}
-            className='flex items-center gap-2'
+            className='flex items-center gap-2 cursor-pointer border rounded-xl'
           >
             {isUploading ? (
               <>
@@ -63,16 +71,15 @@ export function LibraryLayout() {
               </>
             ) : (
               <>
-                <Upload size={16} />
+                <CloudUpload size={16} />
                 上传书籍
               </>
             )}
           </Button>
         </div>
       </header>
-
-      <main>
-        <Outlet />
+      <main className='flex-1'>
+        <Library />
       </main>
     </div>
   )

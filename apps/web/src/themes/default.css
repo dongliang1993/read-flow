@@ -54,6 +54,10 @@
   --shadow-xl: 0 1px 3px 0px oklch(0 0 0 / 0.1),
     0 8px 10px -1px oklch(0 0 0 / 0.1);
   --shadow-2xl: 0 1px 3px 0px oklch(0 0 0 / 0.25);
+
+  --shade-01: #fcfcfc;
+  --shade-03: #f1f1f1;
+  --shade-04: #ececec;
 }
 
 .dark {

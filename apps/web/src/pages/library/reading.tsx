@@ -11,16 +11,12 @@ export function Reading() {
     [books]
   )
 
-  console.log(books)
   return (
     <div className='p-8'>
-      <div className='mb-8'>
-        <h1 className='text-4xl font-bold text-neutral-900 dark:text-neutral-100'>
+      <div className='mb-8 sticky top-0'>
+        <h1 className='text-2xl font-bold text-neutral-900 dark:text-neutral-100'>
           正在阅读
         </h1>
-        <p className='text-neutral-500 dark:text-neutral-400 mt-2'>
-          共 {readingBooks.length} 本书
-        </p>
       </div>
 
       {readingBooks.length > 0 ? (

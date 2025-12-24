@@ -12,13 +12,10 @@ export function Finished() {
 
   return (
     <div className='p-8'>
-      <div className='mb-8'>
-        <h1 className='text-4xl font-bold text-neutral-900 dark:text-neutral-100'>
+      <div className='mb-8 sticky top-0'>
+        <h1 className='text-2xl font-bold text-neutral-900 dark:text-neutral-100'>
           已读完
         </h1>
-        <p className='text-neutral-500 dark:text-neutral-400 mt-2'>
-          共 {finishedBooks.length} 本书
-        </p>
       </div>
 
       {finishedBooks.length > 0 ? (

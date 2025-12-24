@@ -1,6 +1,7 @@
 import { TableOfContents } from 'lucide-react'
 import { useCallback, useState, useMemo } from 'react'
 import { List as VirtualList } from 'react-window'
+import { useMemoizedFn } from 'ahooks'
 
 import {
   DropdownMenu,
@@ -13,7 +14,6 @@ import { useReaderStore } from '@/store/reader-store'
 
 import type { TOCItem } from '@/lib/document'
 import type { RowComponentProps } from 'react-window'
-import { useMemoizedFn } from 'ahooks'
 
 type TOCViewDropdownProps = {
   toc: TOCItem[]
