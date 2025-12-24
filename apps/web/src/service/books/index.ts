@@ -11,16 +11,12 @@ import type {
   UpdateReadingProgressRequest,
 } from '@read-flow/types'
 
-export type BookInfoWithUrl = Book & {
-  fileUrl: string
-}
-
 export interface BooksResponse {
-  books: BookInfoWithUrl[]
+  books: Book[]
 }
 
 export interface BookResponse {
-  book: BookInfoWithUrl
+  book: Book
 }
 
 export interface UploadBookResponse {

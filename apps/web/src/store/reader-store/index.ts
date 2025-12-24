@@ -11,13 +11,9 @@ import type { BookConfig, BookProgress } from '@/types/book'
 import type { BookDoc } from '@/lib/document'
 import type { TextSelection } from '@/utils/position'
 
-export type IBook = Book & {
-  fileUrl: string
-}
-
 export type BookData = {
   id: string
-  book: IBook | null
+  book: Book | null
   file: File | null
   config: BookConfig | null
   bookDoc: BookDoc | null
@@ -27,7 +23,7 @@ export type OpenDropdown = 'toc' | 'search' | 'settings' | null
 
 type ReaderStore = {
   activeBookId: string | null
-  activeBook: IBook | null
+  activeBook: Book | null
   bookData: BookData | null
   loading: boolean
   error: string | null
@@ -38,7 +34,7 @@ type ReaderStore = {
   location: string | null
   selection: TextSelection | null
 
-  getBookById: (bookId: string) => Promise<IBook | null>
+  getBookById: (bookId: string) => Promise<Book | null>
   setActiveBookId: (bookId: string) => void
   initBook: (bookId: string) => Promise<void>
   setOpenDropdown: (dropdown: OpenDropdown) => void
@@ -112,7 +108,6 @@ export const useReaderStore = create<ReaderStore>((set, get) => ({
 
       const { settings } = useAppSettingsStore.getState()
       const { getBookById } = get()
-
       const book = await getBookById(bookId)
 
       if (!book) {
@@ -124,7 +119,7 @@ export const useReaderStore = create<ReaderStore>((set, get) => ({
       }
 
       const fileUrl = book?.fileUrl
-      const response = await fetch(fileUrl)
+      const response = await fetch(fileUrl || '')
 
       if (!response.ok) {
         throw new Error(
@@ -133,7 +128,7 @@ export const useReaderStore = create<ReaderStore>((set, get) => ({
       }
 
       const arrayBuffer = await response.arrayBuffer()
-      const filename = book.title + '.' + fileUrl.split('.').pop()
+      const filename = book.title + '.' + (fileUrl?.split('.').pop() || '')
       const file = new File([arrayBuffer], filename, {
         type: 'application/epub+zip',
       })

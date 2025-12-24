@@ -39,7 +39,7 @@ export const books = pgTable('books', {
 export const readingProgress = pgTable('reading_progress', {
   id: serial('id').primaryKey(),
   bookId: integer('book_id')
-    .references(() => books.id)
+    .references(() => books.id, { onDelete: 'cascade' })
     .notNull(),
   userId: text('user_id').notNull(),
   currentLocation: text('current_location'),
@@ -51,7 +51,7 @@ export const readingProgress = pgTable('reading_progress', {
 
 export const chatHistory = pgTable('chat_history', {
   id: serial('id').primaryKey(),
-  bookId: integer('book_id').references(() => books.id),
+  bookId: integer('book_id').references(() => books.id, { onDelete: 'cascade' }),
   userId: text('user_id').notNull(),
   role: text('role').notNull(),
   content: jsonb('content').notNull(),
@@ -61,7 +61,7 @@ export const chatHistory = pgTable('chat_history', {
 export const annotations = pgTable('annotations', {
   id: serial('id').primaryKey(),
   bookId: integer('book_id')
-    .references(() => books.id)
+    .references(() => books.id, { onDelete: 'cascade' })
     .notNull(),
   userId: text('user_id').notNull(),
   cfiRange: text('cfi_range').notNull(),
@@ -74,7 +74,7 @@ export const annotations = pgTable('annotations', {
 export const chapterSummaries = pgTable('chapter_summaries', {
   id: serial('id').primaryKey(),
   bookId: integer('book_id')
-    .references(() => books.id)
+    .references(() => books.id, { onDelete: 'cascade' })
     .notNull(),
   chapterIndex: integer('chapter_index').notNull(),
   chapterHref: text('chapter_href').notNull(),

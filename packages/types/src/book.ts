@@ -6,12 +6,14 @@ export interface Book {
   coverUrl: string | null
   filePath: string | null
   fileSize: number | null
-  status: BookStatus
+  status: BookStatus | null
   createdAt: string
   updatedAt: string
   format: BookFormat
   language: string | null
   coverPath: string | null
+  // cdn url
+  fileUrl?: string
 }
 
 export interface NewBook {

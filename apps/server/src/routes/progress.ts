@@ -2,7 +2,7 @@ import { Hono } from 'hono'
 import { eq, desc, and } from 'drizzle-orm'
 
 import { db } from '../db'
-import { readingProgress } from '../db/schema'
+import { readingProgress, books } from '../db/schema'
 
 import type {
   UpdateReadingProgressRequest,
@@ -62,6 +62,17 @@ progressRoute.put('/:id/progress', async (c) => {
       location,
       lastReadAt,
     } = body
+
+    // 先检查书籍是否存在
+    const [book] = await db
+      .select({ id: books.id })
+      .from(books)
+      .where(eq(books.id, bookId))
+      .limit(1)
+
+    if (!book) {
+      return c.json({ error: 'Book not found' }, 404)
+    }
 
     const lastReadAtDate = lastReadAt ? new Date(lastReadAt) : new Date()
     // 更新/创建阅读进度

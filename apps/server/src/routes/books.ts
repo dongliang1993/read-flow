@@ -5,6 +5,8 @@ import { eq, desc } from 'drizzle-orm'
 import { supabaseAdmin } from '../lib/supabase'
 import { enqueueJob } from '../jobs'
 
+import type { Book, BookStatus, BookFormat } from '@read-flow/types'
+
 const booksRoute = new Hono()
 
 booksRoute.get('/', async (c) => {
@@ -36,63 +38,41 @@ booksRoute.get('/', async (c) => {
   }
 })
 
-booksRoute.get('/:id/file', async (c) => {
-  try {
-    const id = parseInt(c.req.param('id'))
-
-    const [book] = await db.select().from(books).where(eq(books.id, id))
-
-    if (!book || !book.filePath) {
-      return c.json({ error: 'Book file not found' }, 404)
-    }
-
-    console.log('📖 开始下载书籍文件:', book.filePath)
-
-    const { data, error } = await supabaseAdmin.storage
-      .from('books')
-      .download(book.filePath)
-
-    if (error) {
-      console.error('❌ Supabase 下载失败:', error)
-      return c.json({ error: 'Failed to download file' }, 500)
-    }
-
-    console.log('✅ Supabase 下载成功')
-    console.log('   数据类型:', data.constructor.name)
-    console.log('   数据大小:', data.size, 'bytes')
-    console.log('   MIME 类型:', data.type)
-
-    return new Response(data, {
-      headers: {
-        'Content-Type': 'application/epub+zip',
-        'Access-Control-Allow-Origin': '*',
-        'Cache-Control': 'public, max-age=3600',
-      },
-    })
-  } catch (error) {
-    console.error('❌ 文件下载错误:', error)
-    return c.json({ error: 'Internal server error' }, 500)
-  }
-})
-
+/**
+ * 获取书籍信息
+ * GET /api/v1/books/:id
+ * @param id 书籍 ID
+ * @returns {Promise<Response>} 书籍信息
+ */
 booksRoute.get('/:id', async (c) => {
   try {
     const id = parseInt(c.req.param('id'))
+
     // 添加验证
     if (isNaN(id)) {
       return c.json({ error: 'Invalid book ID' }, 400)
     }
 
     const [book] = await db.select().from(books).where(eq(books.id, id))
-    const {
-      data: { publicUrl },
-    } = supabaseAdmin.storage.from('books').getPublicUrl(book?.filePath || '')
 
-    if (!book) {
+    if (!book || !book.filePath) {
       return c.json({ error: 'Book not found' }, 404)
     }
 
-    return c.json({ book: { ...book, fileUrl: publicUrl } })
+    const {
+      data: { publicUrl },
+    } = supabaseAdmin.storage.from('books').getPublicUrl(book.filePath)
+
+    const bookWithUrl: Book = {
+      ...book,
+      format: book.format as BookFormat,
+      status: book.status as BookStatus | null,
+      createdAt: book.createdAt.toISOString(),
+      updatedAt: book.updatedAt.toISOString(),
+      fileUrl: publicUrl,
+    }
+
+    return c.json({ book: bookWithUrl })
   } catch (error) {
     console.error('Get book error:', error)
     return c.json({ error: 'Failed to fetch book' }, 500)
