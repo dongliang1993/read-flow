@@ -3,6 +3,7 @@ import { db } from '../db'
 import { books, readingProgress } from '../db/schema'
 import { eq, desc } from 'drizzle-orm'
 import { supabaseAdmin } from '../lib/supabase'
+import { enqueueJob } from '../jobs'
 
 const booksRoute = new Hono()
 
@@ -132,7 +133,6 @@ booksRoute.post('/upload', async (c) => {
     const fileName = formData.get('title') as string
     const author = formData.get('author') as string
     const format = formData.get('format') as string
-    const fileSize = formData.get('fileSize') as string
     const coverFile = formData.get('cover') as File
     const coverFileName = coverFile?.name
     const language = formData.get('language') as string
@@ -207,6 +207,14 @@ booksRoute.post('/upload', async (c) => {
         coverPath: coverUploadResult.value?.data?.path,
       })
       .returning()
+
+    await enqueueJob({
+      type: 'parseBook',
+      payload: {
+        bookId: newBook.id,
+        filePath: publicUrl,
+      },
+    })
 
     return c.json(
       {

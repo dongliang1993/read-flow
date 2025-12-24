@@ -5,6 +5,7 @@ import {
   timestamp,
   integer,
   jsonb,
+  uuid,
 } from 'drizzle-orm/pg-core'
 import type {
   Book,
@@ -16,6 +17,9 @@ import type {
   Annotation,
   NewAnnotation,
 } from '@read-flow/types'
+
+// Re-export jobs schema
+export { jobs, type Job, type NewJob, type JobStatus, type JobType } from '../jobs/schema'
 
 export const books = pgTable('books', {
   id: serial('id').primaryKey(),
@@ -115,6 +119,25 @@ export const notes = pgTable('notes', {
     .defaultNow()
     .notNull(),
 })
+
+export const chapters = pgTable('chapters', {
+  id: serial('id').primaryKey(),
+  bookId: integer('book_id')
+    .references(() => books.id, { onDelete: 'cascade' })
+    .notNull(),
+  title: text('title'),
+  href: text('href'),
+  order: integer('order').notNull(),
+  content: text('content'),
+  htmlContent: text('html_content'),
+  wordCount: integer('word_count'),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+})
+
+export type Chapter = typeof chapters.$inferSelect
+export type NewChapter = typeof chapters.$inferInsert
 
 export type {
   Book,

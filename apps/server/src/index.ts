@@ -15,6 +15,7 @@ import note from './routes/note'
 import { env } from './config/env'
 
 import { errorHandler } from './middlewares/error-handler'
+import { initJobSystem } from './jobs'
 
 const app = new Hono()
 
@@ -51,6 +52,13 @@ console.log(`📝 Environment: ${env.nodeEnv}`)
 
 // Error handler
 app.onError(errorHandler)
+
+// 初始化 Job 系统
+initJobSystem({
+  pollInterval: 5000,  // 5 秒轮询一次
+  concurrency: 2,      // 同时处理 2 个任务
+})
+console.log('📋 Job system initialized')
 
 serve({
   fetch: app.fetch,

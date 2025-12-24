@@ -17,11 +17,13 @@
     "@ai-sdk/openai": "^2.0.52",
     "@ai-sdk/openai-compatible": "^1.0.22",
     "@hono/node-server": "^1.12.0",
+    "@read-flow/parser": "workspace:*",
     "@read-flow/types": "workspace:*",
     "@supabase/supabase-js": "^2.76.1",
     "ai": "^5.0.72",
     "dotenv": "^17.2.3",
     "drizzle-orm": "^0.44.6",
+    "epub2": "^3.0.2",
     "hono": "^4.5.0",
     "postgres": "^3.4.7"
   },

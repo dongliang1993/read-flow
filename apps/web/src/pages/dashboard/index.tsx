@@ -26,10 +26,10 @@ export function Dashboard() {
   const { stats, heatmap } = data || { stats: {}, heatmap: [] }
 
   return (
-    <div className='p-8 space-y-8'>
+    <div className='p-4 xl:px-12 space-y-8 h-full overflow-auto bg-background'>
       {/* Header */}
       <div>
-        <h1 className='text-3xl font-bold text-neutral-900 dark:text-neutral-100'>
+        <h1 className='text-2xl font-bold text-neutral-900 dark:text-neutral-100'>
           阅读统计
         </h1>
         <p className='text-neutral-500 mt-1'>查看您的阅读习惯和统计数据</p>
