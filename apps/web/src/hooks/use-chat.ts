@@ -5,9 +5,9 @@ import { useMemoizedFn } from 'ahooks'
 import { cloneDeep } from 'lodash-es'
 
 import { env } from '@/config/env'
-
-import { getChatHistory, saveChatHistory } from '@/service/chat'
+import { getChatHistory } from '@/service/chat'
 import { processQuoteMessages } from '@/service/ai/utils'
+
 import type { ChatContext, ChatReference } from '@read-flow/types'
 import type { UIMessage } from 'ai'
 
@@ -69,7 +69,6 @@ export const useChat = (options: UseChatOptions) => {
         prepareSendMessagesRequest: ({ messages, body }) => {
           const processedMessages = processQuoteMessages(messages)
           console.log(processedMessages, 'processedMessages')
-          debugger
           return {
             body: {
               ...body,
@@ -86,7 +85,6 @@ export const useChat = (options: UseChatOptions) => {
       },
       onFinish: async ({ message, messages }) => {
         console.log('Message finished:', { message, messages })
-        await saveChatHistory(activeBookId, messages)
       },
     }
   )

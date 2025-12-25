@@ -7,12 +7,12 @@ import {
   convertHistoryToUIMessages,
   convertHistoryToModelMessages,
 } from '../lib/chat-transformer'
-import type { UpdateChatMessagesRequest } from '@read-flow/types'
 import { promptService } from '../services/prompt'
-
 import { db } from '../db'
 import { chatHistory } from '../db/schema'
 import { modelsService } from '../services/model-service'
+
+import type { UpdateChatMessagesRequest } from '@read-flow/types'
 
 const chat = new Hono()
 

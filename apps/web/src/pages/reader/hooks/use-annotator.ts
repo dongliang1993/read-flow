@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { useMemoizedFn } from 'ahooks'
 import { toast } from 'sonner'
 
+import { queryClient } from '@/lib/query-client'
 import { useAppSettingsStore } from '@/store/app-settings-store'
 import { useSelectionTippy } from './use-selection-tippy'
 import { useReaderStore } from '@/store/reader-store'
@@ -76,6 +77,11 @@ export const useAnnotator = (bookId: string) => {
 
       await noteService.createNote(bookNote)
       handleDismissPopup()
+      // 刷新 notes 列表
+      queryClient.invalidateQueries({
+        queryKey: ['note', bookData.book.id.toString()],
+      })
+
       toast.success('摘录已保存')
     } catch (error) {}
   })
