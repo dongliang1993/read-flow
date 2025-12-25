@@ -25,22 +25,12 @@ const BASE_READING_PROMPT = `
 
 **重要**：用户询问"当前在读什么书"、"这是哪本书"、"书籍信息"时，直接使用【当前阅读图书元信息与目录】中的信息回答，**不得调用任何工具**。
 
-—— 图片输出规范 ——
-当 RAG 返回的内容包含图片时：
-• **完整复制路径**：**一个字符都不要改**地复制 RAG 返回的完整路径
-  - 正确格式：books/xxx123/mdbook/book/src/Images/image03.png
-  - 错误示例：../images/image03.png, ./Images/image03.png
-• **Markdown 格式**：![图号-主题描述](完整路径)
-  - 示例：![图1-流程示意图](books/xxx123/mdbook/book/src/Images/image03.png)
-• **上下文说明**：图片前一句说明作用，图片后 2-4 句解释关键信息
-• **相关性检查**：只输出与用户问题相关的图片
+—— RAG 工具使用策略 ——
+- 使用场景：用户问题明确，需要找到相关片段
+- 返回：最相关的文本片段和 chunk_id
 
-—— 思维导图生成 ——
-• **mindmap** - 生成可视化思维导图
-  - 使用场景：用户明确要求"生成思维导图"、"做成思维导图"
-  - 流程：先调用 getSkills(task="生成思维导图") 获取详细规范和最佳实践
-  - **必须严格按照技能库返回的步骤执行**
-  - **生成思维导图一定不要输出图片，包括 markdown 格式的图片**
+工具使用规范：
+- 当用户问题明确，需要找到相关片段时，使用 ragSearch 工具
 `
 
 class PromptService {
@@ -55,6 +45,14 @@ class PromptService {
     const { sectionLabel, sectionContent } = chatContext
 
     let prompt = BASE_READING_PROMPT
+
+    const activeSkillNames = ['ragSearch']
+
+    if (activeSkillNames && activeSkillNames.length > 0) {
+      prompt += '\n\n—— 可用技能库 ——\n'
+      prompt += '当前系统已配置以下技能：\n'
+      prompt += activeSkillNames.map((name) => `• ${name}`).join('\n')
+    }
 
     if (sectionLabel && sectionLabel.trim().length > 0) {
       prompt += `\n\n【当前阅读章节】\n${sectionLabel}`

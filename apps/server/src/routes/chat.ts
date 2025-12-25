@@ -1,5 +1,5 @@
 import { Hono } from 'hono'
-import { streamText, UIMessage } from 'ai'
+import { streamText, UIMessage, stepCountIs, convertToModelMessages } from 'ai'
 import { eq, desc } from 'drizzle-orm'
 
 import {
@@ -11,6 +11,7 @@ import { promptService } from '../services/prompt'
 import { db } from '../db'
 import { chatHistory } from '../db/schema'
 import { modelsService } from '../services/model-service'
+import { createRagSearchTool } from '../lib/ai/tools/rag-search'
 
 import type { UpdateChatMessagesRequest } from '@read-flow/types'
 
@@ -83,19 +84,30 @@ chat.post('/', async (c) => {
 
     const modelMessages = convertHistoryToModelMessages(history)
     // 3. 构建 prompt 和调用 AI
-    const systemPrompt = chatContext?.quickPromptType
-      ? await promptService.buildReadingPrompt(chatContext)
-      : 'You are a helpful reading assistant for books.'
+    const systemPrompt = await promptService.buildReadingPrompt(chatContext)
 
     const result = await streamText({
       model: modelsService.getModel('openai')('gpt-4'),
       system: systemPrompt,
-      messages: modelMessages.slice(-10),
+      messages: convertToModelMessages([lastMessage]),
+      toolChoice: 'auto',
+      stopWhen: stepCountIs(2),
+      tools: {
+        ragSearch: createRagSearchTool(validBookId!),
+      },
       providerOptions: {
         store: {
           store: false,
           include: ['reasoning.encrypted_content'],
         },
+      },
+      onStepFinish: ({ toolCalls, toolResults }) => {
+        console.log(
+          'Tool calls:',
+          toolCalls?.length,
+          'Results:',
+          toolResults?.length
+        )
       },
       onFinish: async ({ text }) => {
         try {

@@ -1,11 +1,10 @@
-import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
+import { createOpenAI } from '@ai-sdk/openai'
 
 import { env } from '../config/env'
 
-const openai = createOpenAICompatible({
+const openai = createOpenAI({
   apiKey: env.openai.apiKey,
   baseURL: env.openai.baseURL,
-  name: 'OpenAI Compatible',
   headers: {
     Authorization: `Bearer ${env.openai.apiKey}`,
   },
