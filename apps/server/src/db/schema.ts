@@ -139,6 +139,25 @@ export const chapters = pgTable('chapters', {
 export type Chapter = typeof chapters.$inferSelect
 export type NewChapter = typeof chapters.$inferInsert
 
+export const chunks = pgTable('chunks', {
+  id: serial('id').primaryKey(),
+  chapterId: integer('chapter_id')
+    .references(() => chapters.id, { onDelete: 'cascade' })
+    .notNull(),
+  bookId: integer('book_id')
+    .references(() => books.id, { onDelete: 'cascade' })
+    .notNull(),
+  order: integer('order').notNull(),
+  content: text('content').notNull(),
+  tokenCount: integer('token_count'),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+})
+
+export type Chunk = typeof chunks.$inferSelect
+export type NewChunk = typeof chunks.$inferInsert
+
 export type {
   Book,
   NewBook,

@@ -50,7 +50,6 @@ export async function dequeueJob(workerId: string): Promise<Job | null> {
       .limit(1)
       .for('update', { skipLocked: true })
 
-    console.log('pendingJob', pendingJob)
     if (!pendingJob) {
       return null
     }

@@ -25,6 +25,7 @@
     "drizzle-orm": "^0.44.6",
     "epub2": "^3.0.2",
     "hono": "^4.5.0",
+    "js-tiktoken": "^1.0.21",
     "postgres": "^3.4.7"
   },
   "devDependencies": {

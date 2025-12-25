@@ -76,6 +76,7 @@ export interface EmbedBookPayload {
  * embedBook Job 的结果
  */
 export interface EmbedBookResult {
+  chunksCount: number
   embeddingsCount: number
 }
 

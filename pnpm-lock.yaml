@@ -50,6 +50,9 @@ importers:
       hono:
         specifier: ^4.5.0
         version: 4.9.12
+      js-tiktoken:
+        specifier: ^1.0.21
+        version: 1.0.21
       postgres:
         specifier: ^3.4.7
         version: 3.4.7
@@ -3890,7 +3893,6 @@ packages:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==, tarball: https://registry.npmmirror.com/base64-js/-/base64-js-1.5.1.tgz}
     requiresBuild: true
     dev: false
-    optional: true
 
   /baseline-browser-mapping@2.8.16:
     resolution: {integrity: sha512-OMu3BGQ4E7P1ErFsIPpbJh0qvDudM/UuJeHgkAvfWe+0HFJCXh+t/l8L6fVLR55RI/UbKrVLnAXZSVwd9ysWYw==, tarball: https://registry.npmmirror.com/baseline-browser-mapping/-/baseline-browser-mapping-2.8.16.tgz}
@@ -4720,6 +4722,12 @@ packages:
   /js-cookie@3.0.5:
     resolution: {integrity: sha512-cEiJEAEoIbWfCZYKWhVwFuvPX1gETRYPw6LlaTKoxD3s2AkXzkCjnp6h0V77ozyqj0jakteJ4YqDJT830+lVGw==, tarball: https://registry.npmmirror.com/js-cookie/-/js-cookie-3.0.5.tgz}
     engines: {node: '>=14'}
+    dev: false
+
+  /js-tiktoken@1.0.21:
+    resolution: {integrity: sha512-biOj/6M5qdgx5TKjDnFT1ymSpM5tbd3ylwDtrQvFQSu0Z7bBYko2dF+W/aUkXUPuk6IVpRxk/3Q2sHOzGlS36g==, tarball: https://registry.npmmirror.com/js-tiktoken/-/js-tiktoken-1.0.21.tgz}
+    dependencies:
+      base64-js: 1.5.1
     dev: false
 
   /js-tokens@4.0.0:
