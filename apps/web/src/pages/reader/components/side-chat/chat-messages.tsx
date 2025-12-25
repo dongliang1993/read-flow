@@ -6,7 +6,7 @@ import { useState, useCallback } from 'react'
 
 import { cn } from '@/lib/utils'
 import { MessageTools } from './message-tools'
-import { ShareCardDialog } from './share-card-dialog'
+import { SharedCard } from '@/components/shared-card'
 
 type ChatMessagesProps = {
   messages: UIMessage[]
@@ -163,7 +163,7 @@ export const ChatMessages = ({ messages, className }: ChatMessagesProps) => {
         )
       })}
 
-      <ShareCardDialog
+      <SharedCard
         open={showShareDialog}
         onOpenChange={setShowShareDialog}
         content={shareContent}

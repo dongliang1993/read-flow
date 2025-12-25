@@ -1,8 +1,10 @@
 import { Search, FilePlus } from 'lucide-react'
+import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { NoteCard } from './note-card'
 import { useNote } from '@/hooks/use-note'
+import { SharedCard } from '@/components/shared-card'
 import type { ListNote } from '@read-flow/types'
 
 type NotesProps = {
@@ -11,6 +13,14 @@ type NotesProps = {
 
 export const Notes = ({ bookId }: NotesProps) => {
   const { data, deleteNote } = useNote(bookId)
+  const [showShareDialog, setShowShareDialog] = useState(false)
+  const [shareContent, setShareContent] = useState('')
+
+  const handleShared = (content: string) => {
+    setShareContent(content)
+    setShowShareDialog(true)
+  }
+
   const notes = data?.pages?.flat() ?? []
 
   return (
@@ -36,6 +46,7 @@ export const Notes = ({ bookId }: NotesProps) => {
               <NoteCard
                 key={note.id}
                 note={note}
+                onShared={handleShared}
                 onDelete={() => deleteNote(note.id)}
               />
             ))}
@@ -52,6 +63,11 @@ export const Notes = ({ bookId }: NotesProps) => {
           添加注释
         </Button>
       </div>
+      <SharedCard
+        open={showShareDialog}
+        onOpenChange={setShowShareDialog}
+        content={shareContent}
+      />
     </div>
   )
 }

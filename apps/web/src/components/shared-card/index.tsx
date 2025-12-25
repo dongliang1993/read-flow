@@ -18,7 +18,7 @@ type ShareCardDialogProps = {
   content: string
 }
 
-export const ShareCardDialog = ({
+export const SharedCard = ({
   open,
   onOpenChange,
   content,

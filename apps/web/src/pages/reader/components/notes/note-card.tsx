@@ -1,4 +1,4 @@
-import { Book, Copy, Trash2, FileText } from 'lucide-react'
+import { Book, Copy, Trash2, FileText, Share2 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { zhCN } from 'date-fns/locale'
 import { toast } from 'sonner'
@@ -16,6 +16,7 @@ type NoteCardProps = {
   onAddComment?: () => void
   onCopy?: () => void
   onDelete?: () => void
+  onShared?: (content: string) => void
 }
 
 export const NoteCard = ({
@@ -23,6 +24,7 @@ export const NoteCard = ({
   onAddComment,
   onCopy,
   onDelete,
+  onShared,
 }: NoteCardProps) => {
   const timeAgo = formatDistanceToNow(new Date(note.createdAt), {
     addSuffix: true,
@@ -33,6 +35,10 @@ export const NoteCard = ({
     navigator.clipboard.writeText(note.sourcePlain)
     onCopy?.()
     toast.success('已复制到剪贴板')
+  }
+
+  const handleShared = () => {
+    onShared?.(note.sourcePlain)
   }
 
   return (
@@ -61,6 +67,17 @@ export const NoteCard = ({
               </button>
             </TooltipTrigger>
             <TooltipContent>复制</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                onClick={handleShared}
+                className='rounded p-1.5 text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-600 cursor-pointer'
+              >
+                <Share2 size={16} />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>分享</TooltipContent>
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
