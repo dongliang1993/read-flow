@@ -26,6 +26,7 @@ export const ChatInput = ({
   onSubmit,
   onStop,
   references,
+  setReferences,
 }: ChatInputProps) => {
   const handleValueChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -36,7 +37,8 @@ export const ChatInput = ({
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (e.key === 'Enter') {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault()
         onSubmit(value)
       }
     },
@@ -53,11 +55,11 @@ export const ChatInput = ({
 
   const disabled = value.trim() === ''
 
-  console.log(status, 'status')
-
   return (
     <div className='relative border rounded-xl flex flex-col px-2 py-3'>
-      {references.length > 0 && <References references={references} />}
+      {references.length > 0 && (
+        <References references={references} onChange={setReferences} />
+      )}
       <Textarea
         value={value}
         onChange={handleValueChange}

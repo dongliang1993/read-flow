@@ -6,6 +6,7 @@ import { useAppSettingsStore } from '@/store/app-settings-store'
 import { useSelectionTippy } from './use-selection-tippy'
 import { useReaderStore } from '@/store/reader-store'
 import { noteService } from '@/service/note'
+import { createReferenceId } from '@/hooks/use-chat'
 import {
   getPosition,
   getPopupPosition,
@@ -20,7 +21,7 @@ export const useAnnotator = (bookId: string) => {
   const { settings } = useAppSettingsStore()
   const { showTippy, hideTippy } = useSelectionTippy()
   const bookData = useReaderStore((state) => state.bookData)
-  const setSelection = useReaderStore((state) => state.setSelection)
+  const setReferences = useReaderStore((state) => state.setReferences)
   const [showAnnotatorPopup, setShowAnnotatorPopup] = useState(false)
   const [annotatorPopupPosition, setAnnotatorPopupPosition] =
     useState<Position | null>(null)
@@ -36,14 +37,12 @@ export const useAnnotator = (bookId: string) => {
   const handleSetSelection = useMemoizedFn(
     (selection: TextSelection | null) => {
       setSelectionState(selection)
-      setSelection(selection)
     }
   )
 
   // Popup 相关函数
   const handleDismissPopup = useCallback(() => {
     setSelectionState(null)
-    setSelection(null)
     setShowAnnotatorPopup(false)
     hideTippy()
   }, [])
@@ -79,6 +78,30 @@ export const useAnnotator = (bookId: string) => {
       handleDismissPopup()
       toast.success('摘录已保存')
     } catch (error) {}
+  })
+
+  const copyText = useMemoizedFn(async () => {
+    if (!selection || !selection.text) {
+      return
+    }
+
+    const content = selection.text.trim()
+    navigator.clipboard.writeText(content)
+    toast.success('文本已复制')
+  })
+
+  const askAI = useMemoizedFn(async () => {
+    if (!selection || !selection.text) {
+      return
+    }
+
+    const content = selection.text.trim()
+    const reference = {
+      id: createReferenceId(),
+      text: content,
+    }
+
+    setReferences([reference])
   })
 
   // Popup 位置计算
@@ -144,5 +167,7 @@ export const useAnnotator = (bookId: string) => {
     setShowAnnotatorPopup,
     handleDismissPopup,
     createPick,
+    copyText,
+    askAI,
   }
 }

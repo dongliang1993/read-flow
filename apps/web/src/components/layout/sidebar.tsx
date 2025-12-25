@@ -20,7 +20,7 @@ const dashboardItem = {
 }
 
 const librarySection = {
-  title: '书库',
+  title: 'Library',
   items: [
     {
       title: '全部',
@@ -112,7 +112,7 @@ export function Sidebar() {
       <nav className='flex-1 p-3 space-y-1 overflow-y-auto'>
         {/* Library Section */}
         <div className='space-y-1 mb-4'>
-          <div className='px-3 py-2 text-sm font-semibold text-neutral-500 dark:text-neutral-500 uppercase tracking-wider'>
+          <div className='px-3 py-2 text-sm font-semibold text-neutral-500 dark:text-neutral-500 tracking-wider'>
             {librarySection.title}
           </div>
           {librarySection.items.map((item) => (

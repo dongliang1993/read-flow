@@ -68,7 +68,8 @@ export const useChat = (options: UseChatOptions) => {
         api: `${env.apiBaseUrl}/api/v1/chat`,
         prepareSendMessagesRequest: ({ messages, body }) => {
           const processedMessages = processQuoteMessages(messages)
-
+          console.log(processedMessages, 'processedMessages')
+          debugger
           return {
             body: {
               ...body,

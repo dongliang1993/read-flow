@@ -13,7 +13,14 @@ export interface ImagePart {
   image: string
 }
 
-export type MessagePart = TextPart | ImagePart
+export interface QuotePart {
+  type: 'quote'
+  text: string
+  source?: string
+  id?: string
+}
+
+export type MessagePart = TextPart | ImagePart | QuotePart
 
 /**
  * 数据库中存储的聊天记录格式
@@ -36,10 +43,12 @@ export function convertHistoryToModelMessages(
   return history.map((record) => {
     const parts = record.content as MessagePart[]
 
-    // 提取所有文本内容
     const textContent = parts
-      .filter((p): p is TextPart => p.type === 'text' && !!p.text)
-      .map((p) => p.text)
+      .filter(
+        (p): p is TextPart | QuotePart =>
+          (p.type === 'text' || p.type === 'quote') && !!p.text
+      )
+      .map((p) => (p.type === 'quote' ? `[引用]: ${p.text}` : p.text))
       .join('\n')
 
     return {

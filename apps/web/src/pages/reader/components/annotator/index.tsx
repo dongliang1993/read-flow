@@ -19,6 +19,8 @@ export const Annotator = () => {
     handleDismissPopup,
     showAnnotatorPopup,
     createPick,
+    copyText,
+    askAI,
   } = useAnnotator(bookId)
 
   const { handleScroll, handleMouseUp } = useTextSelector(
@@ -38,18 +40,14 @@ export const Annotator = () => {
       label: '复制',
       key: 'copy',
       icon: <Copy size={16} className='text-black' />,
-      onClick: () => {
-        console.log('注释')
-      },
+      onClick: copyText,
     },
     {
       label: 'Chat with AI',
       key: 'delete',
       icon: <BotMessageSquare size={16} className='text-black' />,
       dividerBefore: true,
-      onClick: () => {
-        console.log('删除')
-      },
+      onClick: askAI,
     },
   ]
 

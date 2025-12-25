@@ -1,5 +1,5 @@
 import { BookOpen, BarChart3, Network } from 'lucide-react'
-import { useMemoizedFn } from 'ahooks'
+import { useDeepCompareEffect, useMemoizedFn } from 'ahooks'
 
 import { Button } from '@/components/ui/button'
 import { ChatInput } from './chat-input'
@@ -9,7 +9,6 @@ import { ScrollContainer } from './scroll-container'
 
 import { useChat } from '@/hooks/use-chat'
 import { useReaderStore } from '@/store/reader-store'
-import { useSelectionToReferences } from '../../hooks/use-selection-to-references'
 import { createBookService } from '@/service/books/book-service'
 
 import type { QuickPromptType } from '@read-flow/types'
@@ -21,7 +20,7 @@ type SideChatProps = {
 export const SideChat = ({ bookId }: SideChatProps) => {
   const view = useReaderStore((state) => state.view)
   const progress = useReaderStore((state) => state.progress)
-  const selection = useReaderStore((state) => state.selection)
+  const referencesFromStore = useReaderStore((state) => state.references)
 
   const {
     input,
@@ -36,12 +35,6 @@ export const SideChat = ({ bookId }: SideChatProps) => {
   } = useChat({
     chatContext: {
       activeBookId: bookId,
-    },
-  })
-
-  useSelectionToReferences(selection, {
-    afterTransform: (refs) => {
-      setReferences(refs)
     },
   })
 
@@ -96,6 +89,10 @@ export const SideChat = ({ bookId }: SideChatProps) => {
       }
     }
   )
+
+  useDeepCompareEffect(() => {
+    setReferences(referencesFromStore)
+  }, [referencesFromStore])
 
   return (
     <div id='side-chat' className='flex flex-col h-full'>

@@ -5,7 +5,7 @@ import { DocumentLoader } from '@/lib/document'
 import { booksApi, loadBookConfig } from '@/service/books'
 import { useAppSettingsStore } from '@/store/app-settings-store'
 
-import type { Book } from '@read-flow/types'
+import type { Book, ChatReference } from '@read-flow/types'
 import type { FoliateView } from '@/types/view'
 import type { BookConfig, BookProgress } from '@/types/book'
 import type { BookDoc } from '@/lib/document'
@@ -33,6 +33,7 @@ type ReaderStore = {
   progress: BookProgress | null
   location: string | null
   selection: TextSelection | null
+  references: ChatReference[]
 
   getBookById: (bookId: string) => Promise<Book | null>
   setActiveBookId: (bookId: string) => void
@@ -43,6 +44,7 @@ type ReaderStore = {
   setProgress: (progress: BookProgress) => void
   setLocation: (location: string) => void
   setSelection: (selection: TextSelection | null) => void
+  setReferences: (references: ChatReference[]) => void
 }
 
 export const useReaderStore = create<ReaderStore>((set, get) => ({
@@ -57,6 +59,7 @@ export const useReaderStore = create<ReaderStore>((set, get) => ({
   progress: null,
   location: null,
   selection: null,
+  references: [],
 
   setActiveBookId: async (bookId: string) => {
     const currentBookId = get().activeBookId
@@ -157,4 +160,5 @@ export const useReaderStore = create<ReaderStore>((set, get) => ({
   setOpenDropdown: (dropdown) => set({ openDropdown: dropdown }),
   setConfig: (config) => set({ config }),
   setSelection: (selection: TextSelection | null) => set({ selection }),
+  setReferences: (references: ChatReference[]) => set({ references }),
 }))

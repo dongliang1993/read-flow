@@ -1,10 +1,11 @@
 import { Hono } from 'hono'
-import { convertToModelMessages, streamText, UIMessage, ModelMessage } from 'ai'
+import { streamText, UIMessage } from 'ai'
 import { eq, desc } from 'drizzle-orm'
 
 import {
   textToParts,
   convertHistoryToUIMessages,
+  convertHistoryToModelMessages,
 } from '../lib/chat-transformer'
 import type { UpdateChatMessagesRequest } from '@read-flow/types'
 import { promptService } from '../services/prompt'
@@ -14,6 +15,20 @@ import { chatHistory } from '../db/schema'
 import { modelsService } from '../services/model-service'
 
 const chat = new Hono()
+
+// 3. 新增：将 UIMessage 保存到数据库
+export async function saveUserMessage(
+  db: any,
+  bookId: number | null,
+  message: UIMessage
+) {
+  await db.insert(chatHistory).values({
+    bookId,
+    userId: 'default-user',
+    role: message.role,
+    content: message.parts, // parts 直接存储为 jsonb
+  })
+}
 
 chat.get('/history/:bookId', async (c) => {
   try {
@@ -44,86 +59,38 @@ chat.post('/', async (c) => {
     const body = await c.req.json<UpdateChatMessagesRequest>()
     const { messages, bookId, chatContext } = body
 
-    if (!messages || !Array.isArray(messages)) {
-      return c.json({ error: 'Messages array is required' }, 400)
-    }
-
-    if (messages.length === 0) {
+    if (!messages?.length) {
       return c.json({ error: 'At least one message is required' }, 400)
     }
 
     const validBookId = bookId ? parseInt(bookId) : null
-
-    // 从数据库查询之前的消息历史
-    let previousMessages: UIMessage[] = []
-    if (validBookId) {
-      const history = await db
-        .select()
-        .from(chatHistory)
-        .where(eq(chatHistory.bookId, validBookId))
-        .orderBy(chatHistory.createdAt)
-        .limit(10) // 限制历史消息数量，避免 token 超限
-
-      previousMessages = convertHistoryToUIMessages(history)
-    }
-
     const lastMessage = messages[messages.length - 1]
-    const currentMessages: ModelMessage[] = convertToModelMessages(
-      messages as unknown as UIMessage[]
-    )
 
-    if (lastMessage.parts) {
-      await db.insert(chatHistory).values({
-        bookId: bookId ? parseInt(bookId) : null,
-        userId: 'default-user',
-        role: lastMessage.role,
-        content: lastMessage.parts,
-      })
+    // 1. 保存用户消息到数据库
+    if (lastMessage.role === 'user' && lastMessage.parts) {
+      await saveUserMessage(db, validBookId, lastMessage)
     }
 
-    // 合并历史消息和当前消息
-    const allMessages = [
-      ...convertToModelMessages(previousMessages as unknown as UIMessage[]),
-      ...currentMessages,
-    ]
+    // 2. 获取历史消息（用于发给 AI）
+    const history = validBookId
+      ? await db
+          .select()
+          .from(chatHistory)
+          .where(eq(chatHistory.bookId, validBookId))
+          .orderBy(chatHistory.createdAt)
+          .limit(10)
+      : []
 
-    if (chatContext?.quickPromptType) {
-      const prompt = await promptService.buildReadingPrompt(chatContext)
-      const messages = currentMessages.slice(-1)
-
-      const result = await streamText({
-        model: modelsService.getModel('openai')('gpt-4'),
-        system: prompt,
-        messages,
-        providerOptions: {
-          store: {
-            store: false,
-            include: ['reasoning.encrypted_content'],
-          },
-        },
-        onFinish: async ({ text }) => {
-          try {
-            await db.insert(chatHistory).values({
-              bookId: validBookId,
-              userId: 'default-user',
-              role: 'assistant',
-              content: textToParts(text),
-            })
-            console.log('✅ AI response saved to database')
-          } catch (error) {
-            console.error('Failed to save AI response:', error)
-          }
-        },
-      })
-
-      return result.toUIMessageStreamResponse()
-    }
+    const modelMessages = convertHistoryToModelMessages(history)
+    // 3. 构建 prompt 和调用 AI
+    const systemPrompt = chatContext?.quickPromptType
+      ? await promptService.buildReadingPrompt(chatContext)
+      : 'You are a helpful reading assistant for books.'
 
     const result = await streamText({
       model: modelsService.getModel('openai')('gpt-4'),
-      system:
-        'You are a helpful reading assistant for books. Help users understand and analyze the content they are reading.',
-      messages: allMessages.slice(-10),
+      system: systemPrompt,
+      messages: modelMessages.slice(-10),
       providerOptions: {
         store: {
           store: false,
