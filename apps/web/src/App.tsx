@@ -7,6 +7,7 @@ import { Reading } from './pages/library/reading'
 import { Finished } from './pages/library/finished'
 import { ReaderLayout } from './pages/reader/index'
 import { ResetPasswordPage } from './pages/auth'
+import { Settings } from './pages/settings'
 import { AuthDialog } from './components/auth/auth-dialog'
 import './App.css'
 
@@ -25,6 +26,7 @@ function App() {
             <Route index element={<Navigate to='/library/all' replace />} />
           </Route>
           <Route path='dashboard' element={<Dashboard />} />
+          <Route path='settings' element={<Settings />} />
           <Route path='*' element={<Navigate to='/' replace />} />
         </Route>
       </Routes>

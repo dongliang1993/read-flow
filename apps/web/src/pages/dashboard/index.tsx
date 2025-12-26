@@ -26,7 +26,7 @@ export function Dashboard() {
   const { stats, heatmap } = data || { stats: {}, heatmap: [] }
 
   return (
-    <div className='p-4 xl:px-12 space-y-8 h-full overflow-auto bg-background'>
+    <div className='p-4 xl:px-12 space-y-8 h-full overflow-auto'>
       {/* Header */}
       <div>
         <h1 className='text-2xl font-bold text-neutral-900 dark:text-neutral-100'>

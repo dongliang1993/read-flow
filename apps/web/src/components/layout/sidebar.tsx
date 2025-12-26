@@ -1,23 +1,12 @@
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import {
-  Library,
-  LayoutDashboard,
-  Clock,
-  CheckCircle2,
-  CircleGauge,
-} from 'lucide-react'
+import { Library, Clock, CheckCircle2 } from 'lucide-react'
 import { Resizable } from 're-resizable'
-
+import { DashboardLink } from './dashboard-link'
+import { UserPopover } from '@/components/user'
 import { cn } from '@/lib/utils'
 
 import type { LucideProps } from 'lucide-react'
-
-const dashboardItem = {
-  title: '仪表盘',
-  href: '/dashboard',
-  icon: LayoutDashboard,
-}
 
 const librarySection = {
   title: 'Library',
@@ -127,16 +116,9 @@ export function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className='p-4'>
-        <NavLink
-          to={dashboardItem.href}
-          className={cn(
-            'inline-flex p-2 rounded-full text-sm font-medium transition-colors',
-            'text-neutral-600  hover:bg-neutral-200/50 dark:hover:bg-neutral-800/50 hover:text-neutral-900 dark:hover:text-neutral-100'
-          )}
-        >
-          <CircleGauge size={18} />
-        </NavLink>
+      <div className='p-4 flex items-center justify-between'>
+        <UserPopover />
+        <DashboardLink />
       </div>
     </Resizable>
   )
