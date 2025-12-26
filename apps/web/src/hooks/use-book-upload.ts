@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react'
 import { useMemoizedFn } from 'ahooks'
 import { toast } from 'sonner'
 
+import { useLibraryStore } from '@/store/library-store'
 import { booksApi as bookService, getFileExtension } from '@/service/books'
 import { FILE_ACCEPT_FORMATS, SUPPORTED_FILE_EXTS } from '@/constants/upload'
 
@@ -11,24 +12,35 @@ SUPPORTED_FILE_EXTS.forEach((ext) => {
   FILE_ACCEPT_MAP.set(ext, `.${ext}`)
 })
 
-export const useBookUpload = () => {
+type UseBookUploadConfig = {
+  onSuccess?: () => void
+  onError?: (error: Error) => void
+}
+
+export const useBookUpload = (config: UseBookUploadConfig = {}) => {
+  const { onSuccess, onError } = config
   const [isUploading, setIsUploading] = useState(false)
+  const addBook = useLibraryStore((state) => state.addBook)
 
   const uploadBooks = useMemoizedFn(async (files: File[]) => {
     try {
       setIsUploading(true)
       for (const file of files) {
         try {
-          const book = await bookService.uploadBook(file)
-          console.log('book', book)
+          const response = await bookService.uploadBook(file)
+          const book = response.book
+          addBook(book)
         } catch (error) {
           console.error('Upload failed:', error)
           toast.error('上传失败!')
         }
       }
+
+      onSuccess?.()
     } catch (error) {
       console.error('Upload failed:', error)
       toast.error('上传失败!')
+      onError?.(error as Error)
     } finally {
       setIsUploading(false)
     }

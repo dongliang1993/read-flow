@@ -28,10 +28,14 @@ export async function parseEpub(
   if (typeof input === 'string') {
     filePath = input
   } else {
+    if (input.length === 0) {
+      throw new Error('Empty buffer provided')
+    }
     // Buffer 写入临时文件
     filePath = join(tmpdir(), `epub-${randomUUID()}.epub`)
     writeFileSync(filePath, input)
     shouldCleanup = true
+    console.log(`[Parser] Wrote ${input.length} bytes to ${filePath}`)
   }
 
   try {

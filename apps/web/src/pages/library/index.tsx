@@ -57,7 +57,7 @@ export function LibraryLayout() {
   return (
     <div className='min-h-screen bg-shade-01 flex flex-col'>
       <header className='border-b border-neutral-200'>
-        <div className='max-w-7xl mx-auto px-4 py-2 flex justify-end'>
+        <div className='w-full px-5 py-3 flex justify-end'>
           <Button
             size='sm'
             variant='secondary'

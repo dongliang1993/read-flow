@@ -151,35 +151,41 @@ booksRoute.post('/upload', async (c) => {
       return c.json({ error: 'Failed to upload file' }, 500)
     }
 
+    const bookFilePath = bookUploadResult.value?.data?.path
+    const coverFilePath = coverUploadResult.value?.data?.path
+
     const {
       data: { publicUrl },
-    } = supabaseAdmin.storage.from('books').getPublicUrl(fileName)
-    const { data: coverPublicUrl } = supabaseAdmin.storage
+    } = supabaseAdmin.storage.from('books').getPublicUrl(bookFilePath || '')
+
+    const { data: signedUrlData } = await supabaseAdmin.storage
       .from('book-cover')
-      .getPublicUrl(fileName)
+      .createSignedUrl(coverFilePath || '', 3600)
+
+    const coverPublicUrl = signedUrlData?.signedUrl
 
     const [newBook] = await db
       .insert(books)
       .values({
         title: fileName,
         author: author || null,
-        filePath: bookUploadResult.value?.data?.path,
-        coverUrl: coverUploadResult.value?.data?.path,
+        filePath: bookFilePath,
+        coverUrl: coverFilePath,
         fileSize: file.size,
         status: 'unread',
         format: format,
         language: language || null,
-        coverPath: coverUploadResult.value?.data?.path,
+        coverPath: coverFilePath,
       })
       .returning()
 
-    await enqueueJob({
-      type: 'parseBook',
-      payload: {
-        bookId: newBook.id,
-        filePath: publicUrl,
-      },
-    })
+    // await enqueueJob({
+    //   type: 'parseBook',
+    //   payload: {
+    //     bookId: newBook.id,
+    //     filePath: bookFilePath || '',
+    //   },
+    // })
 
     return c.json(
       {

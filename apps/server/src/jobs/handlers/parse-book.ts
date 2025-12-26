@@ -21,7 +21,18 @@ export const parseBookHandler: JobHandler<ParseBookPayload, ParseBookResult> = {
       const {
         data: { publicUrl },
       } = supabaseAdmin.storage.from('books').getPublicUrl(filePath)
-      const fileBuffer = await fetch(publicUrl).then((res) => res.arrayBuffer())
+
+      console.log(`[ParseBook] Downloading from: ${publicUrl}`)
+      const response = await fetch(publicUrl)
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to download file: ${response.status} ${response.statusText}`
+        )
+      }
+
+      const fileBuffer = await response.arrayBuffer()
+      console.log(`[ParseBook] Downloaded ${fileBuffer.byteLength} bytes`)
 
       // 解析 EPUB 文件
       const result = await parseEpub(Buffer.from(fileBuffer), {

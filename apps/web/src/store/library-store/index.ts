@@ -11,6 +11,7 @@ type LibraryStore = {
 
   setBooks: (books: Book[]) => void
   setIsLoading: (isLoading: boolean) => void
+  addBook: (book: Book) => void // 新增
   refreshBooks: () => Promise<void>
 }
 
@@ -19,6 +20,7 @@ export const useLibraryStore = create<LibraryStore>((set) => ({
   isLoading: false,
   error: null,
 
+  addBook: (book) => set((state) => ({ books: [...state.books, book] })),
   setBooks: (books) => set({ books }),
   setIsLoading: (isLoading) => set({ isLoading }),
   refreshBooks: async () => {
