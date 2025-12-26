@@ -35,7 +35,7 @@ export function RegisterPage() {
 
     await authClient.signIn.social({
       provider: 'google',
-      callbackURL: '/library',
+      callbackURL: `${window.location.origin}/library`,
     })
   }
 

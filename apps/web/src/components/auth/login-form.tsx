@@ -32,7 +32,7 @@ export function LoginForm() {
   const handleGoogleLogin = async () => {
     await authClient.signIn.social({
       provider: 'google',
-      callbackURL: window.location.pathname,
+      callbackURL: window.location.href,
     })
   }
 
