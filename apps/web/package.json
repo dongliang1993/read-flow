@@ -31,6 +31,7 @@
     "@zip.js/zip.js": "^2.7.52",
     "ahooks": "^3.9.5",
     "ai": "^5.0.72",
+    "better-auth": "^1.4.9",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",

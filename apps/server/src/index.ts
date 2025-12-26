@@ -16,12 +16,52 @@ import { env } from './config/env'
 
 import { errorHandler } from './middlewares/error-handler'
 import { initJobSystem } from './jobs'
+import { auth } from './lib/auth'
 
-const app = new Hono()
+const app = new Hono<{
+  Variables: {
+    user: typeof auth.$Infer.Session.user | null
+    session: typeof auth.$Infer.Session.session | null
+  }
+}>()
 
-app.use('/*', cors())
+app.use(
+  '/api/auth/*',
+  cors({
+    origin: 'http://localhost:3000',
+    allowHeaders: ['Content-Type', 'Authorization'],
+    allowMethods: ['POST', 'GET', 'OPTIONS'],
+    exposeHeaders: ['Content-Length'],
+    maxAge: 600,
+    credentials: true,
+  })
+)
+
+app.use(
+  '/*',
+  cors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+  })
+)
+
 app.use('*', logger())
 app.use('*', prettyJSON())
+
+app.use('*', async (c, next) => {
+  const session = await auth.api.getSession({ headers: c.req.raw.headers })
+
+  if (!session) {
+    c.set('user', null)
+    c.set('session', null)
+    await next()
+    return
+  }
+
+  c.set('user', session.user)
+  c.set('session', session.session)
+  await next()
+})
 
 app.get('/health', (c) => {
   return c.json({
@@ -36,6 +76,19 @@ app.get('/api', (c) => {
     message: 'Hono 服务器运行正常！',
     timestamp: new Date().toISOString(),
   })
+})
+
+app.on(['POST', 'GET'], '/api/auth/*', (c) => {
+  return auth.handler(c.req.raw)
+})
+
+app.get('/api/session', (c) => {
+  const session = c.get('session')
+  const user = c.get('user')
+
+  if (!user) return c.body(null, 401)
+
+  return c.json({ session, user })
 })
 
 app.route('/api/v1/chat', chat)
@@ -55,8 +108,8 @@ app.onError(errorHandler)
 
 // 初始化 Job 系统
 initJobSystem({
-  pollInterval: 5000,  // 5 秒轮询一次
-  concurrency: 2,      // 同时处理 2 个任务
+  pollInterval: 5000, // 5 秒轮询一次
+  concurrency: 2, // 同时处理 2 个任务
 })
 console.log('📋 Job system initialized')
 

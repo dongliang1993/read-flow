@@ -6,12 +6,16 @@ import { AllBooks } from './pages/library/all-books'
 import { Reading } from './pages/library/reading'
 import { Finished } from './pages/library/finished'
 import { ReaderLayout } from './pages/reader/index'
+import { ResetPasswordPage } from './pages/auth'
+import { AuthDialog } from './components/auth/auth-dialog'
 import './App.css'
 
 function App() {
   return (
     <BrowserRouter>
+      <AuthDialog />
       <Routes>
+        <Route path='/auth/reset-password' element={<ResetPasswordPage />} />
         <Route path='/reader/:bookId' element={<ReaderLayout />} />
         <Route path='/' element={<Layout />}>
           <Route path='library' element={<LibraryLayout />}>

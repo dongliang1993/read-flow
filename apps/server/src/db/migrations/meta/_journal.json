@@ -29,6 +29,13 @@
       "when": 1765269605230,
       "tag": "0003_dashing_sentry",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1766727625510,
+      "tag": "0004_purple_fantastic_four",
+      "breakpoints": true
     }
   ]
 }

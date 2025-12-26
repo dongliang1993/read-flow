@@ -3,6 +3,7 @@ import { useMemoizedFn } from 'ahooks'
 import { toast } from 'sonner'
 
 import { useLibraryStore } from '@/store/library-store'
+import { useAuth } from '@/lib/auth-client'
 import { booksApi as bookService, getFileExtension } from '@/service/books'
 import { FILE_ACCEPT_FORMATS, SUPPORTED_FILE_EXTS } from '@/constants/upload'
 
@@ -21,6 +22,7 @@ export const useBookUpload = (config: UseBookUploadConfig = {}) => {
   const { onSuccess, onError } = config
   const [isUploading, setIsUploading] = useState(false)
   const addBook = useLibraryStore((state) => state.addBook)
+  const { assertLogin } = useAuth()
 
   const uploadBooks = useMemoizedFn(async (files: File[]) => {
     try {
@@ -82,10 +84,15 @@ export const useBookUpload = (config: UseBookUploadConfig = {}) => {
   }, [])
 
   const triggerFileSelect = useMemoizedFn(async () => {
-    const files = await selectFiles()
+    if (!assertLogin()) {
+      return
+    }
 
+    const files = await selectFiles()
     if (files) {
       handleProcessFiles(Array.from(files))
+    } else {
+      toast.error('请选择文件')
     }
   })
 

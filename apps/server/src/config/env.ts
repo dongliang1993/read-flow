@@ -13,4 +13,12 @@ export const env = {
     url: process.env.SUPABASE_URL || '',
     serviceKey: process.env.SUPABASE_SERVICE_KEY || '',
   },
+  auth: {
+    secret: process.env.BETTER_AUTH_SECRET || '',
+    baseUrl: process.env.BETTER_AUTH_URL || 'http://localhost:3001',
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID || '',
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+    },
+  },
 } as const
