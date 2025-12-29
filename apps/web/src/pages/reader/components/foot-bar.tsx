@@ -78,12 +78,12 @@ export const FooterBar = () => {
   }, [pageInfo])
 
   return (
-    <footer className='w-full h-10 pointer-events-auto px-2 flex items-center'>
+    <footer className='group w-full h-10 pointer-events-auto px-2 flex items-center'>
       <div className='flex w-full items-center justify-between'>
         <Button
           variant='ghost'
           size='icon'
-          className={`size-7 rounded-full transition-opacity duration-300`}
+          className='size-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer'
           onClick={handleGoPrevPage}
           title={isScrolledMode ? '上一章' : '上一页'}
         >
@@ -97,7 +97,7 @@ export const FooterBar = () => {
         <Button
           variant='ghost'
           size='icon'
-          className={`size-7 rounded-full transition-opacity duration-300`}
+          className='size-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer'
           onClick={handleGoNextPage}
           title={isScrolledMode ? '下一章' : '下一页'}
         >
