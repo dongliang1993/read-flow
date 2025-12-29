@@ -90,7 +90,7 @@ export const SettingsDropdown = () => {
         <Button
           variant='ghost'
           size='icon'
-          className='h-8 w-8 focus-visible:ring-0 focus-visible:ring-offset-0'
+          className='h-8 w-8 focus-visible:ring-0 focus-visible:ring-offset-0 cursor-pointer'
         >
           <Settings2 size={18} />
         </Button>

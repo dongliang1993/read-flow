@@ -1,5 +1,5 @@
 import { TableOfContents } from 'lucide-react'
-import { useCallback, useState, useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { List as VirtualList } from 'react-window'
 import { useMemoizedFn } from 'ahooks'
 
@@ -19,14 +19,13 @@ type TOCViewDropdownProps = {
   toc: TOCItem[]
 }
 
-const useFlattenedTOC = (toc: TOCItem[], expandedItems: Set<string>) => {
+const useFlattenedTOC = (toc: TOCItem[]) => {
   return useMemo(() => {
     const flattenTOC = (items: TOCItem[], depth = 0): FlatTOCItem[] => {
       const result: FlatTOCItem[] = []
       items.forEach((item, index) => {
-        const isExpanded = expandedItems.has(item.href || '')
-        result.push({ item, depth, index, isExpanded })
-        if (item.subitems && isExpanded) {
+        result.push({ item, depth, index })
+        if (item.subitems) {
           result.push(...flattenTOC(item.subitems, depth + 1))
         }
       })
@@ -34,7 +33,7 @@ const useFlattenedTOC = (toc: TOCItem[], expandedItems: Set<string>) => {
     }
 
     return flattenTOC(toc)
-  }, [toc, expandedItems])
+  }, [toc])
 }
 
 type CustomRowComponentProps = {
@@ -64,8 +63,6 @@ const RowComponent = ({
 }
 
 export const TOCViewDropdown = ({ toc }: TOCViewDropdownProps) => {
-  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set())
-
   const isTOCViewDropdownOpen = useReaderStore(
     (state) => state.openDropdown === 'toc'
   )
@@ -85,7 +82,7 @@ export const TOCViewDropdown = ({ toc }: TOCViewDropdownProps) => {
     [setOpenDropdown]
   )
 
-  const flatItems = useFlattenedTOC(toc, expandedItems)
+  const flatItems = useFlattenedTOC(toc)
 
   const handleItemClick = useMemoizedFn((item: TOCItem) => {
     if (item.href && view) {
@@ -102,13 +99,13 @@ export const TOCViewDropdown = ({ toc }: TOCViewDropdownProps) => {
         <Button
           variant='ghost'
           size='icon'
-          className='h-8 w-8 focus-visible:ring-0 focus-visible:ring-offset-0'
+          className='h-8 w-8 focus-visible:ring-0 focus-visible:ring-offset-0 cursor-pointer'
         >
           <TableOfContents size={18} />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
-        className='max-h-[calc(100vh-8rem)]  w-80 overflow-y-auto p-0 bg-white'
+        className='max-h-[calc(100vh-8rem)]  w-80 overflow-y-auto p-0 bg-shade-01'
         align='start'
         sideOffset={4}
       >
@@ -121,7 +118,7 @@ export const TOCViewDropdown = ({ toc }: TOCViewDropdownProps) => {
               onItemClick: handleItemClick,
               activeHref,
             }}
-            rowHeight={30}
+            rowHeight={40}
           />
         </div>
       </DropdownMenuContent>

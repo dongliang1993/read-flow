@@ -20,7 +20,7 @@ export function Reader({ bookId }: ReaderProps) {
   return (
     <div
       id={`reader-${bookId}`}
-      className='flex flex-col h-full w-full bg-background'
+      className='flex flex-col h-full w-full bg-shade-01'
     >
       <HeaderBar />
       <ReadContent />

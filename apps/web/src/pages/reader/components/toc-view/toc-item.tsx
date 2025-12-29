@@ -8,7 +8,6 @@ export type FlatTOCItem = {
   item: TOCItem
   depth: number
   index: number
-  isExpanded: boolean
 }
 
 type TOCItemComponentProps = {
@@ -29,28 +28,21 @@ export const TOCItemComponent = ({
       onItemClick(tocItem)
       e.preventDefault()
     },
-    [item, onItemClick]
+    [tocItem, onItemClick]
   )
 
   return (
     <div
       className={cn(
-        'cursor-pointer w-full flex items-center py-1  rounded-md',
-        isActive ? 'bg-muted' : 'hover:bg-muted'
+        'cursor-pointer w-full h-full flex items-center py-1 rounded-md',
+        isActive ? 'text-highlight-blue' : 'hover:bg-shade-03'
       )}
       style={{
         paddingInlineStart: `${(depth + 1) * 12}px`,
       }}
       onClick={handleItemClick}
     >
-      <div
-        className='select-none'
-        style={{
-          maxWidth: 'calc(100% - 24px)',
-          whiteSpace: 'nowrap',
-          textOverflow: 'ellipsis',
-        }}
-      >
+      <div className='select-none overflow-hidden whitespace-nowrap text-ellipsis'>
         {tocItem.label}
       </div>
     </div>

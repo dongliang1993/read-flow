@@ -63,6 +63,7 @@
   --color-shade-01: var(--shade-01);
   --color-shade-03: var(--shade-03);
   --color-shade-04: var(--shade-04);
+  --color-highlight-blue: var(--highlight-blue);
 }
 
 @layer base {
