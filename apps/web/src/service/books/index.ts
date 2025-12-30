@@ -1,7 +1,7 @@
 import { env } from '@/config/env'
 import { DocumentLoader } from '@/lib/document'
 
-import type { Book, BookFormat } from '@read-flow/types'
+import type { Book, BookFormat } from '@read-flow/shared'
 
 export * from './book-service'
 import type { SystemSettings } from '@/types/settings'
@@ -9,7 +9,7 @@ import type { BookConfig } from '@/types/book'
 import type {
   ReadingProgress,
   UpdateReadingProgressRequest,
-} from '@read-flow/types'
+} from '@read-flow/shared'
 import type { Contributor } from '@/utils/book'
 
 export interface BooksResponse {

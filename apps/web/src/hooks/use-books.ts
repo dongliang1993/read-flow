@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { booksApi } from '../service/books'
-import type { Book } from '@read-flow/types'
+import type { Book } from '@read-flow/shared'
 
 export const BOOKS_QUERY_KEY = ['books']
 

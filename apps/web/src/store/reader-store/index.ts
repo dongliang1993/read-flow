@@ -5,7 +5,7 @@ import { DocumentLoader } from '@/lib/document'
 import { booksApi, loadBookConfig } from '@/service/books'
 import { useAppSettingsStore } from '@/store/app-settings-store'
 
-import type { Book, ChatReference } from '@read-flow/types'
+import type { Book, ChatReference } from '@read-flow/shared'
 import type { FoliateView } from '@/types/view'
 import type { BookConfig, BookProgress } from '@/types/book'
 import type { BookDoc } from '@/lib/document'

@@ -3,7 +3,7 @@ import { createReferenceId } from '@/hooks/use-chat'
 import { useMemoizedFn } from 'ahooks'
 
 import type { TextSelection } from '@/utils/position'
-import type { ChatReference } from '@read-flow/types'
+import type { ChatReference } from '@read-flow/shared'
 
 type UseSelectionToReferencesConfig = {
   afterTransform: (references: ChatReference[]) => void

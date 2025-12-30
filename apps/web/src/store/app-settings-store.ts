@@ -1,11 +1,13 @@
-import { DEFAULT_BOOK_FONT, DEFAULT_BOOK_LAYOUT } from '@/constants/reader'
-import type { SystemSettings } from '@/types/settings'
 import { create } from 'zustand'
 import {
   createJSONStorage,
   persist,
   subscribeWithSelector,
 } from 'zustand/middleware'
+
+import { DEFAULT_BOOK_FONT, DEFAULT_BOOK_LAYOUT } from '@/constants/reader'
+
+import type { SystemSettings } from '@/types/settings'
 
 type AppSettingsState = {
   settings: SystemSettings

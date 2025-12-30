@@ -11,7 +11,7 @@ import { useChat } from '@/hooks/use-chat'
 import { useReaderStore } from '@/store/reader-store'
 import { createBookService } from '@/service/books/book-service'
 
-import type { QuickPromptType } from '@read-flow/types'
+import type { QuickPromptType } from '@read-flow/shared'
 
 type SideChatProps = {
   bookId: string

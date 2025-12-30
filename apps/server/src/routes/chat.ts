@@ -7,13 +7,15 @@ import {
   convertHistoryToUIMessages,
   convertHistoryToModelMessages,
 } from '../lib/chat-transformer'
+import type { OpenAIResponsesProviderOptions } from '@ai-sdk/openai'
 import { promptService } from '../services/prompt'
 import { db } from '../db'
 import { chatHistory } from '../db/schema'
 import { modelsService } from '../services/model-service'
 import { createRagSearchTool } from '../lib/ai/tools/rag-search'
+import { webSearchTool } from '../lib/ai/tools/web-search'
 
-import type { UpdateChatMessagesRequest } from '@read-flow/types'
+import type { UpdateChatMessagesRequest } from '@read-flow/shared'
 
 const chat = new Hono()
 
@@ -69,7 +71,7 @@ chat.post('/', async (c) => {
 
     // 1. 保存用户消息到数据库
     if (lastMessage.role === 'user' && lastMessage.parts) {
-      await saveUserMessage(db, validBookId, lastMessage)
+      // await saveUserMessage(db, validBookId, lastMessage)
     }
 
     // 2. 获取历史消息（用于发给 AI）
@@ -87,29 +89,30 @@ chat.post('/', async (c) => {
     const systemPrompt = await promptService.buildReadingPrompt(chatContext)
 
     const result = await streamText({
-      model: modelsService.getModel('openai')('gpt-4'),
-      system: systemPrompt,
-      messages: convertToModelMessages([lastMessage]),
+      // system: systemPrompt,
+      model: modelsService.getModel('openai')('gpt-5.2'),
+      messages: [
+        ...modelMessages,
+        ...(await convertToModelMessages([lastMessage])),
+      ],
       toolChoice: 'auto',
-      stopWhen: stepCountIs(2),
-      tools: {
-        ragSearch: createRagSearchTool(validBookId!),
-      },
+      stopWhen: stepCountIs(20),
       providerOptions: {
-        store: {
+        openai: {
           store: false,
           include: ['reasoning.encrypted_content'],
-        },
+        } satisfies OpenAIResponsesProviderOptions,
       },
-      onStepFinish: ({ toolCalls, toolResults }) => {
-        console.log(
-          'Tool calls:',
-          toolCalls?.length,
-          'Results:',
-          toolResults?.length
-        )
+      tools: {
+        ragSearch: createRagSearchTool(validBookId!),
+        webSearch: webSearchTool,
       },
-      onFinish: async ({ text }) => {
+      onStepFinish: (rest) => {
+        console.log('rest', rest)
+      },
+      onFinish: async ({ text, finishReason }) => {
+        console.log('finishReason', finishReason)
+        return
         try {
           await db.insert(chatHistory).values({
             bookId: validBookId,

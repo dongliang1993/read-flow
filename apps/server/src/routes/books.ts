@@ -5,7 +5,7 @@ import { eq, desc } from 'drizzle-orm'
 import { supabaseAdmin } from '../lib/supabase'
 import { enqueueJob } from '../jobs'
 
-import type { Book, BookStatus, BookFormat } from '@read-flow/types'
+import type { Book, BookStatus, BookFormat } from '@read-flow/shared'
 
 const booksRoute = new Hono()
 

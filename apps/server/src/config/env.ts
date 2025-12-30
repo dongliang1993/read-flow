@@ -6,6 +6,9 @@ export const env = {
     baseURL: process.env.OPENAI_API_BASE_URL || 'https://api.openai.com/v1',
     model: process.env.OPENAI_MODEL || 'gpt-4',
   },
+  tavily: {
+    apiKey: process.env.TAVILY_API_KEY || '',
+  },
   database: {
     url: process.env.DATABASE_URL || '',
   },

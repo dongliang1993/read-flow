@@ -1,4 +1,4 @@
-import type { Book } from '@read-flow/types'
+import type { Book } from '@read-flow/shared'
 
 export const mockBooks: Book[] = [
   {

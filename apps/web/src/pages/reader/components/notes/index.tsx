@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { NoteCard } from './note-card'
 import { useNote } from '@/hooks/use-note'
 import { SharedCard } from '@/components/shared-card'
-import type { ListNote } from '@read-flow/types'
+import type { ListNote } from '@read-flow/shared'
 
 type NotesProps = {
   bookId: string

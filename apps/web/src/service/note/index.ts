@@ -1,5 +1,5 @@
 import { env } from '@/config/env'
-import type { CreateNoteRequest } from '@read-flow/types'
+import type { CreateNoteRequest } from '@read-flow/shared'
 
 class NoteService {
   /**

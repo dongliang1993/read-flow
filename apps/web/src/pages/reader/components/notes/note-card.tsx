@@ -3,7 +3,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { zhCN } from 'date-fns/locale'
 import { toast } from 'sonner'
 
-import type { ListNote } from '@read-flow/types'
+import type { ListNote } from '@read-flow/shared'
 
 import {
   Tooltip,

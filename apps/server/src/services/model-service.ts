@@ -1,4 +1,5 @@
 import { createOpenAI } from '@ai-sdk/openai'
+import modelsConfig from '@read-flow/shared/data/models-config'
 
 import { env } from '../config/env'
 
@@ -9,6 +10,18 @@ const openai = createOpenAI({
     Authorization: `Bearer ${env.openai.apiKey}`,
   },
 })
+
+export type ModelConfig = {
+  name: string
+  imageInput?: boolean
+  audioInput?: boolean
+  imageOutput?: boolean
+  pricing?: { input: string; output: string }
+}
+
+export type ModelsConfiguration = {
+  models: Record<string, ModelConfig>
+}
 
 type Models = {
   openai: typeof openai
@@ -23,6 +36,10 @@ export class ModelsService {
     this.models = {
       openai,
     }
+  }
+
+  getConfigs(): ModelsConfiguration {
+    return modelsConfig as ModelsConfiguration
   }
 
   getModel(model: ModelName) {

@@ -1,5 +1,5 @@
 import { env } from '@/config/env'
-import type { ReadingSession } from '@read-flow/types'
+import type { ReadingSession } from '@read-flow/shared'
 
 export class ReadingSessionService {
   async getReadingSession(bookId: string) {

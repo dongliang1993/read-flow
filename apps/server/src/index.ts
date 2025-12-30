@@ -12,6 +12,7 @@ import readingSession from './routes/reading-session'
 import readingStats from './routes/reading-stats'
 import progress from './routes/progress'
 import note from './routes/note'
+import modes from './routes/modes'
 import { env } from './config/env'
 
 import { errorHandler } from './middlewares/error-handler'
@@ -98,6 +99,7 @@ app.route('/api/v1/reading-session', readingSession)
 app.route('/api/v1/reading-stats', readingStats)
 app.route('/api/v1/progress', progress)
 app.route('/api/v1/note', note)
+app.route('/api/v1/modes', modes)
 
 const port = env.port
 console.log(`🚀 Server is running on http://localhost:${port}`)

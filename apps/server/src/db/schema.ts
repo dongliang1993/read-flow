@@ -18,10 +18,16 @@ import type {
   NewChatMessage,
   Annotation,
   NewAnnotation,
-} from '@read-flow/types'
+} from '@read-flow/shared'
 
 // Re-export jobs schema
-export { jobs, type Job, type NewJob, type JobStatus, type JobType } from '../jobs/schema'
+export {
+  jobs,
+  type Job,
+  type NewJob,
+  type JobStatus,
+  type JobType,
+} from '../jobs/schema'
 
 // Better Auth tables
 export const user = pgTable('user', {
@@ -121,7 +127,9 @@ export const readingProgress = pgTable('reading_progress', {
 
 export const chatHistory = pgTable('chat_history', {
   id: serial('id').primaryKey(),
-  bookId: integer('book_id').references(() => books.id, { onDelete: 'cascade' }),
+  bookId: integer('book_id').references(() => books.id, {
+    onDelete: 'cascade',
+  }),
   userId: text('user_id').notNull(),
   role: text('role').notNull(),
   content: jsonb('content').notNull(),

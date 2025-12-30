@@ -1,13 +1,16 @@
 import { ArrowUp } from 'lucide-react'
-import { useCallback } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useMemoizedFn } from 'ahooks'
 
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { References } from './references'
+import { ModelSelector } from './model-selector'
+import { env } from '@/config/env'
 
 import type { ChatStatus } from '@/hooks/use-chat'
-import type { ChatReference } from '@read-flow/types'
+import type { ChatReference } from '@read-flow/shared'
+import type { ModelConfig, ModelsConfig } from './model-selector'
 
 type ChatInputProps = {
   value: string
@@ -28,6 +31,38 @@ export const ChatInput = ({
   references,
   setReferences,
 }: ChatInputProps) => {
+  const [models, setModels] = useState<Record<string, ModelConfig>>({})
+  const [selectedModelId, setSelectedModelId] = useState<string | null>(null)
+  const [loadingModels, setLoadingModels] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function load() {
+      try {
+        setLoadingModels(true)
+        const res = await fetch(`${env.apiBaseUrl}/api/v1/modes/configs`)
+        if (!res.ok) return
+        const json = (await res.json()) as ModelsConfig
+        if (cancelled) return
+        const nextModels = json?.models || {}
+        setModels(nextModels)
+        const firstId = Object.keys(nextModels)[0] || null
+        setSelectedModelId((prev) => prev ?? firstId)
+      } catch (error) {
+      } finally {
+        if (!cancelled) setLoadingModels(false)
+      }
+    }
+
+    load()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const hasModels = useMemo(() => Object.keys(models).length > 0, [models])
+
   const handleValueChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       onChange(e.target.value)
@@ -60,6 +95,14 @@ export const ChatInput = ({
       {references.length > 0 && (
         <References references={references} onChange={setReferences} />
       )}
+      <div className='mb-2 flex items-center justify-between'>
+        <ModelSelector
+          value={selectedModelId}
+          models={models}
+          onChange={setSelectedModelId}
+          disabled={loadingModels || !hasModels}
+        />
+      </div>
       <Textarea
         value={value}
         onChange={handleValueChange}

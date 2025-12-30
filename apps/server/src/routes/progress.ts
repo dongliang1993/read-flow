@@ -8,7 +8,7 @@ import type {
   UpdateReadingProgressRequest,
   ReadingProgress,
   BookStatus,
-} from '@read-flow/types'
+} from '@read-flow/shared'
 
 const progressRoute = new Hono()
 

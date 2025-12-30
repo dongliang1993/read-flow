@@ -1,6 +1,6 @@
-# @read-flow/types
+# @read-flow/shared
 
-Read Flow 应用的共享类型定义包。
+Read Flow 应用的共享数据包。
 
 ## 使用方式
 
@@ -9,7 +9,7 @@ Read Flow 应用的共享类型定义包。
 ```json
 {
   "dependencies": {
-    "@read-flow/types": "workspace:*"
+    "@read-flow/shared": "workspace:*"
   }
 }
 ```
@@ -17,7 +17,7 @@ Read Flow 应用的共享类型定义包。
 导入类型：
 
 ```typescript
-import type { Book } from '@read-flow/types'
+import type { Book } from '@read-flow/shared'
 
 const book: Book = {
   id: '1',

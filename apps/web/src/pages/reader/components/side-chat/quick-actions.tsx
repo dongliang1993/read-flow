@@ -7,7 +7,7 @@ import {
   Pencil,
 } from 'lucide-react'
 
-import type { QuickPromptType } from '@read-flow/types'
+import type { QuickPromptType } from '@read-flow/shared'
 
 const quickActions = [
   { icon: FileText, label: '总结这一页的内容', quickPromptType: 'summary' },

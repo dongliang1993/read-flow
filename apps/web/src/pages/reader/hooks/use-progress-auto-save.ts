@@ -3,7 +3,7 @@ import { useMemoizedFn, useThrottleFn } from 'ahooks'
 
 import { useReaderStore } from '@/store/reader-store'
 import { booksApi } from '@/service/books'
-import type { BookStatus } from '@read-flow/types'
+import type { BookStatus } from '@read-flow/shared'
 
 export const useProgressAutoSave = (bookId: string) => {
   const progress = useReaderStore((state) => state.progress)

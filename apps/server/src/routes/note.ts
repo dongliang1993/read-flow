@@ -2,7 +2,7 @@ import { Hono } from 'hono'
 import { db } from '../db'
 import { notes } from '../db/schema'
 import { eq, desc } from 'drizzle-orm'
-import type { CreateNoteRequest } from '@read-flow/types'
+import type { CreateNoteRequest } from '@read-flow/shared'
 
 const noteRoute = new Hono()
 

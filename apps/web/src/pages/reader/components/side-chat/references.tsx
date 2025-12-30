@@ -1,6 +1,6 @@
 import { X } from 'lucide-react'
 import { useMemoizedFn } from 'ahooks'
-import type { ChatReference } from '@read-flow/types'
+import type { ChatReference } from '@read-flow/shared'
 
 type ReferencesProps = {
   references: ChatReference[]

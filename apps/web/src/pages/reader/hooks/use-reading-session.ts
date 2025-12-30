@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { useMemoizedFn } from 'ahooks'
 import { noop, throttle } from 'lodash-es'
-import { SessionState } from '@read-flow/types'
+import { SessionState } from '@read-flow/shared'
 
 import { env } from '@/config/env'
 import { readingSessionService } from '@/service/reading-session'
 
-import type { ReadingSession, SessionStats } from '@read-flow/types'
+import type { ReadingSession, SessionStats } from '@read-flow/shared'
 
 type UseReadingSessionConfig = {
   saveInterval?: number

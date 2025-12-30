@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { Book } from '@read-flow/types'
+import type { Book } from '@read-flow/shared'
 
 import { booksApi } from '@/service/books'
 import { queryClient } from '@/lib/query-client'

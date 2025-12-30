@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { Book } from '@read-flow/types'
+import { Book } from '@read-flow/shared'
 import { MoreHorizontal } from 'lucide-react'
 
 interface BookCardProps {

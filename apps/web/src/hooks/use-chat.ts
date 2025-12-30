@@ -8,7 +8,7 @@ import { env } from '@/config/env'
 import { getChatHistory } from '@/service/chat'
 import { processQuoteMessages } from '@/service/ai/utils'
 
-import type { ChatContext, ChatReference } from '@read-flow/types'
+import type { ChatContext, ChatReference } from '@read-flow/shared'
 import type { UIMessage } from 'ai'
 
 export type { ChatStatus } from 'ai'

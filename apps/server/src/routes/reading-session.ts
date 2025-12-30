@@ -3,7 +3,7 @@ import type {
   ReadingSession,
   CreateReadingSessionRequest,
   UpdateReadingSessionRequest,
-} from '@read-flow/types'
+} from '@read-flow/shared'
 import { eq, desc } from 'drizzle-orm'
 
 import { db } from '../db'

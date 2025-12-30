@@ -2,7 +2,7 @@
 
 ## 🎯 概述
 
-项目采用 Monorepo 架构，通过 `@read-flow/types` 包实现前后端类型共享，确保类型一致性。
+项目采用 Monorepo 架构，通过 `@read-flow/shared` 包实现前后端类型共享，确保类型一致性。
 
 ## 📦 类型包结构
 
@@ -50,7 +50,7 @@ export interface Book {
 
 ```typescript
 // apps/server/src/db/schema.ts
-import type { Book, NewBook } from '@read-flow/types'
+import type { Book, NewBook } from '@read-flow/shared'
 
 // 重新导出，保持原有导入路径可用
 export type { Book, NewBook }
@@ -60,14 +60,14 @@ export type { Book, NewBook }
 // apps/server/src/routes/books.ts
 import { type Book } from '../db/schema'
 // 或
-import type { Book } from '@read-flow/types'
+import type { Book } from '@read-flow/shared'
 ```
 
 ### 3. 前端引用
 
 ```typescript
 // apps/web/src/service/books/index.ts
-import type { Book } from '@read-flow/types'
+import type { Book } from '@read-flow/shared'
 
 export interface BooksResponse {
   books: Book[]
@@ -76,7 +76,7 @@ export interface BooksResponse {
 
 ```typescript
 // apps/web/src/hooks/use-books.ts
-import type { Book } from '@read-flow/types'
+import type { Book } from '@read-flow/shared'
 
 export function useBooks() {
   return useQuery<Book[]>({...})
@@ -186,7 +186,7 @@ interface NewAnnotation {
 
 ```typescript
 // apps/server/src/routes/books.ts
-import type { Book, NewBook } from '@read-flow/types'
+import type { Book, NewBook } from '@read-flow/shared'
 
 booksRoute.post('/', async (c) => {
   const body = await c.req.json() as NewBook
@@ -204,7 +204,7 @@ booksRoute.post('/', async (c) => {
 
 ```typescript
 // apps/web/src/components/BookCard.tsx
-import type { Book } from '@read-flow/types'
+import type { Book } from '@read-flow/shared'
 
 interface BookCardProps {
   book: Book
@@ -309,7 +309,7 @@ export type {
 
 ```typescript
 // apps/server/src/db/schema.ts
-import type { Review, NewReview } from '@read-flow/types'
+import type { Review, NewReview } from '@read-flow/shared'
 
 export const reviews = pgTable('reviews', {
   id: serial('id').primaryKey(),
@@ -327,7 +327,7 @@ export type { Review, NewReview }
 
 ```typescript
 // apps/web/src/hooks/use-reviews.ts
-import type { Review } from '@read-flow/types'
+import type { Review } from '@read-flow/shared'
 
 export function useReviews(bookId: number) {
   return useQuery<Review[]>({
@@ -343,10 +343,10 @@ export function useReviews(bookId: number) {
 
 ```typescript
 // ✅ 推荐：明确标记为类型导入
-import type { Book } from '@read-flow/types'
+import type { Book } from '@read-flow/shared'
 
 // ❌ 不推荐：可能导致运行时导入
-import { Book } from '@read-flow/types'
+import { Book } from '@read-flow/shared'
 ```
 
 ### 2. 区分 Select 和 Insert 类型
@@ -372,7 +372,7 @@ interface FrontendBook {
 }
 
 // ✅ 使用统一的类型
-import type { Book } from '@read-flow/types'
+import type { Book } from '@read-flow/shared'
 ```
 
 ### 4. 使用 Partial 和 Pick
@@ -394,7 +394,7 @@ type BookPreview = Pick<Book, 'id' | 'title' | 'author'>
 
 ## 🔍 故障排查
 
-### 问题：找不到 @read-flow/types
+### 问题：找不到 @read-flow/shared
 
 ```bash
 # 确保安装了依赖

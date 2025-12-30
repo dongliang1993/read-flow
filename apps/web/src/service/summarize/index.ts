@@ -1,5 +1,5 @@
 import { env } from '@/config/env'
-import type { CreateChapterSummaryRequest } from '@read-flow/types'
+import type { CreateChapterSummaryRequest } from '@read-flow/shared'
 
 export interface CachedSummary {
   id: number

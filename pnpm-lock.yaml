@@ -19,7 +19,7 @@ importers:
     dependencies:
       '@ai-sdk/openai':
         specifier: ^2.0.52
-        version: 2.0.52(zod@4.2.1)
+        version: 2.0.88(zod@4.2.1)
       '@ai-sdk/openai-compatible':
         specifier: ^1.0.22
         version: 1.0.22(zod@4.2.1)
@@ -29,9 +29,9 @@ importers:
       '@read-flow/parser':
         specifier: workspace:*
         version: link:../../packages/parser
-      '@read-flow/types':
+      '@read-flow/shared':
         specifier: workspace:*
-        version: link:../../packages/types
+        version: link:../../packages/shared
       '@supabase/supabase-js':
         specifier: ^2.76.1
         version: 2.76.1
@@ -111,9 +111,9 @@ importers:
       '@radix-ui/react-tooltip':
         specifier: ^1.2.8
         version: 1.2.8(@types/react-dom@18.3.7)(@types/react@18.3.26)(react-dom@18.3.1)(react@18.3.1)
-      '@read-flow/types':
+      '@read-flow/shared':
         specifier: workspace:*
-        version: link:../../packages/types
+        version: link:../../packages/shared
       '@tailwindcss/postcss':
         specifier: ^4.1.11
         version: 4.1.17
@@ -288,7 +288,7 @@ importers:
         specifier: ^5.0.0
         version: 5.9.3
 
-  packages/types:
+  packages/shared:
     devDependencies:
       ai:
         specifier: ^5.0.72
@@ -329,14 +329,14 @@ packages:
       zod: 4.2.1
     dev: false
 
-  /@ai-sdk/openai@2.0.52(zod@4.2.1):
-    resolution: {integrity: sha512-n1arAo4+63e6/FFE6z/1ZsZbiOl4cfsoZ3F4i2X7LPIEea786Y2yd7Qdr7AdB4HTLVo3OSb1PHVIcQmvYIhmEA==, tarball: https://registry.npmmirror.com/@ai-sdk/openai/-/openai-2.0.52.tgz}
+  /@ai-sdk/openai@2.0.88(zod@4.2.1):
+    resolution: {integrity: sha512-LlOf83haeZIiRUH1Zw1oEmqUfw5y54227CvndFoBpIkMJwQDGAB3VARUeOJ6iwAWDJjXSz06GdnEnhRU67Yatw==, tarball: https://registry.npmmirror.com/@ai-sdk/openai/-/openai-2.0.88.tgz}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
     dependencies:
       '@ai-sdk/provider': 2.0.0
-      '@ai-sdk/provider-utils': 3.0.12(zod@4.2.1)
+      '@ai-sdk/provider-utils': 3.0.19(zod@4.2.1)
       zod: 4.2.1
     dev: false
 
@@ -350,6 +350,18 @@ packages:
       '@standard-schema/spec': 1.0.0
       eventsource-parser: 3.0.6
       zod: 4.2.1
+
+  /@ai-sdk/provider-utils@3.0.19(zod@4.2.1):
+    resolution: {integrity: sha512-W41Wc9/jbUVXVwCN/7bWa4IKe8MtxO3EyA0Hfhx6grnmiYlCvpI8neSYWFE0zScXJkgA/YK3BRybzgyiXuu6JA==, tarball: https://registry.npmmirror.com/@ai-sdk/provider-utils/-/provider-utils-3.0.19.tgz}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4.1.8
+    dependencies:
+      '@ai-sdk/provider': 2.0.0
+      '@standard-schema/spec': 1.1.0
+      eventsource-parser: 3.0.6
+      zod: 4.2.1
+    dev: false
 
   /@ai-sdk/provider@2.0.0:
     resolution: {integrity: sha512-6o7Y2SeO9vFKB8lArHXehNuusnpddKPk7xqL7T2/b+OvXMRIXUO1rR4wcv1hAFUAT9avGZshty3Wlua/XA7TvA==, tarball: https://registry.npmmirror.com/@ai-sdk/provider/-/provider-2.0.0.tgz}
@@ -1842,40 +1854,40 @@ packages:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  /@napi-rs/canvas-android-arm64@0.1.82:
-    resolution: {integrity: sha512-bvZhN0iI54ouaQOrgJV96H2q7J3ZoufnHf4E1fUaERwW29Rz4rgicohnAg4venwBJZYjGl5Yl3CGmlAl1LZowQ==, tarball: https://registry.npmmirror.com/@napi-rs/canvas-android-arm64/-/canvas-android-arm64-0.1.82.tgz}
+  /@napi-rs/canvas-android-arm64@0.1.88:
+    resolution: {integrity: sha512-KEaClPnZuVxJ8smUWjV1wWFkByBO/D+vy4lN+Dm5DFH514oqwukxKGeck9xcKJhaWJGjfruGmYGiwRe//+/zQQ==, tarball: https://registry.npmmirror.com/@napi-rs/canvas-android-arm64/-/canvas-android-arm64-0.1.88.tgz}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [android]
     requiresBuild: true
     optional: true
 
-  /@napi-rs/canvas-darwin-arm64@0.1.82:
-    resolution: {integrity: sha512-InuBHKCyuFqhNwNr4gpqazo5Xp6ltKflqOLiROn4hqAS8u21xAHyYCJRgHwd+a5NKmutFTaRWeUIT/vxWbU/iw==, tarball: https://registry.npmmirror.com/@napi-rs/canvas-darwin-arm64/-/canvas-darwin-arm64-0.1.82.tgz}
+  /@napi-rs/canvas-darwin-arm64@0.1.88:
+    resolution: {integrity: sha512-Xgywz0dDxOKSgx3eZnK85WgGMmGrQEW7ZLA/E7raZdlEE+xXCozobgqz2ZvYigpB6DJFYkqnwHjqCOTSDGlFdg==, tarball: https://registry.npmmirror.com/@napi-rs/canvas-darwin-arm64/-/canvas-darwin-arm64-0.1.88.tgz}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [darwin]
     requiresBuild: true
     optional: true
 
-  /@napi-rs/canvas-darwin-x64@0.1.82:
-    resolution: {integrity: sha512-aQGV5Ynn96onSXcuvYb2y7TRXD/t4CL2EGmnGqvLyeJX1JLSNisKQlWN/1bPDDXymZYSdUqbXehj5qzBlOx+RQ==, tarball: https://registry.npmmirror.com/@napi-rs/canvas-darwin-x64/-/canvas-darwin-x64-0.1.82.tgz}
+  /@napi-rs/canvas-darwin-x64@0.1.88:
+    resolution: {integrity: sha512-Yz4wSCIQOUgNucgk+8NFtQxQxZV5NO8VKRl9ePKE6XoNyNVC8JDqtvhh3b3TPqKK8W5p2EQpAr1rjjm0mfBxdg==, tarball: https://registry.npmmirror.com/@napi-rs/canvas-darwin-x64/-/canvas-darwin-x64-0.1.88.tgz}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [darwin]
     requiresBuild: true
     optional: true
 
-  /@napi-rs/canvas-linux-arm-gnueabihf@0.1.82:
-    resolution: {integrity: sha512-YIUpmHWeHGGRhWitT1KJkgj/JPXPfc9ox8oUoyaGPxolLGPp5AxJkq8wIg8CdFGtutget968dtwmx71m8o3h5g==, tarball: https://registry.npmmirror.com/@napi-rs/canvas-linux-arm-gnueabihf/-/canvas-linux-arm-gnueabihf-0.1.82.tgz}
+  /@napi-rs/canvas-linux-arm-gnueabihf@0.1.88:
+    resolution: {integrity: sha512-9gQM2SlTo76hYhxHi2XxWTAqpTOb+JtxMPEIr+H5nAhHhyEtNmTSDRtz93SP7mGd2G3Ojf2oF5tP9OdgtgXyKg==, tarball: https://registry.npmmirror.com/@napi-rs/canvas-linux-arm-gnueabihf/-/canvas-linux-arm-gnueabihf-0.1.88.tgz}
     engines: {node: '>= 10'}
     cpu: [arm]
     os: [linux]
     requiresBuild: true
     optional: true
 
-  /@napi-rs/canvas-linux-arm64-gnu@0.1.82:
-    resolution: {integrity: sha512-AwLzwLBgmvk7kWeUgItOUor/QyG31xqtD26w1tLpf4yE0hiXTGp23yc669aawjB6FzgIkjh1NKaNS52B7/qEBQ==, tarball: https://registry.npmmirror.com/@napi-rs/canvas-linux-arm64-gnu/-/canvas-linux-arm64-gnu-0.1.82.tgz}
+  /@napi-rs/canvas-linux-arm64-gnu@0.1.88:
+    resolution: {integrity: sha512-7qgaOBMXuVRk9Fzztzr3BchQKXDxGbY+nwsovD3I/Sx81e+sX0ReEDYHTItNb0Je4NHbAl7D0MKyd4SvUc04sg==, tarball: https://registry.npmmirror.com/@napi-rs/canvas-linux-arm64-gnu/-/canvas-linux-arm64-gnu-0.1.88.tgz}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
@@ -1883,8 +1895,8 @@ packages:
     requiresBuild: true
     optional: true
 
-  /@napi-rs/canvas-linux-arm64-musl@0.1.82:
-    resolution: {integrity: sha512-moZWuqepAwWBffdF4JDadt8TgBD02iMhG6I1FHZf8xO20AsIp9rB+p0B8Zma2h2vAF/YMjeFCDmW5un6+zZz9g==, tarball: https://registry.npmmirror.com/@napi-rs/canvas-linux-arm64-musl/-/canvas-linux-arm64-musl-0.1.82.tgz}
+  /@napi-rs/canvas-linux-arm64-musl@0.1.88:
+    resolution: {integrity: sha512-kYyNrUsHLkoGHBc77u4Unh067GrfiCUMbGHC2+OTxbeWfZkPt2o32UOQkhnSswKd9Fko/wSqqGkY956bIUzruA==, tarball: https://registry.npmmirror.com/@napi-rs/canvas-linux-arm64-musl/-/canvas-linux-arm64-musl-0.1.88.tgz}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
@@ -1892,8 +1904,8 @@ packages:
     requiresBuild: true
     optional: true
 
-  /@napi-rs/canvas-linux-riscv64-gnu@0.1.82:
-    resolution: {integrity: sha512-w9++2df2kG9eC9LWYIHIlMLuhIrKGQYfUxs97CwgxYjITeFakIRazI9LYWgVzEc98QZ9x9GQvlicFsrROV59MQ==, tarball: https://registry.npmmirror.com/@napi-rs/canvas-linux-riscv64-gnu/-/canvas-linux-riscv64-gnu-0.1.82.tgz}
+  /@napi-rs/canvas-linux-riscv64-gnu@0.1.88:
+    resolution: {integrity: sha512-HVuH7QgzB0yavYdNZDRyAsn/ejoXB0hn8twwFnOqUbCCdkV+REna7RXjSR7+PdfW0qMQ2YYWsLvVBT5iL/mGpw==, tarball: https://registry.npmmirror.com/@napi-rs/canvas-linux-riscv64-gnu/-/canvas-linux-riscv64-gnu-0.1.88.tgz}
     engines: {node: '>= 10'}
     cpu: [riscv64]
     os: [linux]
@@ -1901,8 +1913,8 @@ packages:
     requiresBuild: true
     optional: true
 
-  /@napi-rs/canvas-linux-x64-gnu@0.1.82:
-    resolution: {integrity: sha512-lZulOPwrRi6hEg/17CaqdwWEUfOlIJuhXxincx1aVzsVOCmyHf+xFq4i6liJl1P+x2v6Iz2Z/H5zHvXJCC7Bwg==, tarball: https://registry.npmmirror.com/@napi-rs/canvas-linux-x64-gnu/-/canvas-linux-x64-gnu-0.1.82.tgz}
+  /@napi-rs/canvas-linux-x64-gnu@0.1.88:
+    resolution: {integrity: sha512-hvcvKIcPEQrvvJtJnwD35B3qk6umFJ8dFIr8bSymfrSMem0EQsfn1ztys8ETIFndTwdNWJKWluvxztA41ivsEw==, tarball: https://registry.npmmirror.com/@napi-rs/canvas-linux-x64-gnu/-/canvas-linux-x64-gnu-0.1.88.tgz}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
@@ -1910,8 +1922,8 @@ packages:
     requiresBuild: true
     optional: true
 
-  /@napi-rs/canvas-linux-x64-musl@0.1.82:
-    resolution: {integrity: sha512-Be9Wf5RTv1w6GXlTph55K3PH3vsAh1Ax4T1FQY1UYM0QfD0yrwGdnJ8/fhqw7dEgMjd59zIbjJQC8C3msbGn5g==, tarball: https://registry.npmmirror.com/@napi-rs/canvas-linux-x64-musl/-/canvas-linux-x64-musl-0.1.82.tgz}
+  /@napi-rs/canvas-linux-x64-musl@0.1.88:
+    resolution: {integrity: sha512-eSMpGYY2xnZSQ6UxYJ6plDboxq4KeJ4zT5HaVkUnbObNN6DlbJe0Mclh3wifAmquXfrlgTZt6zhHsUgz++AK6g==, tarball: https://registry.npmmirror.com/@napi-rs/canvas-linux-x64-musl/-/canvas-linux-x64-musl-0.1.88.tgz}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
@@ -1919,29 +1931,38 @@ packages:
     requiresBuild: true
     optional: true
 
-  /@napi-rs/canvas-win32-x64-msvc@0.1.82:
-    resolution: {integrity: sha512-LN/i8VrvxTDmEEK1c10z2cdOTkWT76LlTGtyZe5Kr1sqoSomKeExAjbilnu1+oee5lZUgS5yfZ2LNlVhCeARuw==, tarball: https://registry.npmmirror.com/@napi-rs/canvas-win32-x64-msvc/-/canvas-win32-x64-msvc-0.1.82.tgz}
+  /@napi-rs/canvas-win32-arm64-msvc@0.1.88:
+    resolution: {integrity: sha512-qcIFfEgHrchyYqRrxsCeTQgpJZ/GqHiqPcU/Fvw/ARVlQeDX1VyFH+X+0gCR2tca6UJrq96vnW+5o7buCq+erA==, tarball: https://registry.npmmirror.com/@napi-rs/canvas-win32-arm64-msvc/-/canvas-win32-arm64-msvc-0.1.88.tgz}
+    engines: {node: '>= 10'}
+    cpu: [arm64]
+    os: [win32]
+    requiresBuild: true
+    optional: true
+
+  /@napi-rs/canvas-win32-x64-msvc@0.1.88:
+    resolution: {integrity: sha512-ROVqbfS4QyZxYkqmaIBBpbz/BQvAR+05FXM5PAtTYVc0uyY8Y4BHJSMdGAaMf6TdIVRsQsiq+FG/dH9XhvWCFQ==, tarball: https://registry.npmmirror.com/@napi-rs/canvas-win32-x64-msvc/-/canvas-win32-x64-msvc-0.1.88.tgz}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [win32]
     requiresBuild: true
     optional: true
 
-  /@napi-rs/canvas@0.1.82:
-    resolution: {integrity: sha512-FGjyUBoF0sl1EenSiE4UV2WYu76q6F9GSYedq5EiOCOyGYoQ/Owulcv6rd7v/tWOpljDDtefXXIaOCJrVKem4w==, tarball: https://registry.npmmirror.com/@napi-rs/canvas/-/canvas-0.1.82.tgz}
+  /@napi-rs/canvas@0.1.88:
+    resolution: {integrity: sha512-/p08f93LEbsL5mDZFQ3DBxcPv/I4QG9EDYRRq1WNlCOXVfAHBTHMSVMwxlqG/AtnSfUr9+vgfN7MKiyDo0+Weg==, tarball: https://registry.npmmirror.com/@napi-rs/canvas/-/canvas-0.1.88.tgz}
     engines: {node: '>= 10'}
     requiresBuild: true
     optionalDependencies:
-      '@napi-rs/canvas-android-arm64': 0.1.82
-      '@napi-rs/canvas-darwin-arm64': 0.1.82
-      '@napi-rs/canvas-darwin-x64': 0.1.82
-      '@napi-rs/canvas-linux-arm-gnueabihf': 0.1.82
-      '@napi-rs/canvas-linux-arm64-gnu': 0.1.82
-      '@napi-rs/canvas-linux-arm64-musl': 0.1.82
-      '@napi-rs/canvas-linux-riscv64-gnu': 0.1.82
-      '@napi-rs/canvas-linux-x64-gnu': 0.1.82
-      '@napi-rs/canvas-linux-x64-musl': 0.1.82
-      '@napi-rs/canvas-win32-x64-msvc': 0.1.82
+      '@napi-rs/canvas-android-arm64': 0.1.88
+      '@napi-rs/canvas-darwin-arm64': 0.1.88
+      '@napi-rs/canvas-darwin-x64': 0.1.88
+      '@napi-rs/canvas-linux-arm-gnueabihf': 0.1.88
+      '@napi-rs/canvas-linux-arm64-gnu': 0.1.88
+      '@napi-rs/canvas-linux-arm64-musl': 0.1.88
+      '@napi-rs/canvas-linux-riscv64-gnu': 0.1.88
+      '@napi-rs/canvas-linux-x64-gnu': 0.1.88
+      '@napi-rs/canvas-linux-x64-musl': 0.1.88
+      '@napi-rs/canvas-win32-arm64-msvc': 0.1.88
+      '@napi-rs/canvas-win32-x64-msvc': 0.1.88
     optional: true
 
   /@noble/ciphers@2.1.1:
@@ -3393,6 +3414,10 @@ packages:
 
   /@standard-schema/spec@1.0.0:
     resolution: {integrity: sha512-m2bOd0f2RT9k8QJx1JN85cZYyH1RqFBdlwtkSlf4tBDYLCiiZnv1fIIwacK6cqwXavOydf0NPToMQgpKq+dVlA==, tarball: https://registry.npmmirror.com/@standard-schema/spec/-/spec-1.0.0.tgz}
+
+  /@standard-schema/spec@1.1.0:
+    resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==, tarball: https://registry.npmmirror.com/@standard-schema/spec/-/spec-1.1.0.tgz}
+    dev: false
 
   /@supabase/auth-js@2.76.1:
     resolution: {integrity: sha512-bxmcgPuyjTUBg7+jAohJ15TDh3ph4hXcv7QkRsQgnIpszurD5LYaJPzX638ETQ8zDL4fvHZRHfGrcmHV8C91jA==, tarball: https://registry.npmmirror.com/@supabase/auth-js/-/auth-js-2.76.1.tgz}
@@ -5695,7 +5720,7 @@ packages:
     resolution: {integrity: sha512-/Y3fcFrXEAsMjJXeL9J8+ZG9U01LbuWaYypvDW2ycW1jL269L3js3DVBjDJ0Up9Np1uqDXsDrRihHANhZOlwdQ==, tarball: https://registry.npmmirror.com/pdfjs-dist/-/pdfjs-dist-4.10.38.tgz}
     engines: {node: '>=20'}
     optionalDependencies:
-      '@napi-rs/canvas': 0.1.82
+      '@napi-rs/canvas': 0.1.88
 
   /pdfjs-dist@4.8.69:
     resolution: {integrity: sha512-IHZsA4T7YElCKNNXtiLgqScw4zPd3pG9do8UrznC757gMd7UPeHSL2qwNNMJo4r79fl8oj1Xx+1nh2YkzdMpLQ==, tarball: https://registry.npmmirror.com/pdfjs-dist/-/pdfjs-dist-4.8.69.tgz}

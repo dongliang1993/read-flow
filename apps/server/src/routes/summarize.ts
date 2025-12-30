@@ -7,7 +7,7 @@ import { chapterSummaries } from '../db/schema'
 import { modelsService } from '../services/model-service'
 import { SUMMARY_PROMPTS } from '../config/prompts'
 
-import type { CreateChapterSummaryRequest } from '@read-flow/types'
+import type { CreateChapterSummaryRequest } from '@read-flow/shared'
 
 const summarize = new Hono()
 
