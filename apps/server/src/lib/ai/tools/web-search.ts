@@ -1,77 +1,25 @@
-import { tool } from 'ai'
 import { z } from 'zod'
+import { createTool } from './create-tool'
+import { webSearch } from '../../web-search'
 
-import { env } from '../../../config/env'
+export const webSearchTool = createTool({
+  name: 'webSearch',
+  description: `Search the web for comprehensive and up-to-date information.
 
-interface TavilySearchResult {
-  title: string
-  url: string
-  content: string
-  score: number
-}
-
-interface TavilyResponse {
-  results: TavilySearchResult[]
-  answer?: string
-}
-
-async function tavilySearch(
-  query: string,
-  options: { maxResults?: number } = {}
-): Promise<TavilyResponse> {
-  const { maxResults = 5 } = options
-
-  const response = await fetch('https://api.tavily.com/search', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      api_key: env.tavily.apiKey,
-      query,
-      max_results: maxResults,
-      include_answer: true,
-      search_depth: 'basic',
-    }),
-  })
-
-  if (!response.ok) {
-    throw new Error(`Tavily search failed: ${response.statusText}`)
-  }
-
-  return response.json()
-}
-
-export const webSearchTool = tool({
-  description: '网络搜索',
-  // @ts-ignore
+Query Optimization Guidelines:
+- Extract the core topic/entity from questions (e.g., "who is Elon Musk" → "Elon Musk", "what is React" → "React")
+- For comparisons (e.g., "X vs Y"), search for both terms together to get comparison results
+- Remove question words (who, what, when, where, why, how) but keep context words that add meaning
+- Keep technical terms, version numbers, and specific qualifiers (e.g., "React 19 features" stays as-is)
+- For "latest" or "recent" queries, include temporal keywords (e.g., "latest AI models 2025")
+- Preserve programming language/framework context (e.g., "error handling in Rust" → "Rust error handling")
+- For debugging queries, keep error messages and stack traces intact
+- Use multiple searches only when topics are completely unrelated, not for comparisons`,
   inputSchema: z.object({
-    query: z.string().describe('搜索关键词或问题，使用英文搜索效果更好'),
+    query: z.string().min(1).max(100).describe('The search query'),
   }),
-  execute: async ({ query }: { query: string }) => {
-    if (!env.tavily.apiKey) {
-      return '网络搜索功能未配置，请设置 TAVILY_API_KEY 环境变量'
-    }
-
-    try {
-      const result = await tavilySearch(query, { maxResults: 5 })
-
-      if (!result.results?.length) {
-        return '未找到相关搜索结果'
-      }
-
-      const formattedResults = result.results
-        .map(
-          (r, i) => `### ${i + 1}. ${r.title}\n**来源**: ${r.url}\n${r.content}`
-        )
-        .join('\n\n')
-
-      const answer = result.answer ? `**摘要**: ${result.answer}\n\n` : ''
-
-      return `${answer}${formattedResults}`
-    } catch (error) {
-      console.error('Web search error:', error)
-      return `搜索失败: ${error instanceof Error ? error.message : '未知错误'}`
-    }
+  canConcurrent: true,
+  execute: async ({ query }) => {
+    return await webSearch(query)
   },
 })

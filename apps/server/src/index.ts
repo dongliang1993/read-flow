@@ -15,6 +15,7 @@ import note from './routes/note'
 import modes from './routes/modes'
 import { env } from './config/env'
 
+import { loadAllTools } from './lib/ai/tools'
 import { errorHandler } from './middlewares/error-handler'
 import { initJobSystem } from './jobs'
 import { auth } from './lib/auth'
@@ -113,7 +114,9 @@ initJobSystem({
   pollInterval: 5000, // 5 秒轮询一次
   concurrency: 2, // 同时处理 2 个任务
 })
+
 console.log('📋 Job system initialized')
+loadAllTools()
 
 serve({
   fetch: app.fetch,

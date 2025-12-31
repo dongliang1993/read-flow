@@ -11,10 +11,8 @@ import type { OpenAIResponsesProviderOptions } from '@ai-sdk/openai'
 import { promptService } from '../services/prompt'
 import { db } from '../db'
 import { chatHistory } from '../db/schema'
-import { modelsService } from '../services/model-service'
-import { createRagSearchTool } from '../lib/ai/tools/rag-search'
-import { webSearchTool } from '../lib/ai/tools/web-search'
 import { providerService } from '../services/provider'
+import { getAllToolsSync } from '../lib/ai/tools'
 
 import type { UpdateChatMessagesRequest } from '@read-flow/shared'
 
@@ -94,6 +92,17 @@ chat.post('/', async (c) => {
     const systemPrompt = await promptService.buildReadingPrompt(chatContext)
     const providerModel = providerService.getProviderModel(model)
 
+    // Initialize agent loop state
+    const loopState = {
+      messages: [],
+      currentIteration: 0,
+      isComplete: false,
+      lastFinishReason: undefined,
+      lastRequestTokens: 0,
+    }
+
+    const filteredTools = { ...getAllToolsSync() }
+
     const result = await streamText({
       model: providerModel,
       system: systemPrompt,
@@ -109,15 +118,17 @@ chat.post('/', async (c) => {
           include: ['reasoning.encrypted_content'],
         } satisfies OpenAIResponsesProviderOptions,
       },
-      tools: {
-        ragSearch: createRagSearchTool(validBookId!),
-        webSearch: webSearchTool,
-      },
+      tools: filteredTools,
       onStepFinish: (rest) => {
         console.log('rest', rest)
       },
-      onFinish: async ({ text, finishReason }) => {
+      onFinish: async ({ text, finishReason, totalUsage }) => {
         console.log('finishReason', finishReason)
+
+        if (totalUsage?.totalTokens) {
+          loopState.lastRequestTokens = totalUsage.totalTokens
+        }
+
         return
         try {
           await db.insert(chatHistory).values({
