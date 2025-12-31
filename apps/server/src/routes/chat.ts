@@ -75,7 +75,7 @@ chat.post('/', async (c) => {
 
     // 1. 保存用户消息到数据库
     if (lastMessage.role === 'user' && lastMessage.parts) {
-      // await saveUserMessage(db, validBookId, lastMessage)
+      await saveUserMessage(db, validBookId, lastMessage)
     }
 
     // 2. 获取历史消息（用于发给 AI）
