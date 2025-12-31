@@ -16,14 +16,14 @@ export const Studio = ({ children }: StudioProps) => {
 
   return (
     <div id='studio' className='h-full w-full'>
-      <div className='flex flex-row h-full position-relative'>
-        <div className='rounded-3xl bg-shade-01 ml-2 flex-1 px-4 py-3 relative'>
+      <div className='flex flex-row h-full position-relative flex-1'>
+        <div className='rounded-3xl bg-shade-01 ml-2 flex-1 px-4 py-3 relative max-w-full'>
           {/* 渲染所有 tab 内容，用 CSS 控制显隐 */}
           {STUDIO_TABS.map((tab) => (
             <div
               key={tab.id}
               className={cn(
-                'h-full',
+                'h-full w-full',
                 activeTab === tab.id ? 'block' : 'hidden'
               )}
             >

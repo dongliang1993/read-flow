@@ -98,7 +98,7 @@ export const SideChat = ({ bookId }: SideChatProps) => {
   }, [referencesFromStore])
 
   return (
-    <div id='side-chat' className='flex flex-col h-full'>
+    <div id='side-chat' className='flex flex-col h-full max-w-full'>
       <div className='flex items-center justify-between h-6'>
         <h2 className='text-sm font-medium'>对话</h2>
       </div>
