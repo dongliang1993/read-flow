@@ -6,14 +6,15 @@ import {
   textToParts,
   convertHistoryToUIMessages,
   convertHistoryToModelMessages,
+  convertResponseMessagesToParts,
 } from '../lib/chat-transformer'
-import type { OpenAIResponsesProviderOptions } from '@ai-sdk/openai'
 import { promptService } from '../services/prompt'
 import { db } from '../db'
 import { chatHistory } from '../db/schema'
 import { providerService } from '../services/provider'
 import { getAllToolsSync } from '../lib/ai/tools'
 
+import type { OpenAIResponsesProviderOptions } from '@ai-sdk/openai'
 import type { UpdateChatMessagesRequest } from '@read-flow/shared'
 
 const chat = new Hono()
@@ -111,31 +112,34 @@ chat.post('/', async (c) => {
         ...(await convertToModelMessages([lastMessage])),
       ],
       toolChoice: 'auto',
-      stopWhen: stepCountIs(20),
       providerOptions: {
         openai: {
           store: false,
           include: ['reasoning.encrypted_content'],
         } satisfies OpenAIResponsesProviderOptions,
       },
+      stopWhen: stepCountIs(5),
       tools: filteredTools,
-      onStepFinish: (rest) => {
-        console.log('rest', rest)
+      onStepFinish: async ({ finishReason }) => {
+        console.log('stepFinish:', finishReason)
       },
-      onFinish: async ({ text, finishReason, totalUsage }) => {
-        console.log('finishReason', finishReason)
-
+      onFinish: async ({ text, finishReason, totalUsage, response }) => {
         if (totalUsage?.totalTokens) {
           loopState.lastRequestTokens = totalUsage.totalTokens
         }
 
-        return
         try {
+          // 1) 优先用 response.messages（包含 tool call/result 的完整链路）生成可回放的 parts
+          // 2) 兜底：如果 provider 没有返回 response 或 messages，则仅存 text
+          const parts = response?.messages?.length
+            ? convertResponseMessagesToParts(response.messages)
+            : textToParts(text)
+
           await db.insert(chatHistory).values({
             bookId: validBookId,
             userId: 'default-user',
             role: 'assistant',
-            content: textToParts(text),
+            content: parts,
           })
           console.log('✅ AI response saved to database')
         } catch (error) {
