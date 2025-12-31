@@ -10,6 +10,7 @@ import { ScrollContainer } from './scroll-container'
 import { useChat } from '@/hooks/use-chat'
 import { useReaderStore } from '@/store/reader-store'
 import { createBookService } from '@/service/books/book-service'
+import { useAppSettingsStore } from '@/store/app-settings-store'
 
 import type { QuickPromptType } from '@read-flow/shared'
 
@@ -21,6 +22,7 @@ export const SideChat = ({ bookId }: SideChatProps) => {
   const view = useReaderStore((state) => state.view)
   const progress = useReaderStore((state) => state.progress)
   const referencesFromStore = useReaderStore((state) => state.references)
+  const model = useAppSettingsStore((state) => state.model)
 
   const {
     input,
@@ -33,6 +35,7 @@ export const SideChat = ({ bookId }: SideChatProps) => {
     references,
     setReferences,
   } = useChat({
+    model,
     chatContext: {
       activeBookId: bookId,
     },
@@ -114,7 +117,7 @@ export const SideChat = ({ bookId }: SideChatProps) => {
               key={index}
               variant='outline'
               size='sm'
-              className='flex-1 gap-2 text-xs rounded-3xl'
+              className='gap-2 text-xs rounded-3xl bg-transparent cursor-pointer h-8'
               onClick={() =>
                 handleQuickPrompt(action.prompt, action.quickPromptType)
               }

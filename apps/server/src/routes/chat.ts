@@ -14,6 +14,7 @@ import { chatHistory } from '../db/schema'
 import { modelsService } from '../services/model-service'
 import { createRagSearchTool } from '../lib/ai/tools/rag-search'
 import { webSearchTool } from '../lib/ai/tools/web-search'
+import { providerService } from '../services/provider'
 
 import type { UpdateChatMessagesRequest } from '@read-flow/shared'
 
@@ -60,7 +61,11 @@ chat.get('/history/:bookId', async (c) => {
 chat.post('/', async (c) => {
   try {
     const body = await c.req.json<UpdateChatMessagesRequest>()
-    const { messages, bookId, chatContext } = body
+    const { messages, bookId, chatContext, model } = body
+
+    if (!model) {
+      return c.json({ error: 'Model is required' }, 400)
+    }
 
     if (!messages?.length) {
       return c.json({ error: 'At least one message is required' }, 400)
@@ -87,10 +92,11 @@ chat.post('/', async (c) => {
     const modelMessages = convertHistoryToModelMessages(history)
     // 3. 构建 prompt 和调用 AI
     const systemPrompt = await promptService.buildReadingPrompt(chatContext)
+    const providerModel = providerService.getProviderModel(model)
 
     const result = await streamText({
-      // system: systemPrompt,
-      model: modelsService.getModel('openai')('gpt-5.2'),
+      model: providerModel,
+      system: systemPrompt,
       messages: [
         ...modelMessages,
         ...(await convertToModelMessages([lastMessage])),

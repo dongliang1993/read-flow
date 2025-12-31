@@ -27,9 +27,7 @@
     "pdfjs-dist": "^4.7.76",
     "rollup": "^4.22.4"
   },
-  "scripts": {
-    "build": "npx rollup -c"
-  },
+  "scripts": {},
   "keywords": [
     "ebook",
     "reader",

@@ -24,7 +24,6 @@ export interface ProviderConfig {
   baseUrl?: string
   required?: boolean
   type: ProviderType
-  // biome-ignore lint/suspicious/noExplicitAny: Provider return types vary by implementation
   createProvider?: (apiKey: string, baseUrl?: string) => any
   isCustom?: boolean
   customConfig?: CustomProviderConfig

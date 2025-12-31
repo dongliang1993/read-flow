@@ -14,6 +14,7 @@ import type { UIMessage } from 'ai'
 export type { ChatStatus } from 'ai'
 
 type UseChatOptions = {
+  model: string
   chatContext: ChatContext
 }
 
@@ -28,12 +29,14 @@ export const createReferenceId = () => {
 
 export const useChat = (options: UseChatOptions) => {
   const { chatContext } = options
+
   const { activeBookId } = chatContext
 
   const [input, setInput] = useState('')
   const [references, setReferences] = useState<ChatReference[]>([])
-  const contextRef = useRef<ChatContext>(chatContext)
-  contextRef.current = chatContext
+
+  const optionsRef = useRef<UseChatOptions>(options)
+  optionsRef.current = options
 
   const messagesRef = useRef<UIMessage[]>([])
 
@@ -68,13 +71,15 @@ export const useChat = (options: UseChatOptions) => {
         api: `${env.apiBaseUrl}/api/v1/chat`,
         prepareSendMessagesRequest: ({ messages, body }) => {
           const processedMessages = processQuoteMessages(messages)
-          console.log(processedMessages, 'processedMessages')
+          console.log(processedMessages, chatContext, 'processedMessages')
+
           return {
             body: {
               ...body,
-              bookId: activeBookId,
+              bookId: optionsRef.current.chatContext.activeBookId,
+              model: optionsRef.current.model,
               messages: processedMessages.slice(-1),
-              chatContext: contextRef.current,
+              chatContext: optionsRef.current.chatContext,
             },
           }
         },
@@ -146,7 +151,7 @@ export const useChat = (options: UseChatOptions) => {
   })
 
   const setChatContext = useMemoizedFn((chatContext: ChatContext) => {
-    contextRef.current = chatContext
+    optionsRef.current.chatContext = chatContext
   })
 
   useEffect(() => {

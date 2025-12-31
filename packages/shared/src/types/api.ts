@@ -22,6 +22,7 @@ export interface UpdateChatMessagesRequest {
   messages: UIMessage[]
   bookId: string
   chatContext: ChatContext
+  model: string
 }
 
 export interface CreateChapterSummaryRequest {
