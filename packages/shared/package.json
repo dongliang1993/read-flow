@@ -9,9 +9,13 @@
   "exports": {
     ".": "./src/index.ts",
     "./types": "./src/types/index.ts",
-    "./data/models-config": "./src/data/models-config.json"
+    "./data/models-config": "./src/data/models-config.json",
+    "./providers/provider-config": "./src/providers/provider-config.ts"
   },
   "devDependencies": {
     "ai": "^5.0.72"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "^2.0.52"
   }
 }

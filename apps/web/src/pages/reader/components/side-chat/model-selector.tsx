@@ -1,12 +1,16 @@
 import { Check, ChevronDown } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from '@/components/ui/popover'
+import { useAppSettingsStore } from '@/store/app-settings-store'
+import { useProviderStore } from '@/store/provider-store'
+
+import type { AvailableModel } from '@read-flow/shared/types'
 
 export type ModelPricing = {
   input: string
@@ -26,62 +30,102 @@ export type ModelsConfig = {
   models: Record<string, ModelConfig>
 }
 
-type ModelSelectorProps = {
-  value: string | null
-  models: Record<string, ModelConfig>
-  onChange: (id: string) => void
-  disabled?: boolean
+const ModelItem = ({
+  model,
+  active,
+  onChange,
+}: {
+  model: AvailableModel
+  active: boolean
+  onChange: (model: AvailableModel) => void
+}) => {
+  return (
+    <div
+      className='flex items-center px-2 py-2 mx-2 rounded-md cursor-pointer hover:bg-shade-03'
+      onClick={() => onChange(model)}
+    >
+      <div className='truncate text-sm text-foreground flex-1'>
+        {model.name}
+      </div>
+      {active && <Check className='size-4' />}
+    </div>
+  )
 }
 
-export const ModelSelector = ({
-  value,
-  models,
-  onChange,
-  disabled,
-}: ModelSelectorProps) => {
-  const entries = Object.entries(models)
-  const selected = value ? models[value] : null
-  const label = selected?.name || '选择模型'
+export const ModelSelector = () => {
+  const [open, setOpen] = useState(false)
+
+  const model = useAppSettingsStore((state) => state.model)
+  const setModel = useAppSettingsStore((state) => state.setModel)
+
+  const isLoading = useProviderStore((state) => state.isLoading)
+  const loadModels = useProviderStore((state) => state.initialize)
+  const availableModels = useProviderStore((state) => state.availableModels)
+
+  const currentModelKey = useMemo(() => {
+    if (!model) {
+      return ''
+    }
+    const parts = model.split('@')
+    return parts[0] || ''
+  }, [model])
+
+  // Find current model info
+  const currentModel = useMemo(() => {
+    return availableModels.find((m) => m.key === currentModelKey)
+  }, [availableModels, currentModelKey])
+
+  // Handle model selection
+  const handleSelectModel = useCallback(
+    (model: AvailableModel) => {
+      if (isLoading) {
+        return
+      }
+      // Store as "modelKey@provider" format
+      const modelIdentifier = `${model.key}@${model.provider}`
+      setModel(modelIdentifier)
+      setOpen(false)
+    },
+    [isLoading, setModel]
+  )
+
+  useEffect(() => {
+    loadModels()
+  }, [loadModels])
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
         <Button
           type='button'
           variant='ghost'
           size='sm'
-          className='h-7 px-2 text-neutral-200 hover:text-neutral-100 hover:bg-neutral-800'
-          disabled={disabled}
+          disabled={isLoading}
+          className='h-7 px-3 text-sm rounded-full cursor-pointer hover:bg-neutral-100 '
         >
-          <span className='max-w-[180px] truncate'>{label}</span>
+          <span className='max-w-[180px] truncate text-foreground'>
+            {currentModel?.name}
+          </span>
           <ChevronDown className='ml-1 size-4 text-neutral-400' />
         </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align='start' className='min-w-[240px]'>
-        {entries.length === 0 ? (
-          <DropdownMenuItem disabled>暂无可用模型</DropdownMenuItem>
-        ) : (
-          entries.map(([id, model]) => {
-            const isSelected = id === value
-            return (
-              <DropdownMenuItem
-                key={id}
-                onClick={() => onChange(id)}
-                className='flex items-center justify-between gap-3'
-              >
-                <div className='min-w-0'>
-                  <div className='truncate'>{model.name}</div>
-                  <div className='text-xs text-neutral-400'>
-                    context {model.context_length.toLocaleString()}
-                    {model.imageInput ? ' · image' : ''}
-                  </div>
-                </div>
-                {isSelected && <Check className='size-4 text-neutral-200' />}
-              </DropdownMenuItem>
-            )
-          })
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
+      </PopoverTrigger>
+      <PopoverContent
+        align='start'
+        className='w-[280px] overflow-y-auto max-h-[400px] px-0 py-1 shadow-lg outline-none rounded-2xl border border-neutral-50'
+      >
+        {availableModels.map((model) => {
+          const isSelected = model.key === currentModelKey
+
+          return (
+            <ModelItem
+              key={model.key}
+              model={model}
+              active={isSelected}
+              onChange={handleSelectModel}
+            />
+          )
+        })}
+      </PopoverContent>
+    </Popover>
   )
 }

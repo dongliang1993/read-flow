@@ -17,7 +17,6 @@ function App() {
       <AuthDialog />
       <Routes>
         <Route path='/auth/reset-password' element={<ResetPasswordPage />} />
-        <Route path='/reader/:bookId' element={<ReaderLayout />} />
         <Route path='/' element={<Layout />}>
           <Route path='library' element={<LibraryLayout />}>
             <Route path='all' element={<AllBooks />} />
@@ -25,6 +24,7 @@ function App() {
             <Route path='finished' element={<Finished />} />
             <Route index element={<Navigate to='/library/all' replace />} />
           </Route>
+          <Route path='/reader/:bookId' element={<ReaderLayout />} />
           <Route path='dashboard' element={<Dashboard />} />
           <Route path='settings' element={<Settings />} />
           <Route path='*' element={<Navigate to='/' replace />} />
