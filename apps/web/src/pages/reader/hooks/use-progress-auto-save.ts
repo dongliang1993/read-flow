@@ -9,7 +9,6 @@ export const useProgressAutoSave = (bookId: string) => {
   const progress = useReaderStore((state) => state.progress)
   const location = useReaderStore((state) => state.location)
 
-  console.log('progress', progress)
   const updateBookProgress = useMemoizedFn(async () => {
     const currentProgress = progress
     if (!currentProgress || !currentProgress.pageInfo || !location) {

@@ -114,11 +114,6 @@ export const useReaderStore = create<ReaderStore>((set, get) => ({
       const { settings } = useAppSettingsStore.getState()
       const { getBookById, bookDataMap } = get()
 
-      if (bookDataMap.has(bookId)) {
-        set({ loading: false, bookData: bookDataMap.get(bookId) })
-        return
-      }
-
       const book = await getBookById(bookId)
 
       if (!book) {
