@@ -21,11 +21,13 @@ import { cn } from '@/lib/utils'
 type UserPopoverProps = {
   avatarSize?: UserAvatarSize
   contentAlign?: 'start' | 'center' | 'end'
+  className?: string
 }
 
 export function UserPopover({
   avatarSize = 'sm',
   contentAlign = 'start',
+  className,
 }: UserPopoverProps) {
   const { data: session, isPending } = useSession()
   const openAuth = useAuthStore((state) => state.openAuth)
@@ -72,7 +74,10 @@ export function UserPopover({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button type='button' className='outline-none cursor-pointer'>
+        <button
+          type='button'
+          className={cn('outline-none cursor-pointer', className)}
+        >
           <UserAvatar src={user.image} name={user.name} size={avatarSize} />
         </button>
       </DropdownMenuTrigger>

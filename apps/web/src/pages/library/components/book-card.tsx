@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { Book } from '@read-flow/shared'
 import { MoreHorizontal } from 'lucide-react'
+import { motion } from 'motion/react'
 
 interface BookCardProps {
   book: Book & { progress?: number }
@@ -18,7 +19,8 @@ export function BookCard({ book }: BookCardProps) {
   }
 
   return (
-    <div
+    <motion.div
+      layoutId={`book-card-${book.id}`}
       className='group relative cursor-pointer rounded-2xl hover:shadow-prompt-input border border-shade-04 p-2 transition-shadow'
       onClick={handleClick}
     >
@@ -66,6 +68,6 @@ export function BookCard({ book }: BookCardProps) {
           </div>
         </div>
       )}
-    </div>
+    </motion.div>
   )
 }

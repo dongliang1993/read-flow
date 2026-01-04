@@ -25,6 +25,7 @@ type ReaderStore = {
   activeBookId: string | null
   activeBook: Book | null
   bookData: BookData | null
+  bookDataMap: Map<string, BookData>
   loading: boolean
   error: string | null
   openDropdown: OpenDropdown | null
@@ -51,6 +52,7 @@ export const useReaderStore = create<ReaderStore>((set, get) => ({
   activeBookId: null,
   activeBook: null,
   bookData: null,
+  bookDataMap: new Map<string, BookData>(),
   loading: false,
   error: null,
   openDropdown: null,
@@ -110,7 +112,13 @@ export const useReaderStore = create<ReaderStore>((set, get) => ({
       set({ loading: true, error: null })
 
       const { settings } = useAppSettingsStore.getState()
-      const { getBookById } = get()
+      const { getBookById, bookDataMap } = get()
+
+      if (bookDataMap.has(bookId)) {
+        set({ loading: false, bookData: bookDataMap.get(bookId) })
+        return
+      }
+
       const book = await getBookById(bookId)
 
       if (!book) {
@@ -146,6 +154,8 @@ export const useReaderStore = create<ReaderStore>((set, get) => ({
         config,
         bookDoc,
       }
+
+      bookDataMap.set(bookId, bookData)
 
       set({ loading: false, bookData, config })
     } catch (error) {

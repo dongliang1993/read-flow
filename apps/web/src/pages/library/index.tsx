@@ -60,9 +60,8 @@ export function LibraryLayout() {
         <div className='w-full px-5 py-3 flex justify-end'>
           <Button
             size='sm'
-            variant='secondary'
             onClick={triggerFileSelect}
-            className='flex items-center gap-2 cursor-pointer border rounded-xl'
+            className='flex items-center gap-2 cursor-pointer border rounded-full'
           >
             {isUploading ? (
               <>

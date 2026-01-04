@@ -12,11 +12,11 @@ export const Header = () => {
   }, [navigate])
 
   return (
-    <div className='h-13 w-full py-3 px-2 flex'>
+    <div className='h-13 w-full py-3 px-3 flex'>
       <div className='flex-1'>
         <Logo className='cursor-pointer' onClick={handleLogoClick} />
       </div>
-      <UserPopover avatarSize='sm' contentAlign='end' />
+      <UserPopover avatarSize='sm' contentAlign='end' className='mr-[2px]' />
     </div>
   )
 }

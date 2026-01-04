@@ -2,6 +2,7 @@ import { Resizable } from 're-resizable'
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { useShallow } from 'zustand/react/shallow'
+import { motion } from 'motion/react'
 
 import { Card, CardDescription, CardHeader } from '@/components/ui/card'
 import { Studio } from './components/studio'
@@ -42,14 +43,14 @@ const ReaderContent = ({ bookId }: { bookId: string }) => {
   )
 
   useEffect(() => {
-    if (bookId && !bookData) {
+    if (bookId) {
       initBook(bookId)
     }
-  }, [bookId, bookData])
+  }, [bookId])
 
   if (loading) {
     return (
-      <div className='flex h-full items-center justify-center'>
+      <div className='flex-1 flex items-center justify-center min-h-screen p-8 bg-neutral-50 dark:bg-neutral-950 rounded-3xl'>
         <div className='text-neutral-500'>loading...</div>
       </div>
     )
@@ -57,7 +58,7 @@ const ReaderContent = ({ bookId }: { bookId: string }) => {
 
   if (error) {
     return (
-      <div className='flex items-center justify-center min-h-screen p-8 bg-neutral-50 dark:bg-neutral-950'>
+      <div className='flex-1 flex items-center justify-center min-h-screen p-8 bg-neutral-50 dark:bg-neutral-950 rounded-3xl'>
         <Card className='max-w-md'>
           <CardHeader>
             <CardDescription>加载失败：{error}</CardDescription>
@@ -108,7 +109,7 @@ const ReaderContent = ({ bookId }: { bookId: string }) => {
   )
 
   return (
-    <div className='flex-1 flex min-h-0'>
+    <>
       <div className='relative flex-1 rounded-3xl border shadow-around overflow-hidden'>
         {/* 阅读器 */}
         <Reader bookId={bookData.id} />
@@ -119,7 +120,7 @@ const ReaderContent = ({ bookId }: { bookId: string }) => {
         )}
       </div>
       {chatSidebar}
-    </div>
+    </>
   )
 }
 
@@ -127,9 +128,14 @@ export const ReaderLayout = () => {
   const { bookId = '' } = useParams<{ bookId: string }>()
 
   return (
-    <div className='flex flex-col h-full w-full p-2 pt-0 bg-accent'>
+    <div className='flex flex-col h-full w-full pt-0 bg-accent'>
       <Header />
-      <ReaderContent bookId={bookId} />
+      <motion.div
+        layoutId={`book-card-${bookId}`}
+        className='flex-1 flex min-h-0 p-2 pt-0'
+      >
+        <ReaderContent bookId={bookId} />
+      </motion.div>
     </div>
   )
 }

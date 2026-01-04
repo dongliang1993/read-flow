@@ -2,8 +2,11 @@ import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { Library, Clock, CheckCircle2 } from 'lucide-react'
 import { Resizable } from 're-resizable'
+
 import { DashboardLink } from './dashboard-link'
 import { UserPopover } from '@/components/user'
+import { Logo } from '@/components/logo'
+
 import { cn } from '@/lib/utils'
 
 import type { LucideProps } from 'lucide-react'
@@ -93,8 +96,8 @@ export function Sidebar() {
       className='h-screen bg-shade-01 dark:bg-neutral-900 border-r border-neutral-200 dark:border-neutral-800 flex flex-col'
     >
       {/* Header */}
-      <div className='p-4'>
-        <h1 className='text-xl font-bold text-neutral-900'>Read Flow</h1>
+      <div className='p-3'>
+        <Logo />
       </div>
 
       {/* Navigation */}

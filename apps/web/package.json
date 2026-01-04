@@ -43,6 +43,7 @@
     "html-to-image": "^1.11.13",
     "lodash-es": "^4.17.21",
     "lucide-react": "^0.428.0",
+    "motion": "^12.23.26",
     "pdfjs-dist": "^4.8.69",
     "re-resizable": "^6.9.0",
     "react": "^18.3.0",
