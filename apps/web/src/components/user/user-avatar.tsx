@@ -1,14 +1,16 @@
 import { cn } from '@/lib/utils'
 
+export type UserAvatarSize = 'xs' | 'sm' | 'md' | 'lg'
+
 type UserAvatarProps = {
   src?: string | null
   name?: string | null
-  size?: 'xs' | 'sm' | 'md' | 'lg'
+  size?: UserAvatarSize
   className?: string
   showBorder?: boolean
 }
 
-const sizeMap = {
+export const userAvatarSizeMap = {
   xs: 'h-7 w-7 text-xs',
   sm: 'h-8 w-8 text-xs',
   md: 'h-10 w-10 text-sm',
@@ -42,7 +44,10 @@ export function UserAvatar({
     <img
       src={src}
       alt={name || 'User avatar'}
-      className={cn('rounded-full object-cover bg-neutral-100', sizeMap[size])}
+      className={cn(
+        'rounded-full object-cover bg-neutral-100',
+        userAvatarSizeMap[size]
+      )}
     />
   ) : (
     <div

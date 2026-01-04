@@ -10,23 +10,41 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useSession, signOut } from '@/lib/auth-client'
-import { useAuthStore } from '@/store/auth-store'
 import { Profile } from './profile'
-import { UserAvatar } from './user-avatar'
+import { UserAvatar, UserAvatarSize, userAvatarSizeMap } from './user-avatar'
 import { Settings } from '@/components/icon/setting'
 import { SignOut } from '@/components/icon/signout'
 
-export function UserPopover() {
+import { useAuthStore } from '@/store/auth-store'
+import { cn } from '@/lib/utils'
+
+type UserPopoverProps = {
+  avatarSize?: UserAvatarSize
+  contentAlign?: 'start' | 'center' | 'end'
+}
+
+export function UserPopover({
+  avatarSize = 'sm',
+  contentAlign = 'start',
+}: UserPopoverProps) {
   const { data: session, isPending } = useSession()
   const openAuth = useAuthStore((state) => state.openAuth)
   const navigate = useNavigate()
+  const avatarSizeClass = userAvatarSizeMap[avatarSize]
 
   const handleSettings = useCallback(() => {
     navigate('/settings')
   }, [navigate])
 
   if (isPending) {
-    return <div className='size-10 rounded-full bg-neutral-200 animate-pulse' />
+    return (
+      <div
+        className={cn(
+          'size-10 rounded-full bg-neutral-200 animate-pulse',
+          avatarSizeClass
+        )}
+      />
+    )
   }
 
   if (!session) {
@@ -34,10 +52,12 @@ export function UserPopover() {
       <button
         type='button'
         onClick={() => openAuth('login')}
-        className='flex items-center gap-2 rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-neutral-800'
+        className={cn(
+          'flex items-center justify-center rounded-full bg-neutral-900 font-medium text-white transition-colors cursor-pointer',
+          avatarSizeClass
+        )}
       >
         <User className='h-4 w-4' />
-        登录
       </button>
     )
   }
@@ -52,11 +72,11 @@ export function UserPopover() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button type='button' className='outline-none'>
-          <UserAvatar src={user.image} name={user.name} size='xs' showBorder />
+        <button type='button' className='outline-none cursor-pointer'>
+          <UserAvatar src={user.image} name={user.name} size={avatarSize} />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align='start' className='rounded-3xl p-0'>
+      <DropdownMenuContent align={contentAlign} className='rounded-3xl p-0'>
         <Profile
           className='shadow-none p-1.5'
           avatarImage={user.image || ''}

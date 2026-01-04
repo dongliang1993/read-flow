@@ -24,11 +24,11 @@ function App() {
             <Route path='finished' element={<Finished />} />
             <Route index element={<Navigate to='/library/all' replace />} />
           </Route>
-          <Route path='/reader/:bookId' element={<ReaderLayout />} />
           <Route path='dashboard' element={<Dashboard />} />
           <Route path='settings' element={<Settings />} />
           <Route path='*' element={<Navigate to='/' replace />} />
         </Route>
+        <Route path='/reader/:bookId' element={<ReaderLayout />} />
       </Routes>
     </BrowserRouter>
   )

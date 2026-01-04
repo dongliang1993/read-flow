@@ -30,7 +30,7 @@ const HeaderBar = () => {
           <Button
             variant='ghost'
             size='icon'
-            className='h-8 w-8 cursor-pointer'
+            className='h-8 w-8 cursor-pointer hover:bg-transparent'
             onClick={handleGoBack}
           >
             <ArrowLeft size={18} />

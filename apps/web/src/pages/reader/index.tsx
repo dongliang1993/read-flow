@@ -8,6 +8,8 @@ import { Studio } from './components/studio'
 import { Reader } from './components/reader'
 import { SideChat } from './components/side-chat'
 import { Notes } from './components/notes'
+import { Header } from './components/header'
+
 import { useReaderStore } from '@/store/reader-store'
 
 const DEFAULT_SIZE = {
@@ -26,10 +28,9 @@ const RESIZE_ENABLE = {
   topLeft: false,
 }
 
-export const ReaderLayout = () => {
-  const [isChatVisible] = useState(true)
+const ReaderContent = ({ bookId }: { bookId: string }) => {
   const [showOverlay, setShowOverlay] = useState(false)
-  const { bookId = '' } = useParams<{ bookId: string }>()
+  const [isChatVisible] = useState(true)
 
   const { initBook, loading, error, bookData } = useReaderStore(
     useShallow((state) => ({
@@ -107,7 +108,7 @@ export const ReaderLayout = () => {
   )
 
   return (
-    <div className='flex h-full w-full p-2 bg-accent'>
+    <div className='flex-1 flex min-h-0'>
       <div className='relative flex-1 rounded-3xl border shadow-around overflow-hidden'>
         {/* 阅读器 */}
         <Reader bookId={bookData.id} />
@@ -118,6 +119,17 @@ export const ReaderLayout = () => {
         )}
       </div>
       {chatSidebar}
+    </div>
+  )
+}
+
+export const ReaderLayout = () => {
+  const { bookId = '' } = useParams<{ bookId: string }>()
+
+  return (
+    <div className='flex flex-col h-full w-full p-2 pt-0 bg-accent'>
+      <Header />
+      <ReaderContent bookId={bookId} />
     </div>
   )
 }
