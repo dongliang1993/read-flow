@@ -106,7 +106,7 @@ export const SideChat = ({ bookId }: SideChatProps) => {
         <QuickActions onSelect={handleQuickPrompt} />
       ) : (
         <ScrollContainer className='relative flex-1 mx-[-14px]' autoScroll>
-          <ChatMessages className='px-4' messages={messages} />
+          <ChatMessages status={status} className='px-4' messages={messages} />
         </ScrollContainer>
       )}
 

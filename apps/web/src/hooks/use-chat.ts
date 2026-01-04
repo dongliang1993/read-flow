@@ -94,7 +94,7 @@ export const useChat = (options: UseChatOptions) => {
     }
   )
 
-  console.log(messages, 'messagesRef.current')
+  console.log(messages, 'messages')
 
   const handleSubmit = useMemoizedFn(async (outInput: string) => {
     if (status !== 'ready') {

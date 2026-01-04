@@ -1,6 +1,5 @@
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { Bot } from 'lucide-react'
 
 import { MessageTools } from './message-tools'
 import { Tool, ToolHeader, ToolContent, ToolOutput } from '@/components/tool'
@@ -169,9 +168,6 @@ export const MessageItem = ({ message, onShareOpen }: MessageItemProps) => {
           key={message.id}
           className='flex flex-col gap-3 items-start w-full'
         >
-          <div className='shrink-0 w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center'>
-            <Bot className='w-5 h-5 text-blue-600 dark:text-blue-400' />
-          </div>
           <div className='flex-1 py-2 w-full'>
             {message.parts.map((part, index) =>
               renderMessagePart(part, `${messageId}-${index}`, true)

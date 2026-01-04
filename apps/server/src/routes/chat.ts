@@ -120,35 +120,30 @@ chat.post('/', async (c) => {
       },
       stopWhen: stepCountIs(5),
       tools: filteredTools,
-      onStepFinish: async ({ finishReason }) => {
-        console.log('stepFinish:', finishReason)
-      },
-      onFinish: async ({ text, finishReason, totalUsage, response }) => {
-        if (totalUsage?.totalTokens) {
-          loopState.lastRequestTokens = totalUsage.totalTokens
-        }
+      // onFinish: async ({ text, finishReason, totalUsage, response }) => {
+      //   if (totalUsage?.totalTokens) {
+      //     loopState.lastRequestTokens = totalUsage.totalTokens
+      //   }
 
+      // },
+    })
+
+    return result.toUIMessageStreamResponse({
+      onFinish: async ({ messages }) => {
         try {
-          // 1) 优先用 response.messages（包含 tool call/result 的完整链路）生成可回放的 parts
-          // 2) 兜底：如果 provider 没有返回 response 或 messages，则仅存 text
-          const parts = response?.messages?.length
-            ? convertResponseMessagesToParts(response.messages)
-            : textToParts(text)
-
-          await db.insert(chatHistory).values({
-            bookId: validBookId,
-            userId: 'default-user',
-            role: 'assistant',
-            content: parts,
+          messages.forEach(async (message) => {
+            await db.insert(chatHistory).values({
+              bookId: validBookId,
+              userId: 'default-user',
+              role: message.role,
+              content: message.parts,
+            })
           })
-          console.log('✅ AI response saved to database')
         } catch (error) {
           console.error('Failed to save AI response:', error)
         }
       },
     })
-
-    return result.toUIMessageStreamResponse()
   } catch (error) {
     console.error('Chat API error:', error)
     return c.json(
