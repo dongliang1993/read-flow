@@ -18,6 +18,7 @@ function App() {
       <Routes>
         <Route path='/auth/reset-password' element={<ResetPasswordPage />} />
         <Route path='/' element={<Layout />}>
+          <Route index element={<Navigate to='/library/all' replace />} />
           <Route path='library' element={<LibraryLayout />}>
             <Route path='all' element={<AllBooks />} />
             <Route path='reading' element={<Reading />} />
