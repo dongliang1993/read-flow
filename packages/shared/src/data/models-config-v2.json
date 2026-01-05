@@ -24,6 +24,7 @@
       }
     ],
     "apiKey": "sk-YlT7MFkRb58GuKHsYQ2l3tvXW7zyH8DNlzdFTv2C0ukFNbH6",
-    "baseURL": "https://api.gptbest.vip/v1"
+    "baseURL": "https://api.gptbest.vip/v1",
+    "enabled": true
   }
 ]

@@ -40,6 +40,7 @@ export interface ProviderConfigV2 {
   baseURL: string
   apiVersion?: string
   isResponseAPI?: boolean
+  enabled: boolean
 }
 
 export interface AvailableModel {
