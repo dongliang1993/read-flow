@@ -13,6 +13,7 @@ import readingStats from './routes/reading-stats'
 import progress from './routes/progress'
 import note from './routes/note'
 import modes from './routes/modes'
+import settings from './routes/settings'
 import { env } from './config/env'
 
 import { loadAllTools } from './lib/ai/tools'
@@ -101,6 +102,7 @@ app.route('/api/v1/reading-stats', readingStats)
 app.route('/api/v1/progress', progress)
 app.route('/api/v1/note', note)
 app.route('/api/v1/modes', modes)
+app.route('/api/v1/settings', settings)
 
 const port = env.port
 console.log(`🚀 Server is running on http://localhost:${port}`)

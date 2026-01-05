@@ -3,26 +3,46 @@ import { env } from '@/config/env'
 import type { ProviderConfigV2 } from '@read-flow/shared/types'
 
 export default class ModelLoader {
-  async load() {
-    let serverConfig: ProviderConfigV2[]
-
-    // Load server config
+  async load(): Promise<ProviderConfigV2[]> {
     try {
-      const response = await fetch(`${env.apiBaseUrl}/api/v1/modes/configs`)
-      const data = await response.json()
+      const response = await fetch(
+        `${env.apiBaseUrl}/api/v1/settings/providers`,
+        { credentials: 'include' }
+      )
 
       if (!response.ok) {
-        throw new Error(`Failed to load models: ${response.statusText}`)
+        throw new Error(`Failed to load providers: ${response.statusText}`)
       }
 
-      serverConfig = data as ProviderConfigV2[]
-      console.log('models data', data)
+      const data = await response.json()
+      return data.providers as ProviderConfigV2[]
     } catch (error) {
-      serverConfig = []
-      console.warn('Failed to load models cache file, using default:', error)
+      console.warn('Failed to load provider settings:', error)
+      return []
     }
+  }
 
-    return serverConfig
+  async save(providers: ProviderConfigV2[]): Promise<boolean> {
+    try {
+      const response = await fetch(
+        `${env.apiBaseUrl}/api/v1/settings/providers`,
+        {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ providers }),
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error(`Failed to save providers: ${response.statusText}`)
+      }
+
+      return true
+    } catch (error) {
+      console.error('Failed to save provider settings:', error)
+      return false
+    }
   }
 }
 

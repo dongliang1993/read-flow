@@ -33,7 +33,7 @@ const ProviderItem = ({
           : 'hover:bg-neutral-50 border border-transparent'
       )}
     >
-      <ProviderIcon provider={provider.type} className='size-6' />
+      <ProviderIcon provider={provider.type} className='size-5' />
       <span className='flex-1 text-sm font-medium text-neutral-900'>
         {provider.name}
       </span>
@@ -53,7 +53,7 @@ export const ProviderList = ({
   onSelect,
 }: ProviderListProps) => {
   return (
-    <div className='flex flex-col gap-1 w-72 shrink-0'>
+    <div className='flex flex-col gap-1 w-72 shrink-0 shadow-sm border border-neutral-100 rounded-2xl p-2'>
       {providers.map((provider) => (
         <ProviderItem
           key={provider.id}

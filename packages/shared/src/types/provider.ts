@@ -2,6 +2,7 @@ import type { ModelConfigV2 } from './models'
 
 export type ProviderType =
   | 'openai'
+  | 'anthropic'
   | 'openai-compatible'
   | 'custom'
   | 'custom-openai'
