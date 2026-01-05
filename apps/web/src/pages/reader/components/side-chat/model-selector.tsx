@@ -1,5 +1,6 @@
 import { Check, ChevronDown } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useMemoizedFn } from 'ahooks'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -7,11 +8,13 @@ import {
   PopoverTrigger,
   PopoverContent,
 } from '@/components/ui/popover'
+import { ProviderIcon } from '@/components/provider-icon'
+
+import { cn } from '@/lib/utils'
 import { useAppSettingsStore } from '@/store/app-settings-store'
 import { useProviderStore } from '@/store/provider-store'
 
 import type { ModelConfigV2, ProviderConfigV2 } from '@read-flow/shared/types'
-import { useMemoizedFn } from 'ahooks'
 
 export type ModelPricing = {
   input: string
@@ -32,6 +35,7 @@ export type ModelsConfig = {
 }
 
 const ModelItem = ({
+  className,
   model,
   active,
   onChange,
@@ -39,10 +43,14 @@ const ModelItem = ({
   model: ModelConfigV2
   active: boolean
   onChange: (model: ModelConfigV2) => void
+  className?: string
 }) => {
   return (
     <div
-      className='flex items-center px-2 py-2 rounded-md cursor-pointer hover:bg-shade-03'
+      className={cn(
+        'flex items-center px-2 py-2 rounded-md cursor-pointer hover:bg-shade-03',
+        className
+      )}
       onClick={() => onChange(model)}
     >
       <div className='truncate text-sm text-foreground flex-1'>
@@ -54,10 +62,12 @@ const ModelItem = ({
 }
 
 const ProviderItem = ({
+  className,
   provider,
   selectedModel,
   onChange,
 }: {
+  className?: string
   provider: ProviderConfigV2
   selectedModel: string
   onChange: (provider: ProviderConfigV2, model: ModelConfigV2) => void
@@ -70,9 +80,10 @@ const ProviderItem = ({
   )
 
   return (
-    <div className='flex flex-col px-1 py-2 rounded-md'>
-      <div className='truncate text-sm text-foreground flex-1 py-1 px-1'>
-        {provider.name}
+    <div className={cn('flex flex-col px-1 py-2 rounded-md', className)}>
+      <div className='flex items-center flex-1 py-1 px-1'>
+        <ProviderIcon className='size-6' provider={provider.type} />
+        <span className='ml-1 text-sm text-foreground'>{provider.name}</span>
       </div>
       <div className='flex flex-col'>
         {provider.models.map((model) => {
@@ -84,6 +95,7 @@ const ProviderItem = ({
               key={model.id}
               model={model}
               active={active}
+              className='pl-8.5'
               onChange={(model) => handleSelectModel(provider, model)}
             />
           )
