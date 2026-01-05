@@ -1,0 +1,29 @@
+[
+  {
+    "id": "openai",
+    "name": "OpenAI",
+    "type": "openai",
+    "models": [
+      {
+        "id": "gpt-5.2",
+        "name": "gpt-5.2"
+      },
+      {
+        "id": "gpt-5.1",
+        "name": "gpt-5.1",
+        "capabilities": {
+          "vision": true,
+          "imageOutput": true,
+          "functionCalling": true,
+          "jsonMode": false,
+          "streaming": true,
+          "reasoning": true,
+          "contextWindow": 272000,
+          "maxOutputTokens": 128000
+        }
+      }
+    ],
+    "apiKey": "sk-YlT7MFkRb58GuKHsYQ2l3tvXW7zyH8DNlzdFTv2C0ukFNbH6",
+    "baseURL": "https://api.gptbest.vip/v1"
+  }
+]

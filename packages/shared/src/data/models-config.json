@@ -2,6 +2,7 @@
   "version": "2025-12-30T00:00:00Z",
   "models": {
     "gpt-52": {
+      "id": "openai",
       "name": "GPT-5.2",
       "imageInput": true,
       "providers": ["openai"],

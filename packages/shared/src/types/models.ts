@@ -9,6 +9,23 @@ export interface ModelConfig {
   context_length?: number
 }
 
+export interface ModelCapability {
+  vision?: boolean
+  imageOutput?: boolean
+  functionCalling?: boolean
+  jsonMode?: boolean
+  streaming?: boolean
+  reasoning?: boolean
+  contextWindow?: number
+  maxOutputTokens?: number
+}
+
+export interface ModelConfigV2 {
+  id: string
+  name: string
+  capabilities: ModelCapability | null
+}
+
 export interface ModelsConfiguration {
   version: string // ISO 8601 timestamp
   models: Record<string, ModelConfig>

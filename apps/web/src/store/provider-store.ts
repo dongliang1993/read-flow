@@ -1,21 +1,16 @@
 import { create } from 'zustand'
 
-import { ensureModelsInitialized } from '@/service/providers/config/model-config'
-import {
-  computeAvailableModels,
-  buildProviderConfigs,
-} from '@/service/providers/core/provider-utils'
+import { modelLoader } from '@/service/providers/models/model-loader'
+import { computeAvailableModels } from '@/service/providers/core/provider-utils'
+import { useAppSettingsStore } from './app-settings-store'
 
-import type { AvailableModel, ProviderConfig } from '@read-flow/shared/types'
+import type { ProviderConfigV2, ModelConfigV2 } from '@read-flow/shared/types'
 
 export type ProviderFactory = (modelName: string) => any
 
 type ProviderStoreState = {
-  providers: Map<string, ProviderFactory>
-  // Provider configurations (built-in + custom)
-  providerConfigs: Map<string, ProviderConfig>
-
-  availableModels: AvailableModel[]
+  providers: ProviderConfigV2[]
+  availableModels: ModelConfigV2[]
 
   isInitialized: boolean
   isLoading: boolean
@@ -28,26 +23,25 @@ type ProviderStoreActions = {
 
 type ProviderStore = ProviderStoreState & ProviderStoreActions
 
-async function loadApiKeys(): Promise<Record<string, string | undefined>> {
-  const { useAppSettingsStore } = await import('@/store/app-settings-store')
-  return useAppSettingsStore.getState().getApiKeys()
-}
-
-async function setDefaultModel(firstModel: AvailableModel) {
-  const { useAppSettingsStore } = await import('@/store/app-settings-store')
+/**
+ *
+ * @param model
+ * @param override 是否覆盖默认模型
+ * @returns
+ */
+function setDefaultModel(model: string, override: boolean = false) {
   const setModel = useAppSettingsStore.getState().setModel
-  const model = useAppSettingsStore.getState().model
+  const initModel = useAppSettingsStore.getState().model
 
-  if (model) {
+  if (initModel && !override) {
     return
   }
 
-  setModel(`${firstModel.key}@${firstModel.provider}`)
+  setModel(model)
 }
 
 export const useProviderStore = create<ProviderStore>((set, get) => ({
-  providers: new Map(),
-  providerConfigs: new Map(),
+  providers: [],
   availableModels: [],
   isInitialized: false,
   isLoading: false,
@@ -64,14 +58,11 @@ export const useProviderStore = create<ProviderStore>((set, get) => ({
     set({ isLoading: true, error: null })
 
     try {
-      await ensureModelsInitialized()
-      const [apiKeys] = await Promise.all([loadApiKeys()])
+      const modelsConfig = await modelLoader.load()
+      const availableModels = computeAvailableModels(modelsConfig)
 
-      // Build provider configs (built-in + custom)
-      const providerConfigs = buildProviderConfigs()
-      const availableModels = computeAvailableModels(apiKeys, providerConfigs)
-      await setDefaultModel(availableModels[0])
-      set({ availableModels })
+      setDefaultModel(availableModels[0].id, false)
+      set({ availableModels, providers: modelsConfig })
       console.info('[ProviderStore] Starting initialization...', {
         availableModels,
       })

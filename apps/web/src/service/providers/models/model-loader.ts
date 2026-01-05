@@ -1,11 +1,10 @@
-import modelsDefault from '@read-flow/shared/data/models-config'
 import { env } from '@/config/env'
 
-import type { ModelsConfiguration } from '@read-flow/shared/types'
+import type { ProviderConfigV2 } from '@read-flow/shared/types'
 
 export default class ModelLoader {
   async load() {
-    let serverConfig: ModelsConfiguration
+    let serverConfig: ProviderConfigV2[]
 
     // Load server config
     try {
@@ -16,22 +15,14 @@ export default class ModelLoader {
         throw new Error(`Failed to load models: ${response.statusText}`)
       }
 
-      serverConfig = data as ModelsConfiguration
+      serverConfig = data as ProviderConfigV2[]
       console.log('models data', data)
     } catch (error) {
-      serverConfig = modelsDefault as ModelsConfiguration
+      serverConfig = []
       console.warn('Failed to load models cache file, using default:', error)
     }
 
-    // Merge configs (custom models take precedence)
-    const mergedConfig: ModelsConfiguration = {
-      version: serverConfig.version,
-      models: {
-        ...serverConfig.models,
-      },
-    }
-
-    return mergedConfig
+    return serverConfig
   }
 }
 

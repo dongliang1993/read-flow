@@ -10,6 +10,7 @@
     ".": "./src/index.ts",
     "./types": "./src/types/index.ts",
     "./data/models-config": "./src/data/models-config.json",
+    "./data/models-config-v2": "./src/data/models-config-v2.json",
     "./providers/provider-config": "./src/providers/provider-config.ts",
     "./providers/core/provider-registry": "./src/providers/core/provider-registry.ts",
     "./providers/core/provider-utils": "./src/providers/core/provider-utils.ts"

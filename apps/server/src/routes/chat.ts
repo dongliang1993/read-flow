@@ -2,12 +2,7 @@ import { Hono } from 'hono'
 import { streamText, UIMessage, stepCountIs, convertToModelMessages } from 'ai'
 import { eq, desc } from 'drizzle-orm'
 
-import {
-  textToParts,
-  convertHistoryToUIMessages,
-  convertHistoryToModelMessages,
-  convertResponseMessagesToParts,
-} from '../lib/chat-transformer'
+import { convertHistoryToUIMessages } from '../lib/chat-transformer'
 import { promptService } from '../services/prompt'
 import { db } from '../db'
 import { chatHistory } from '../db/schema'
@@ -88,7 +83,7 @@ chat.post('/', async (c) => {
           .limit(10)
       : []
 
-    const modelMessages = convertHistoryToModelMessages(history)
+    const modelMessages = convertHistoryToUIMessages(history) //convertHistoryToModelMessages(history)
     // 3. 构建 prompt 和调用 AI
     const systemPrompt = await promptService.buildReadingPrompt(chatContext)
     const providerModel = providerService.getProviderModel(model)
@@ -107,10 +102,7 @@ chat.post('/', async (c) => {
     const result = await streamText({
       model: providerModel,
       system: systemPrompt,
-      messages: [
-        ...modelMessages,
-        ...(await convertToModelMessages([lastMessage])),
-      ],
+      messages: await convertToModelMessages([...modelMessages, lastMessage]),
       toolChoice: 'auto',
       providerOptions: {
         openai: {
@@ -124,7 +116,6 @@ chat.post('/', async (c) => {
       //   if (totalUsage?.totalTokens) {
       //     loopState.lastRequestTokens = totalUsage.totalTokens
       //   }
-
       // },
     })
 

@@ -10,7 +10,8 @@ import {
 import { useAppSettingsStore } from '@/store/app-settings-store'
 import { useProviderStore } from '@/store/provider-store'
 
-import type { AvailableModel } from '@read-flow/shared/types'
+import type { ModelConfigV2, ProviderConfigV2 } from '@read-flow/shared/types'
+import { useMemoizedFn } from 'ahooks'
 
 export type ModelPricing = {
   input: string
@@ -35,19 +36,59 @@ const ModelItem = ({
   active,
   onChange,
 }: {
-  model: AvailableModel
+  model: ModelConfigV2
   active: boolean
-  onChange: (model: AvailableModel) => void
+  onChange: (model: ModelConfigV2) => void
 }) => {
   return (
     <div
-      className='flex items-center px-2 py-2 mx-2 rounded-md cursor-pointer hover:bg-shade-03'
+      className='flex items-center px-2 py-2 rounded-md cursor-pointer hover:bg-shade-03'
       onClick={() => onChange(model)}
     >
       <div className='truncate text-sm text-foreground flex-1'>
         {model.name}
       </div>
       {active && <Check className='size-4' />}
+    </div>
+  )
+}
+
+const ProviderItem = ({
+  provider,
+  selectedModel,
+  onChange,
+}: {
+  provider: ProviderConfigV2
+  selectedModel: string
+  onChange: (provider: ProviderConfigV2, model: ModelConfigV2) => void
+}) => {
+  const handleSelectModel = useCallback(
+    (provider: ProviderConfigV2, model: ModelConfigV2) => {
+      onChange(provider, model)
+    },
+    [onChange]
+  )
+
+  return (
+    <div className='flex flex-col px-1 py-2 rounded-md'>
+      <div className='truncate text-sm text-foreground flex-1 py-1 px-1'>
+        {provider.name}
+      </div>
+      <div className='flex flex-col'>
+        {provider.models.map((model) => {
+          const modelIdentifier = `${model.id}@${provider.type}`
+          const active = modelIdentifier === selectedModel
+
+          return (
+            <ModelItem
+              key={model.id}
+              model={model}
+              active={active}
+              onChange={(model) => handleSelectModel(provider, model)}
+            />
+          )
+        })}
+      </div>
     </div>
   )
 }
@@ -60,6 +101,7 @@ export const ModelSelector = () => {
 
   const isLoading = useProviderStore((state) => state.isLoading)
   const loadModels = useProviderStore((state) => state.initialize)
+  const providers = useProviderStore((state) => state.providers)
   const availableModels = useProviderStore((state) => state.availableModels)
 
   const currentModelKey = useMemo(() => {
@@ -72,21 +114,20 @@ export const ModelSelector = () => {
 
   // Find current model info
   const currentModel = useMemo(() => {
-    return availableModels.find((m) => m.key === currentModelKey)
+    return availableModels.find((m) => m.id === currentModelKey)
   }, [availableModels, currentModelKey])
 
   // Handle model selection
-  const handleSelectModel = useCallback(
-    (model: AvailableModel) => {
+  const handleSelectModel = useMemoizedFn(
+    (provider: ProviderConfigV2, selectedModel: ModelConfigV2) => {
       if (isLoading) {
         return
       }
       // Store as "modelKey@provider" format
-      const modelIdentifier = `${model.key}@${model.provider}`
+      const modelIdentifier = `${selectedModel.id}@${provider.type}`
       setModel(modelIdentifier)
       setOpen(false)
-    },
-    [isLoading, setModel]
+    }
   )
 
   useEffect(() => {
@@ -113,18 +154,14 @@ export const ModelSelector = () => {
         align='start'
         className='w-[280px] overflow-y-auto max-h-[400px] px-0 py-1 shadow-lg outline-none rounded-2xl border border-neutral-50'
       >
-        {availableModels.map((model) => {
-          const isSelected = model.key === currentModelKey
-
-          return (
-            <ModelItem
-              key={model.key}
-              model={model}
-              active={isSelected}
-              onChange={handleSelectModel}
-            />
-          )
-        })}
+        {providers.map((provider) => (
+          <ProviderItem
+            key={provider.id}
+            provider={provider}
+            selectedModel={model}
+            onChange={handleSelectModel}
+          />
+        ))}
       </PopoverContent>
     </Popover>
   )
