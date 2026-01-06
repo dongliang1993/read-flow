@@ -142,46 +142,61 @@ export const MessageItem = ({ message, onShareOpen }: MessageItemProps) => {
       )
     }
 
-    // tool-plan
-    if (type === 'tool-plan') {
+    // tool-createPlan
+    if (type === 'tool-createPlan') {
       const { toolCallId, state, output } = part
 
-      const activeToolCalls = message.parts
-        ?.filter(
-          (p) =>
-            p.type?.startsWith('tool-') &&
-            p.type !== 'tool-plan' &&
-            (p.state === 'input-available' || p.state === 'input-streaming')
-        )
-        .map((p) => p.type?.replace('tool-', ''))
-        .filter(Boolean) as string[]
+      // 收集所有 updatePlanStep 的输出作为步骤状态更新
+      // 注意：需要取每个 stepId 的最新状态
+      const allUpdates =
+        message.parts
+          ?.filter(
+            (p) =>
+              p.type === 'tool-updatePlanStep' &&
+              p.state === 'output-available' &&
+              (p as any).output
+          )
+          .map(
+            (p) =>
+              (p as any).output as {
+                stepId: string
+                status: 'running' | 'completed' | 'error'
+                result?: string
+              }
+          )
+          .filter(Boolean) || []
 
-      const completedToolCalls = message.parts
-        ?.filter(
-          (p) =>
-            p.type?.startsWith('tool-') &&
-            p.type !== 'tool-plan' &&
-            p.state === 'output-available'
-        )
-        .map((p) => p.type?.replace('tool-', ''))
-        .filter(Boolean) as string[]
+      // 合并相同 stepId 的更新，保留最新的状态
+      const stepUpdatesMap = new Map<
+        string,
+        {
+          stepId: string
+          status: 'running' | 'completed' | 'error'
+          result?: string
+        }
+      >()
+      for (const update of allUpdates) {
+        stepUpdatesMap.set(update.stepId, update)
+      }
+      const stepUpdates = Array.from(stepUpdatesMap.values())
 
       return (
         <div key={toolCallId} className='w-full max-w-[500px]'>
           <Tool>
-            <ToolHeader state={state} type='tool-plan' />
+            <ToolHeader state={state} type='tool-createPlan' />
             <ToolContent>
               {output && (
-                <PlanSteps
-                  output={output}
-                  activeToolCalls={activeToolCalls}
-                  completedToolCalls={completedToolCalls}
-                />
+                <PlanSteps output={output} stepUpdates={stepUpdates} />
               )}
             </ToolContent>
           </Tool>
         </div>
       )
+    }
+
+    // tool-updatePlanStep 不需要单独渲染，状态会合并到 createPlan 中显示
+    if (type === 'tool-updatePlanStep') {
+      return null
     }
 
     return null

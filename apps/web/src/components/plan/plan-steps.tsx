@@ -17,21 +17,26 @@ type PlanStep = {
   id: string
   description: string
   tool?: string
-  detail?: string
   status: 'pending' | 'running' | 'completed' | 'error'
+}
+
+type StepUpdate = {
+  stepId: string
+  status: 'running' | 'completed' | 'error'
+  result?: string
 }
 
 type PlanOutput = {
   planId: string
-  goal: string
+  title: string
+  description: string
   steps: PlanStep[]
   createdAt: string
 }
 
 type PlanStepsProps = {
   output: PlanOutput
-  activeToolCalls?: string[]
-  completedToolCalls?: string[]
+  stepUpdates?: StepUpdate[]
 }
 
 const statusIcons = {
@@ -43,34 +48,28 @@ const statusIcons = {
 
 const VISIBLE_STEPS = 4
 
-export const PlanSteps = ({
-  output,
-  activeToolCalls = [],
-  completedToolCalls = [],
-}: PlanStepsProps) => {
-  const { goal, steps } = output
+export const PlanSteps = ({ output, stepUpdates = [] }: PlanStepsProps) => {
+  const { title, description, steps } = output
   const [showAll, setShowAll] = useState(false)
 
-  const getStepStatus = (step: PlanStep): PlanStep['status'] => {
-    if (!step.tool) {
-      return step.status
+  const getStepStatus = (
+    step: PlanStep
+  ): { status: PlanStep['status']; result?: string } => {
+    const update = stepUpdates.find((u) => u.stepId === step.id)
+    if (update) {
+      return { status: update.status, result: update.result }
     }
-
-    if (completedToolCalls.includes(step.tool)) {
-      return 'completed'
-    }
-
-    if (activeToolCalls.includes(step.tool)) {
-      return 'running'
-    }
-
-    return step.status
+    return { status: step.status }
   }
 
-  const stepsWithStatus = steps.map((step) => ({
-    ...step,
-    computedStatus: getStepStatus(step),
-  }))
+  const stepsWithStatus = steps.map((step) => {
+    const { status, result } = getStepStatus(step)
+    return {
+      ...step,
+      computedStatus: status,
+      result,
+    }
+  })
 
   const completedCount = stepsWithStatus.filter(
     (s) => s.computedStatus === 'completed'
@@ -87,7 +86,10 @@ export const PlanSteps = ({
   return (
     <div className='space-y-4 p-4'>
       <div className='space-y-1'>
-        <div className='text-base font-semibold text-neutral-900'>{goal}</div>
+        <div className='text-base font-semibold text-neutral-900'>{title}</div>
+        {description && (
+          <div className='text-sm text-neutral-500'>{description}</div>
+        )}
       </div>
 
       <div className='space-y-2'>
@@ -128,7 +130,7 @@ export const PlanSteps = ({
               </CollapsibleTrigger>
               <CollapsibleContent>
                 <div className='pl-8 pr-2 pb-2 text-sm text-neutral-500'>
-                  {step.detail || (step.tool && `Using ${step.tool}`)}
+                  {step.result || (step.tool && `Using ${step.tool}`)}
                 </div>
               </CollapsibleContent>
             </Collapsible>

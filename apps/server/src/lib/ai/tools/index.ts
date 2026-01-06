@@ -1,11 +1,20 @@
 import type { Tool } from '../../../types/tools'
 import { webSearchTool } from './web-search'
-import { planTool } from './plan'
+import { createPlanTool, updatePlanStepTool } from './plan'
 
 export const TOOL_DEFINITIONS = {
-  plan: {
-    tool: planTool,
-    label: 'Plan',
+  createPlan: {
+    tool: createPlanTool,
+    label: 'Create Plan',
+    metadata: {
+      canConcurrent: false,
+      fileOperation: false,
+      renderDoingUI: true,
+    },
+  },
+  updatePlanStep: {
+    tool: updatePlanStepTool,
+    label: 'Update Plan Step',
     metadata: {
       canConcurrent: false,
       fileOperation: false,

@@ -110,7 +110,7 @@ chat.post('/', async (c) => {
           include: ['reasoning.encrypted_content'],
         } satisfies OpenAIResponsesProviderOptions,
       },
-      stopWhen: stepCountIs(5),
+      stopWhen: stepCountIs(30),
       tools: filteredTools,
       // experimental_transform: smoothStream({
       //   chunking: 'word',
