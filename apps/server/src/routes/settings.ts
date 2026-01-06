@@ -2,7 +2,7 @@ import { Hono } from 'hono'
 import { eq } from 'drizzle-orm'
 import { db } from '../db'
 import { user } from '../db/schema'
-import modelsConfig from '@read-flow/shared/data/models-config'
+import { providerService } from '../services/provider'
 
 import type { ProviderConfig } from '@read-flow/shared/types'
 
@@ -33,28 +33,30 @@ settingsRoute.get('/providers', async (c) => {
     const userSettings = (dbUser?.providerSettings as ProviderConfig[]) || []
     const settingsMap = new Map(userSettings.map((p) => [p.id, p]))
 
-    const mergedProviders: ProviderConfig[] = (
-      modelsConfig as ProviderConfig[]
-    ).map((defaultProvider) => {
-      const userProvider = settingsMap.get(defaultProvider.id)
+    const mergedProviders: ProviderConfig[] = providerService
+      .getAllProviders()
+      .map((defaultProvider) => {
+        const userProvider = settingsMap.get(defaultProvider.id)
 
-      if (!userProvider) {
-        return defaultProvider
-      }
+        if (!userProvider) {
+          return defaultProvider
+        }
 
-      return {
-        ...defaultProvider,
-        apiKey: userProvider.apiKey || defaultProvider.apiKey,
-        baseURL: userProvider.baseURL || defaultProvider.baseURL,
-        models: defaultProvider.models.map((model) => {
-          const userModel = userProvider.models?.find((m) => m.id === model.id)
-          return {
-            ...model,
-            enabled: userModel?.enabled ?? model.enabled,
-          }
-        }),
-      }
-    })
+        return {
+          ...defaultProvider,
+          apiKey: userProvider.apiKey || defaultProvider.apiKey,
+          baseURL: userProvider.baseURL || defaultProvider.baseURL,
+          models: defaultProvider.models.map((model) => {
+            const userModel = userProvider.models?.find(
+              (m) => m.id === model.id
+            )
+            return {
+              ...model,
+              enabled: userModel?.enabled ?? model.enabled,
+            }
+          }),
+        }
+      })
 
     return c.json({ providers: mergedProviders })
   } catch (error) {

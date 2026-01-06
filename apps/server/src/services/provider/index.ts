@@ -4,27 +4,38 @@ import {
   createProviders,
   type ProviderFactory,
 } from '@read-flow/shared/providers/core/provider-utils'
-import { modelLoader } from './model-loader'
-import type { ModelConfig } from '@read-flow/shared'
+import modelsDefault from '@read-flow/shared/data/models-config'
+
+import type { ModelConfig, ProviderConfig } from '@read-flow/shared'
 
 class ProviderService {
   private modelConfigs: Record<string, ModelConfig>
   private providers: Map<string, ProviderFactory>
+  private providerConfigs: Map<string, ProviderConfig>
 
   constructor() {
     this.providers = new Map<string, ProviderFactory>()
+    this.providerConfigs = new Map<string, ProviderConfig>()
     this.modelConfigs = {} as Record<string, ModelConfig>
+
     this.initialize()
   }
 
   async initialize() {
-    const { modelConfigs, providerConfigs } = await modelLoader.load()
-    this.modelConfigs = modelConfigs!
+    let modelConfigs: Record<string, ModelConfig> = {}
+    let providerConfigs: Map<string, ProviderConfig> = new Map()
 
-    const providers = createProviders(providerConfigs!)
-    this.providers = providers
+    for (const provider of modelsDefault) {
+      providerConfigs.set(provider.id, provider as ProviderConfig)
 
-    console.log('providers', this.providers)
+      for (const model of provider.models) {
+        modelConfigs[model.id] = model
+      }
+    }
+
+    this.modelConfigs = modelConfigs
+    this.providers = createProviders(providerConfigs)
+    this.providerConfigs = providerConfigs
   }
 
   // Get provider model instance (synchronous - main API for LLM service)
@@ -52,6 +63,10 @@ class ProviderService {
     )
 
     return provider(providerModelName)
+  }
+
+  getAllProviders(): ProviderConfig[] {
+    return Array.from(this.providerConfigs.values())
   }
 }
 
