@@ -20,24 +20,6 @@ import type {
   ProviderType,
 } from '@read-flow/shared/types'
 
-export type ModelPricing = {
-  input: string
-  output: string
-  cachedInput?: string
-}
-
-export type ModelConfig = {
-  name: string
-  imageInput: boolean
-  providerMappings: Record<string, string>
-  pricing: ModelPricing
-  context_length: number
-}
-
-export type ModelsConfig = {
-  models: Record<string, ModelConfig>
-}
-
 const ModelItem = ({
   className,
   model,
@@ -120,21 +102,29 @@ export const ModelSelector = () => {
   const providers = useProviderStore((state) => state.providers)
   const availableModels = useProviderStore((state) => state.availableModels)
 
-  const { currentModelKey, currentProvider } = useMemo(() => {
+  const hasNotAvailableModels = useMemo(() => {
+    return availableModels.length === 0
+  }, [availableModels])
+
+  const { currentModelId, currentProvider } = useMemo(() => {
     if (!model) {
       return { currentModelKey: '', currentProvider: '' }
     }
 
     const parts = model.split('@')
-    const [currentModelKey, currentProvider] = parts
-    return { currentModelKey, currentProvider: currentProvider as ProviderType }
+    const [currentModelId, currentProvider] = parts
+    return { currentModelId, currentProvider: currentProvider as ProviderType }
   }, [model])
 
   // Find current model info
   const currentModel = useMemo(() => {
-    return availableModels.find((m) => m.id === currentModelKey)
-  }, [availableModels, currentModelKey])
+    return availableModels.find((m) => m.id === currentModelId)
+  }, [availableModels, currentModelId])
 
+  console.log('currentModel', {
+    currentModelId,
+    availableModels,
+  })
   // Handle model selection
   const handleSelectModel = useMemoizedFn(
     (provider: ProviderConfig, selectedModel: ModelConfig) => {
@@ -159,19 +149,23 @@ export const ModelSelector = () => {
           type='button'
           variant='ghost'
           size='sm'
-          disabled={isLoading}
+          disabled={isLoading || hasNotAvailableModels}
           className='h-7 px-3 text-sm rounded-full cursor-pointer hover:bg-neutral-100 '
         >
-          <div className='flex items-center max-w-[200px]'>
-            <ProviderIcon
-              className='size-4 mr-2'
-              provider={currentProvider as ProviderType}
-            />
-            <span className='max-w-[180px] truncate text-foreground'>
-              {currentModel?.name}
-            </span>
-            <ChevronDown className='ml-1 size-4 text-neutral-400' />
-          </div>
+          {hasNotAvailableModels ? (
+            'No available model'
+          ) : (
+            <div className='flex items-center max-w-[200px]'>
+              <ProviderIcon
+                className='size-4 mr-2'
+                provider={currentProvider as ProviderType}
+              />
+              <span className='max-w-[180px] truncate text-foreground'>
+                {currentModel?.name}
+              </span>
+              <ChevronDown className='ml-1 size-4 text-neutral-400' />
+            </div>
+          )}
         </Button>
       </PopoverTrigger>
       <PopoverContent

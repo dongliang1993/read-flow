@@ -22,6 +22,7 @@ type ProviderStoreState = {
 
 type ProviderStoreActions = {
   initialize: () => Promise<void>
+  refresh: () => Promise<void>
   updateProvider: (
     providerId: string,
     updates: Partial<Pick<ProviderConfig, 'apiKey' | 'baseURL' | 'enabled'>>
@@ -84,6 +85,27 @@ export const useProviderStore = create<ProviderStore>((set, get) => ({
       })
     } catch (error) {
       console.error('[ProviderStore] Initialization failed:', error)
+      set({ error: error instanceof Error ? error.message : 'Unknown error' })
+    } finally {
+      set({ isLoading: false })
+    }
+  },
+
+  refresh: async () => {
+    set({ isLoading: true, error: null })
+
+    try {
+      const modelsConfig = await modelLoader.load()
+      const availableModels = computeAvailableModels(modelsConfig)
+
+      set({
+        availableModels,
+        providers: modelsConfig,
+        originalProviders: JSON.parse(JSON.stringify(modelsConfig)),
+        isDirty: false,
+      })
+    } catch (error) {
+      console.error('[ProviderStore] Refresh failed:', error)
       set({ error: error instanceof Error ? error.message : 'Unknown error' })
     } finally {
       set({ isLoading: false })

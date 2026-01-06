@@ -25,6 +25,7 @@ export function Settings() {
   )
   const saveSettings = useProviderStore((state) => state.saveSettings)
   const resetChanges = useProviderStore((state) => state.resetChanges)
+  const refresh = useProviderStore((state) => state.refresh)
 
   const selectedProvider =
     providers.find((p) => p.id === selectedProviderId) || null
@@ -71,6 +72,12 @@ export function Settings() {
       setSelectedProviderId(providers[0].id)
     }
   }, [providers, selectedProviderId])
+
+  useEffect(() => {
+    return () => {
+      refresh()
+    }
+  }, [refresh])
 
   return (
     <div className='min-h-screen bg-white flex flex-col p-6'>

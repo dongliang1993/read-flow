@@ -1,11 +1,6 @@
 import { PROVIDER_CONFIGS } from '@read-flow/shared/providers/provider-config'
 
-import type {
-  ProviderConfig,
-  AvailableModel,
-  ProviderConfig,
-  ModelConfig,
-} from '@read-flow/shared/types'
+import type { ProviderConfig, ModelConfig } from '@read-flow/shared/types'
 
 /**
  * Check if API key is configured for a provider
@@ -42,7 +37,7 @@ export function computeAvailableModels(
     if (!providerConfig) continue
 
     // Create a model entry for each available provider
-    for (const model of providerConfig.models) {
+    for (const model of providerConfig.models || []) {
       modelMap.set(model.id, model)
     }
   }

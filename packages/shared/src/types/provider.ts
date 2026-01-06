@@ -33,17 +33,6 @@ export interface ProviderConfig {
   createProvider?: (apiKey: string, baseUrl?: string) => any
 }
 
-export interface AvailableModel {
-  key: string
-  name: string
-  provider: string
-  providerName: string
-  imageInput: boolean
-  imageOutput: boolean
-  audioInput: boolean
-  inputPricing?: string
-}
-
 export interface ProviderRegistry {
   [key: string]: ProviderConfig
 }
