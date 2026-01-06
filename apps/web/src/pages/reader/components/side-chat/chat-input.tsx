@@ -1,4 +1,4 @@
-import { ArrowUp } from 'lucide-react'
+import { ArrowUp, Loader2Icon, SquareIcon, XIcon } from 'lucide-react'
 import { useCallback } from 'react'
 import { useMemoizedFn } from 'ahooks'
 
@@ -55,7 +55,17 @@ export const ChatInput = ({
   })
 
   const disabled = value.trim() === ''
+  let Icon: React.ReactNode = <ArrowUp size={18} />
 
+  if (status === 'submitted') {
+    Icon = <Loader2Icon className='size-4 animate-spin' />
+  } else if (status === 'streaming') {
+    Icon = <SquareIcon className='size-4' />
+  } else if (status === 'error') {
+    Icon = <XIcon className='size-4' />
+  }
+
+  console.log('status', status)
   return (
     <div className='relative border rounded-xl flex flex-col px-2 py-3'>
       {references.length > 0 && (
@@ -83,11 +93,7 @@ export const ChatInput = ({
           disabled={disabled}
           onClick={handleSubmit}
         >
-          {status === 'ready' ? (
-            <ArrowUp size={18} />
-          ) : (
-            <span className='size-2 rounded-xs bg-white dark:bg-neutral-700' />
-          )}
+          {Icon}
         </Button>
       </div>
     </div>

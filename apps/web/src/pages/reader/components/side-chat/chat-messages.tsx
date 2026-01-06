@@ -48,9 +48,11 @@ export const ChatMessages = ({
       })}
 
       {status === 'submitted' &&
-        !messages.some((msg) => msg.parts?.some((part) => 'state' in part)) && (
-          <ThinkingMessage />
-        )}
+        !messages.some((msg) =>
+          msg.parts?.some(
+            (part) => 'state' in part && part.state === 'approval-responded'
+          )
+        ) && <ThinkingMessage />}
 
       <div
         className='min-h-[24px] min-w-[24px] shrink-0'

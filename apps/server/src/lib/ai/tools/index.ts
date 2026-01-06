@@ -1,7 +1,17 @@
 import type { Tool } from '../../../types/tools'
 import { webSearchTool } from './web-search'
+import { planTool } from './plan'
 
 export const TOOL_DEFINITIONS = {
+  plan: {
+    tool: planTool,
+    label: 'Plan',
+    metadata: {
+      canConcurrent: false,
+      fileOperation: false,
+      renderDoingUI: true,
+    },
+  },
   webSearch: {
     tool: webSearchTool,
     label: 'Web Search',

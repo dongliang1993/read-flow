@@ -112,6 +112,9 @@ chat.post('/', async (c) => {
       },
       stopWhen: stepCountIs(5),
       tools: filteredTools,
+      // experimental_transform: smoothStream({
+      //   chunking: 'word',
+      // }),
       // onFinish: async ({ text, finishReason, totalUsage, response }) => {
       //   if (totalUsage?.totalTokens) {
       //     loopState.lastRequestTokens = totalUsage.totalTokens

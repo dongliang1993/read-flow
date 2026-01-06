@@ -23,7 +23,7 @@ export interface ModelCapability {
 export interface ModelConfigV2 {
   id: string
   name: string
-  capabilities: ModelCapability | null
+  capabilities?: ModelCapability | null
   enabled?: boolean
 }
 

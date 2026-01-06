@@ -39,6 +39,9 @@
         "name": "claude-opus-4.5",
         "enabled": true
       }
-    ]
+    ],
+    "apiKey": "sk-YlT7MFkRb58GuKHsYQ2l3tvXW7zyH8DNlzdFTv2C0ukFNbH6",
+    "baseURL": "https://api.katonai.dev/v1",
+    "enabled": true
   }
 ]

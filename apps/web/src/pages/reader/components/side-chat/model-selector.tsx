@@ -132,6 +132,7 @@ export const ModelSelector = () => {
   // Handle model selection
   const handleSelectModel = useMemoizedFn(
     (provider: ProviderConfigV2, selectedModel: ModelConfigV2) => {
+      debugger
       if (isLoading) {
         return
       }
@@ -145,6 +146,8 @@ export const ModelSelector = () => {
   useEffect(() => {
     loadModels()
   }, [loadModels])
+
+  console.log('currentModel', availableModels, currentModel)
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

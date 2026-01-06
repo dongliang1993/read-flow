@@ -1,4 +1,5 @@
 import { createOpenAI } from '@ai-sdk/openai'
+import { createAnthropic } from '@ai-sdk/anthropic'
 import type { ProviderRegistry } from '../types'
 
 export const PROVIDER_CONFIGS: ProviderRegistry = {
@@ -12,6 +13,20 @@ export const PROVIDER_CONFIGS: ProviderRegistry = {
     createProvider: (apiKey: string, baseUrl?: string) => {
       return createOpenAI({
         baseURL: baseUrl || 'https://api.openai.com/v1',
+        apiKey,
+      })
+    },
+  },
+  anthropic: {
+    id: 'anthropic',
+    name: 'Anthropic',
+    apiKeyName: 'ANTHROPIC_API_KEY',
+    baseUrl: 'https://api.anthropic.com',
+    required: false,
+    type: 'anthropic',
+    createProvider: (apiKey: string, baseUrl?: string) => {
+      return createAnthropic({
+        baseURL: baseUrl,
         apiKey,
       })
     },

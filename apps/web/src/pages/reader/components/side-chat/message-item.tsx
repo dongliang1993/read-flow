@@ -4,6 +4,7 @@ import remarkGfm from 'remark-gfm'
 import { MessageTools } from './message-tools'
 import { Tool, ToolHeader, ToolContent, ToolOutput } from '@/components/tool'
 import { OptionList } from '@/components/web-search'
+import { PlanSteps } from '@/components/plan/plan-steps'
 
 import type { UIMessage, UIMessagePart } from 'ai'
 
@@ -135,6 +136,48 @@ export const MessageItem = ({ message, onShareOpen }: MessageItemProps) => {
                   <OptionList options={part.output} selectionMode={false} />
                 }
               />
+            </ToolContent>
+          </Tool>
+        </div>
+      )
+    }
+
+    // tool-plan
+    if (type === 'tool-plan') {
+      const { toolCallId, state, output } = part
+
+      const activeToolCalls = message.parts
+        ?.filter(
+          (p) =>
+            p.type?.startsWith('tool-') &&
+            p.type !== 'tool-plan' &&
+            (p.state === 'input-available' || p.state === 'input-streaming')
+        )
+        .map((p) => p.type?.replace('tool-', ''))
+        .filter(Boolean) as string[]
+
+      const completedToolCalls = message.parts
+        ?.filter(
+          (p) =>
+            p.type?.startsWith('tool-') &&
+            p.type !== 'tool-plan' &&
+            p.state === 'output-available'
+        )
+        .map((p) => p.type?.replace('tool-', ''))
+        .filter(Boolean) as string[]
+
+      return (
+        <div key={toolCallId} className='w-full max-w-[500px]'>
+          <Tool>
+            <ToolHeader state={state} type='tool-plan' />
+            <ToolContent>
+              {output && (
+                <PlanSteps
+                  output={output}
+                  activeToolCalls={activeToolCalls}
+                  completedToolCalls={completedToolCalls}
+                />
+              )}
             </ToolContent>
           </Tool>
         </div>

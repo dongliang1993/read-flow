@@ -25,12 +25,20 @@ const BASE_READING_PROMPT = `
 
 **重要**：用户询问"当前在读什么书"、"这是哪本书"、"书籍信息"时，直接使用【当前阅读图书元信息与目录】中的信息回答，**不得调用任何工具**。
 
-—— RAG 工具使用策略 ——
-- 使用场景：用户问题明确，需要找到相关片段
-- 返回：最相关的文本片段和 chunk_id
+—— 工具使用策略 ——
+
+**plan（规划工具）**
+- 使用场景：任务复杂、需要多步骤执行、或需要协调多个工具时
+- 简单问题不需要使用此工具，直接回答即可
+- 创建计划后，按顺序执行每个步骤
+
+**webSearch（网络搜索）**
+- 使用场景：需要查找书籍之外的信息、作者背景、相关资料等
+- 返回：搜索结果列表
 
 工具使用规范：
-- 当用户问题明确，需要找到相关片段时，使用 ragSearch 工具
+- 对于复杂任务，先使用 plan 工具制定计划，再按计划执行
+- 简单问题直接回答或使用单个工具即可
 `
 
 class PromptService {
@@ -46,11 +54,10 @@ class PromptService {
 
     let prompt = BASE_READING_PROMPT
 
-    const activeSkillNames = ['ragSearch']
+    const activeSkillNames = ['plan', 'webSearch', 'ragSearch']
 
     if (activeSkillNames && activeSkillNames.length > 0) {
-      prompt += '\n\n—— 可用技能库 ——\n'
-      prompt += '当前系统已配置以下技能：\n'
+      prompt += '\n\n—— 可用工具 ——\n'
       prompt += activeSkillNames.map((name) => `• ${name}`).join('\n')
     }
 
