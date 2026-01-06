@@ -1,9 +1,9 @@
 import { createOpenAI } from '@ai-sdk/openai'
-import modelsConfigV2 from '@read-flow/shared/data/models-config-v2'
+import modelsConfig from '@read-flow/shared/data/models-config'
 
 import { env } from '../config/env'
 
-import type { ProviderConfigV2 } from '@read-flow/shared/types'
+import type { ProviderConfig } from '@read-flow/shared/types'
 
 const openai = createOpenAI({
   apiKey: env.openai.apiKey,
@@ -40,8 +40,8 @@ export class ModelsService {
     }
   }
 
-  getConfigs(): ProviderConfigV2[] {
-    return modelsConfigV2 as ProviderConfigV2[]
+  getConfigs(): ProviderConfig[] {
+    return modelsConfig as ProviderConfig[]
   }
 
   getModel(model: ModelName) {

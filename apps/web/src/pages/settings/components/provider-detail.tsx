@@ -6,10 +6,10 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ProviderIcon } from '@/components/provider-icon'
 
-import type { ProviderConfigV2 } from '@read-flow/shared/types'
+import type { ProviderConfig } from '@read-flow/shared/types'
 
 type ProviderDetailProps = {
-  provider: ProviderConfigV2
+  provider: ProviderConfig
   onToggle?: (enabled: boolean) => void
   onApiKeyChange?: (apiKey: string) => void
   onBaseUrlChange?: (url: string) => void

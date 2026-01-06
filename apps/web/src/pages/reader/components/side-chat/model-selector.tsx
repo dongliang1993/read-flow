@@ -14,7 +14,11 @@ import { cn } from '@/lib/utils'
 import { useAppSettingsStore } from '@/store/app-settings-store'
 import { useProviderStore } from '@/store/provider-store'
 
-import type { ModelConfigV2, ProviderConfigV2 } from '@read-flow/shared/types'
+import type {
+  ModelConfig,
+  ProviderConfig,
+  ProviderType,
+} from '@read-flow/shared/types'
 
 export type ModelPricing = {
   input: string
@@ -40,9 +44,9 @@ const ModelItem = ({
   active,
   onChange,
 }: {
-  model: ModelConfigV2
+  model: ModelConfig
   active: boolean
-  onChange: (model: ModelConfigV2) => void
+  onChange: (model: ModelConfig) => void
   className?: string
 }) => {
   return (
@@ -68,12 +72,12 @@ const ProviderItem = ({
   onChange,
 }: {
   className?: string
-  provider: ProviderConfigV2
+  provider: ProviderConfig
   selectedModel: string
-  onChange: (provider: ProviderConfigV2, model: ModelConfigV2) => void
+  onChange: (provider: ProviderConfig, model: ModelConfig) => void
 }) => {
   const handleSelectModel = useCallback(
-    (provider: ProviderConfigV2, model: ModelConfigV2) => {
+    (provider: ProviderConfig, model: ModelConfig) => {
       onChange(provider, model)
     },
     [onChange]
@@ -82,11 +86,11 @@ const ProviderItem = ({
   return (
     <div className={cn('flex flex-col px-1 py-2 rounded-md', className)}>
       <div className='flex items-center flex-1 py-1 px-1'>
-        <ProviderIcon className='size-6' provider={provider.type} />
-        <span className='ml-1 text-sm text-foreground'>{provider.name}</span>
+        <ProviderIcon className='size-4' provider={provider.type} />
+        <span className='ml-2 text-sm text-foreground'>{provider.name}</span>
       </div>
       <div className='flex flex-col'>
-        {provider.models.map((model) => {
+        {provider.models?.map((model) => {
           const modelIdentifier = `${model.id}@${provider.type}`
           const active = modelIdentifier === selectedModel
 
@@ -116,12 +120,14 @@ export const ModelSelector = () => {
   const providers = useProviderStore((state) => state.providers)
   const availableModels = useProviderStore((state) => state.availableModels)
 
-  const currentModelKey = useMemo(() => {
+  const { currentModelKey, currentProvider } = useMemo(() => {
     if (!model) {
-      return ''
+      return { currentModelKey: '', currentProvider: '' }
     }
+
     const parts = model.split('@')
-    return parts[0] || ''
+    const [currentModelKey, currentProvider] = parts
+    return { currentModelKey, currentProvider: currentProvider as ProviderType }
   }, [model])
 
   // Find current model info
@@ -131,8 +137,7 @@ export const ModelSelector = () => {
 
   // Handle model selection
   const handleSelectModel = useMemoizedFn(
-    (provider: ProviderConfigV2, selectedModel: ModelConfigV2) => {
-      debugger
+    (provider: ProviderConfig, selectedModel: ModelConfig) => {
       if (isLoading) {
         return
       }
@@ -147,8 +152,6 @@ export const ModelSelector = () => {
     loadModels()
   }, [loadModels])
 
-  console.log('currentModel', availableModels, currentModel)
-
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -159,10 +162,16 @@ export const ModelSelector = () => {
           disabled={isLoading}
           className='h-7 px-3 text-sm rounded-full cursor-pointer hover:bg-neutral-100 '
         >
-          <span className='max-w-[180px] truncate text-foreground'>
-            {currentModel?.name}
-          </span>
-          <ChevronDown className='ml-1 size-4 text-neutral-400' />
+          <div className='flex items-center max-w-[200px]'>
+            <ProviderIcon
+              className='size-4 mr-2'
+              provider={currentProvider as ProviderType}
+            />
+            <span className='max-w-[180px] truncate text-foreground'>
+              {currentModel?.name}
+            </span>
+            <ChevronDown className='ml-1 size-4 text-neutral-400' />
+          </div>
         </Button>
       </PopoverTrigger>
       <PopoverContent

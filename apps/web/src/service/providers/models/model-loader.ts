@@ -1,9 +1,9 @@
 import { env } from '@/config/env'
 
-import type { ProviderConfigV2 } from '@read-flow/shared/types'
+import type { ProviderConfig } from '@read-flow/shared/types'
 
 export default class ModelLoader {
-  async load(): Promise<ProviderConfigV2[]> {
+  async load(): Promise<ProviderConfig[]> {
     try {
       const response = await fetch(
         `${env.apiBaseUrl}/api/v1/settings/providers`,
@@ -15,14 +15,14 @@ export default class ModelLoader {
       }
 
       const data = await response.json()
-      return data.providers as ProviderConfigV2[]
+      return data.providers as ProviderConfig[]
     } catch (error) {
       console.warn('Failed to load provider settings:', error)
       return []
     }
   }
 
-  async save(providers: ProviderConfigV2[]): Promise<boolean> {
+  async save(providers: ProviderConfig[]): Promise<boolean> {
     try {
       const response = await fetch(
         `${env.apiBaseUrl}/api/v1/settings/providers`,

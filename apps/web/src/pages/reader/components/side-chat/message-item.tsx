@@ -181,7 +181,7 @@ export const MessageItem = ({ message, onShareOpen }: MessageItemProps) => {
       const stepUpdates = Array.from(stepUpdatesMap.values())
 
       return (
-        <div key={toolCallId} className='w-full max-w-[500px]'>
+        <div key={toolCallId} className='w-full max-w-[400px]'>
           <Tool>
             <ToolHeader state={state} type='tool-createPlan' />
             <ToolContent>

@@ -3,8 +3,8 @@ import { PROVIDER_CONFIGS } from '@read-flow/shared/providers/provider-config'
 import type {
   ProviderConfig,
   AvailableModel,
-  ProviderConfigV2,
-  ModelConfigV2,
+  ProviderConfig,
+  ModelConfig,
 } from '@read-flow/shared/types'
 
 /**
@@ -25,10 +25,10 @@ export function hasApiKeyForProvider(
  * the same model exists in both built-in MODEL_CONFIGS and customModels
  */
 export function computeAvailableModels(
-  providerConfigs: ProviderConfigV2[]
-): ModelConfigV2[] {
+  providerConfigs: ProviderConfig[]
+): ModelConfig[] {
   // Use Map for O(1) deduplication lookup - key is "${modelKey}-${providerId}"
-  const modelMap = new Map<string, ModelConfigV2>()
+  const modelMap = new Map<string, ModelConfig>()
 
   const availableProviders = providerConfigs.filter((provider) => {
     // Check built-in provider

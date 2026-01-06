@@ -6,9 +6,8 @@ export const PROVIDER_CONFIGS: ProviderRegistry = {
   openai: {
     id: 'openai',
     name: 'OpenAI',
-    apiKeyName: 'OPENAI_API_KEY',
-    baseUrl: 'https://api.openai.com/v1',
-    required: false,
+    apiKey: '',
+    baseURL: 'https://api.openai.com/v1',
     type: 'openai',
     createProvider: (apiKey: string, baseUrl?: string) => {
       return createOpenAI({
@@ -20,9 +19,8 @@ export const PROVIDER_CONFIGS: ProviderRegistry = {
   anthropic: {
     id: 'anthropic',
     name: 'Anthropic',
-    apiKeyName: 'ANTHROPIC_API_KEY',
-    baseUrl: 'https://api.anthropic.com',
-    required: false,
+    apiKey: '',
+    baseURL: 'https://api.anthropic.com',
     type: 'anthropic',
     createProvider: (apiKey: string, baseUrl?: string) => {
       return createAnthropic({

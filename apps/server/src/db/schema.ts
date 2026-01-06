@@ -29,7 +29,7 @@ export {
   type JobType,
 } from '../jobs/schema'
 
-import type { ProviderConfigV2 } from '@read-flow/shared/types'
+import type { ProviderConfig } from '@read-flow/shared/types'
 
 // Better Auth tables
 export const user = pgTable('user', {
@@ -38,7 +38,7 @@ export const user = pgTable('user', {
   email: text('email').notNull().unique(),
   emailVerified: boolean('email_verified').notNull().default(false),
   image: text('image'),
-  providerSettings: jsonb('provider_settings').$type<ProviderConfigV2[]>(),
+  providerSettings: jsonb('provider_settings').$type<ProviderConfig[]>(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })

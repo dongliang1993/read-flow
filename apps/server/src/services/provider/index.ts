@@ -4,17 +4,16 @@ import {
   createProviders,
   type ProviderFactory,
 } from '@read-flow/shared/providers/core/provider-utils'
-import { ProviderRegistry } from '@read-flow/shared/providers/core/provider-registry'
 import { modelLoader } from './model-loader'
-import type { ModelConfigV2 } from '@read-flow/shared'
+import type { ModelConfig } from '@read-flow/shared'
 
 class ProviderService {
-  private modelConfigs: Record<string, ModelConfigV2>
+  private modelConfigs: Record<string, ModelConfig>
   private providers: Map<string, ProviderFactory>
 
   constructor() {
     this.providers = new Map<string, ProviderFactory>()
-    this.modelConfigs = {} as Record<string, ModelConfigV2>
+    this.modelConfigs = {} as Record<string, ModelConfig>
     this.initialize()
   }
 
@@ -46,7 +45,11 @@ class ProviderService {
       )
     }
 
-    const providerModelName = resolveProviderModelName(modelKey, providerId)
+    const providerModelName = resolveProviderModelName(
+      this.modelConfigs,
+      modelKey,
+      providerId
+    )
 
     return provider(providerModelName)
   }

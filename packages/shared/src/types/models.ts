@@ -1,14 +1,3 @@
-export interface ModelConfig {
-  name: string
-  imageInput?: boolean
-  audioInput?: boolean
-  imageOutput?: boolean
-  providers: string[] // Will be validated against ProviderIds at runtime
-  providerMappings?: Record<string, string>
-  pricing?: { input: string; output: string }
-  context_length?: number
-}
-
 export interface ModelCapability {
   vision?: boolean
   imageOutput?: boolean
@@ -20,11 +9,13 @@ export interface ModelCapability {
   maxOutputTokens?: number
 }
 
-export interface ModelConfigV2 {
+export interface ModelConfig {
   id: string
   name: string
   capabilities?: ModelCapability | null
   enabled?: boolean
+  pricing?: { input: string; output: string }
+  context_length?: number
 }
 
 export interface ModelsConfiguration {

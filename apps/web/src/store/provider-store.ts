@@ -4,14 +4,14 @@ import { modelLoader } from '@/service/providers/models/model-loader'
 import { computeAvailableModels } from '@/service/providers/core/provider-utils'
 import { useAppSettingsStore } from './app-settings-store'
 
-import type { ProviderConfigV2, ModelConfigV2 } from '@read-flow/shared/types'
+import type { ProviderConfig, ModelConfig } from '@read-flow/shared/types'
 
 export type ProviderFactory = (modelName: string) => any
 
 type ProviderStoreState = {
-  providers: ProviderConfigV2[]
-  originalProviders: ProviderConfigV2[]
-  availableModels: ModelConfigV2[]
+  providers: ProviderConfig[]
+  originalProviders: ProviderConfig[]
+  availableModels: ModelConfig[]
 
   isInitialized: boolean
   isLoading: boolean
@@ -24,7 +24,7 @@ type ProviderStoreActions = {
   initialize: () => Promise<void>
   updateProvider: (
     providerId: string,
-    updates: Partial<Pick<ProviderConfigV2, 'apiKey' | 'baseURL' | 'enabled'>>
+    updates: Partial<Pick<ProviderConfig, 'apiKey' | 'baseURL' | 'enabled'>>
   ) => void
   updateModelEnabled: (
     providerId: string,

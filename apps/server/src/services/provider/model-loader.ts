@@ -1,11 +1,11 @@
-import modelsDefault from '@read-flow/shared/data/models-config-v2'
+import modelsDefault from '@read-flow/shared/data/models-config'
 
-import type { ModelConfigV2, ProviderConfigV2 } from '@read-flow/shared/types'
+import type { ModelConfig, ProviderConfig } from '@read-flow/shared/types'
 
 export default class ModelLoader {
   async load() {
-    let modelConfigs: Record<string, ModelConfigV2> = {}
-    let providerConfigs: Map<string, ProviderConfigV2> = new Map()
+    let modelConfigs: Record<string, ModelConfig> = {}
+    let providerConfigs: Map<string, ProviderConfig> = new Map()
 
     // Load server config
     try {

@@ -2,9 +2,9 @@ import { Hono } from 'hono'
 import { eq } from 'drizzle-orm'
 import { db } from '../db'
 import { user } from '../db/schema'
-import modelsConfig from '@read-flow/shared/data/models-config-v2'
+import modelsConfig from '@read-flow/shared/data/models-config'
 
-import type { ProviderConfigV2 } from '@read-flow/shared/types'
+import type { ProviderConfig } from '@read-flow/shared/types'
 
 type Variables = {
   user: { id: string } | null
@@ -30,11 +30,11 @@ settingsRoute.get('/providers', async (c) => {
       .where(eq(user.id, currentUser.id))
       .limit(1)
 
-    const userSettings = (dbUser?.providerSettings as ProviderConfigV2[]) || []
+    const userSettings = (dbUser?.providerSettings as ProviderConfig[]) || []
     const settingsMap = new Map(userSettings.map((p) => [p.id, p]))
 
-    const mergedProviders: ProviderConfigV2[] = (
-      modelsConfig as ProviderConfigV2[]
+    const mergedProviders: ProviderConfig[] = (
+      modelsConfig as ProviderConfig[]
     ).map((defaultProvider) => {
       const userProvider = settingsMap.get(defaultProvider.id)
 
@@ -75,7 +75,7 @@ settingsRoute.put('/providers', async (c) => {
   }
 
   try {
-    const body = await c.req.json<{ providers: ProviderConfigV2[] }>()
+    const body = await c.req.json<{ providers: ProviderConfig[] }>()
     const { providers } = body
 
     if (!providers || !Array.isArray(providers)) {

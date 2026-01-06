@@ -1,7 +1,6 @@
-import type { ModelConfig } from '../../types/models'
 import type { ProviderConfig } from '../../types/provider'
 import { PROVIDER_CONFIGS } from '../provider-config'
-import type { ProviderConfigV2 } from '../../types/provider'
+import type { ModelConfig } from '../../types/models'
 
 export type ProviderFactory = (modelName: string) => any
 
@@ -27,27 +26,24 @@ export function parseModelIdentifier(modelIdentifier: string): {
  * Some providers use different model names (e.g., "gpt-4" vs "gpt-4-turbo")
  */
 export function resolveProviderModelName(
+  modelConfigs: Record<string, ModelConfig>,
   modelKey: string,
   providerId: string
 ): string {
-  const providerMappings: Record<string, Record<string, string>> = {
-    openai: {
-      'gpt-4': 'gpt-4-turbo',
-      'gpt-4-turbo': 'gpt-4-turbo',
-    },
-    anthropic: {
-      'claude-opus-4.5': 'claude-opus-4-5-20251101',
-    },
+  // 优先使用配置中的映射
+  const config = modelConfigs[`${modelKey}`] as ModelConfig
+  if (config?.id) {
+    return config.id
   }
 
-  return providerMappings[providerId]?.[modelKey] || modelKey
+  return modelKey
 }
 
 /**
  * Create all provider factory instances based on API keys and configs
  */
 export function createProviders(
-  providerConfigs: Map<string, ProviderConfigV2>
+  providerConfigs: Map<string, ProviderConfig>
 ): Map<string, ProviderFactory> {
   const providers = new Map<string, ProviderFactory>()
 

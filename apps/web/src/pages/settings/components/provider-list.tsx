@@ -1,16 +1,16 @@
 import { cn } from '@/lib/utils'
 import { ProviderIcon } from '@/components/provider-icon'
 
-import type { ProviderConfigV2 } from '@read-flow/shared/types'
+import type { ProviderConfig } from '@read-flow/shared/types'
 
 type ProviderListProps = {
-  providers: ProviderConfigV2[]
-  selectedProvider: ProviderConfigV2 | null
-  onSelect: (provider: ProviderConfigV2) => void
+  providers: ProviderConfig[]
+  selectedProvider: ProviderConfig | null
+  onSelect: (provider: ProviderConfig) => void
 }
 
 type ProviderItemProps = {
-  provider: ProviderConfigV2
+  provider: ProviderConfig
   isSelected: boolean
   onSelect: () => void
 }

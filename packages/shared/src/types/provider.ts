@@ -1,4 +1,4 @@
-import type { ModelConfigV2 } from './models'
+import type { ModelConfig } from './models'
 
 export type ProviderType =
   | 'openai'
@@ -23,25 +23,14 @@ export interface CustomProviderConfig {
 export interface ProviderConfig {
   id: string
   name: string
-  apiKeyName: string
-  baseUrl?: string
-  required?: boolean
   type: ProviderType
-  createProvider?: (apiKey: string, baseUrl?: string) => any
-  isCustom?: boolean
-  customConfig?: CustomProviderConfig
-}
-
-export interface ProviderConfigV2 {
-  id: string
-  name: string
-  type: ProviderType
-  models: ModelConfigV2[]
+  models?: ModelConfig[]
   apiKey: string
   baseURL: string
-  apiVersion?: string
   isResponseAPI?: boolean
-  enabled: boolean
+  isCustom?: boolean
+  enabled?: boolean
+  createProvider?: (apiKey: string, baseUrl?: string) => any
 }
 
 export interface AvailableModel {

@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 
 import { useProviderStore } from '@/store/provider-store'
 
-import type { ProviderConfigV2 } from '@read-flow/shared/types'
+import type { ProviderConfig } from '@read-flow/shared/types'
 
 export function Settings() {
   const [selectedProviderId, setSelectedProviderId] = useState<string | null>(
@@ -29,7 +29,7 @@ export function Settings() {
   const selectedProvider =
     providers.find((p) => p.id === selectedProviderId) || null
 
-  const handleProviderSelect = (provider: ProviderConfigV2) => {
+  const handleProviderSelect = (provider: ProviderConfig) => {
     setSelectedProviderId(provider.id)
   }
 
