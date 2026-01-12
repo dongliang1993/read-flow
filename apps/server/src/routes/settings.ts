@@ -46,7 +46,7 @@ settingsRoute.get('/providers', async (c) => {
           ...defaultProvider,
           apiKey: userProvider.apiKey || defaultProvider.apiKey,
           baseURL: userProvider.baseURL || defaultProvider.baseURL,
-          models: defaultProvider.models.map((model) => {
+          models: defaultProvider?.models?.map((model) => {
             const userModel = userProvider.models?.find(
               (m) => m.id === model.id
             )
