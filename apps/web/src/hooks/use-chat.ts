@@ -69,6 +69,7 @@ export const useChat = (options: UseChatOptions) => {
     {
       transport: new DefaultChatTransport({
         api: `${env.apiBaseUrl}/api/v1/chat`,
+        credentials: 'include',
         prepareSendMessagesRequest: ({ messages, body }) => {
           const processedMessages = processQuoteMessages(messages)
           console.log(processedMessages, chatContext, 'processedMessages')

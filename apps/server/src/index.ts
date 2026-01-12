@@ -14,11 +14,12 @@ import progress from './routes/progress'
 import note from './routes/note'
 import modes from './routes/modes'
 import settings from './routes/settings'
+import credits from './routes/credits'
 import { env } from './config/env'
 
 import { loadAllTools } from './lib/ai/tools'
 import { errorHandler } from './middlewares/error-handler'
-import { initJobSystem } from './jobs'
+// import { initJobSystem } from './jobs'
 import { auth } from './lib/auth'
 
 const app = new Hono<{
@@ -103,6 +104,7 @@ app.route('/api/v1/progress', progress)
 app.route('/api/v1/note', note)
 app.route('/api/v1/modes', modes)
 app.route('/api/v1/settings', settings)
+app.route('/api/v1/credits', credits)
 
 const port = env.port
 console.log(`🚀 Server is running on http://localhost:${port}`)
@@ -112,12 +114,12 @@ console.log(`📝 Environment: ${env.nodeEnv}`)
 app.onError(errorHandler)
 
 // 初始化 Job 系统
-initJobSystem({
-  pollInterval: 5000, // 5 秒轮询一次
-  concurrency: 2, // 同时处理 2 个任务
-})
+// initJobSystem({
+//   pollInterval: 5000, // 5 秒轮询一次
+//   concurrency: 2, // 同时处理 2 个任务
+// })
 
-console.log('📋 Job system initialized')
+// console.log('📋 Job system initialized')
 loadAllTools()
 
 serve({

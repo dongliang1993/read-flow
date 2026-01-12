@@ -9,8 +9,14 @@ import type {
   ReadingProgress,
   BookStatus,
 } from '@read-flow/shared'
+import type { auth } from '../lib/auth'
 
-const progressRoute = new Hono()
+type Variables = {
+  user: typeof auth.$Infer.Session.user | null
+  session: typeof auth.$Infer.Session.session | null
+}
+
+const progressRoute = new Hono<{ Variables: Variables }>()
 
 /**
  * Get book status
@@ -18,11 +24,21 @@ const progressRoute = new Hono()
  */
 progressRoute.get('/:id/status', async (c) => {
   try {
+    const user = c.get('user')
+    if (!user) {
+      return c.json({ error: 'Unauthorized' }, 401)
+    }
+
     const bookId = parseInt(c.req.param('id'))
     const [dbProgress] = await db
       .select()
       .from(readingProgress)
-      .where(eq(readingProgress.bookId, bookId))
+      .where(
+        and(
+          eq(readingProgress.bookId, bookId),
+          eq(readingProgress.userId, user.id)
+        )
+      )
       .orderBy(desc(readingProgress.lastReadAt))
       .limit(1)
 
@@ -52,16 +68,15 @@ progressRoute.get('/:id/status', async (c) => {
  */
 progressRoute.put('/:id/progress', async (c) => {
   try {
+    const user = c.get('user')
+    if (!user) {
+      return c.json({ error: 'Unauthorized' }, 401)
+    }
+
     const bookId = parseInt(c.req.param('id'))
     const body = await c.req.json<UpdateReadingProgressRequest>()
-    const {
-      userId,
-      status,
-      progressCurrent,
-      progressTotal,
-      location,
-      lastReadAt,
-    } = body
+    const { status, progressCurrent, progressTotal, location, lastReadAt } =
+      body
 
     // 先检查书籍是否存在
     const [book] = await db
@@ -75,16 +90,15 @@ progressRoute.put('/:id/progress', async (c) => {
     }
 
     const lastReadAtDate = lastReadAt ? new Date(lastReadAt) : new Date()
-    // 更新/创建阅读进度
 
-    // 方案 A: 先查后决定 insert/update
+    // 先查后决定 insert/update
     const [existing] = await db
       .select()
       .from(readingProgress)
       .where(
         and(
           eq(readingProgress.bookId, bookId),
-          eq(readingProgress.userId, userId)
+          eq(readingProgress.userId, user.id)
         )
       )
       .limit(1)
@@ -102,6 +116,7 @@ progressRoute.put('/:id/progress', async (c) => {
           status,
           lastReadAt: lastReadAtDate,
         })
+        .where(eq(readingProgress.id, existing.id))
         .returning()
     } else {
       // 创建阅读进度
@@ -109,7 +124,7 @@ progressRoute.put('/:id/progress', async (c) => {
         .insert(readingProgress)
         .values({
           bookId,
-          userId,
+          userId: user.id,
           currentLocation: location,
           progressCurrent,
           progressTotal,

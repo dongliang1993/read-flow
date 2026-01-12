@@ -85,7 +85,9 @@ function getBookFormat(fileName: string): BookFormat {
 
 export const booksApi = {
   async getAll(): Promise<BooksResponse> {
-    const response = await fetch(`${env.apiBaseUrl}/api/v1/books`)
+    const response = await fetch(`${env.apiBaseUrl}/api/v1/books`, {
+      credentials: 'include',
+    })
     if (!response.ok) {
       throw new Error('Failed to fetch books')
     }
@@ -93,7 +95,9 @@ export const booksApi = {
   },
 
   async getById(id: number): Promise<BookResponse> {
-    const response = await fetch(`${env.apiBaseUrl}/api/v1/books/${id}`)
+    const response = await fetch(`${env.apiBaseUrl}/api/v1/books/${id}`, {
+      credentials: 'include',
+    })
     if (!response.ok) {
       throw new Error('Failed to fetch book')
     }
@@ -154,6 +158,7 @@ export const booksApi = {
     const response = await fetch(`${env.apiBaseUrl}/api/v1/books/upload`, {
       method: 'POST',
       body: formData,
+      credentials: 'include',
     })
 
     if (!response.ok) {
@@ -167,6 +172,7 @@ export const booksApi = {
   async delete(id: number): Promise<void> {
     const response = await fetch(`${env.apiBaseUrl}/api/v1/books/${id}`, {
       method: 'DELETE',
+      credentials: 'include',
     })
 
     if (!response.ok) {
@@ -176,7 +182,10 @@ export const booksApi = {
 
   async downloadBook(id: number): Promise<ArrayBuffer> {
     const response = await fetch(
-      `${env.apiBaseUrl}/api/v1/books/${id}/download`
+      `${env.apiBaseUrl}/api/v1/books/${id}/download`,
+      {
+        credentials: 'include',
+      }
     )
 
     console.log('response', `${env.apiBaseUrl}/api/v1/books/${id}/download`)
@@ -187,7 +196,9 @@ export const booksApi = {
   },
 
   async getBookInfo(id: number): Promise<BookResponse> {
-    const response = await fetch(`${env.apiBaseUrl}/api/v1/books/${id}`)
+    const response = await fetch(`${env.apiBaseUrl}/api/v1/books/${id}`, {
+      credentials: 'include',
+    })
     if (!response.ok) {
       throw new Error('Failed to get book info')
     }
@@ -197,7 +208,10 @@ export const booksApi = {
 
   async getBookStatus(id: string): Promise<ReadingProgress> {
     const response = await fetch(
-      `${env.apiBaseUrl}/api/v1/progress/${id}/status`
+      `${env.apiBaseUrl}/api/v1/progress/${id}/status`,
+      {
+        credentials: 'include',
+      }
     )
 
     if (!response.ok) {
@@ -216,7 +230,11 @@ export const booksApi = {
       `${env.apiBaseUrl}/api/v1/progress/${id}/progress`,
       {
         method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(data),
+        credentials: 'include',
       }
     )
 

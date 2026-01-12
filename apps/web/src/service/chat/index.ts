@@ -8,6 +8,7 @@ export const getChatHistory = async (bookId: string) => {
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
     }
   )
 

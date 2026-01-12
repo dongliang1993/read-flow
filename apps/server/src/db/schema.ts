@@ -5,9 +5,9 @@ import {
   timestamp,
   integer,
   jsonb,
-  uuid,
   boolean,
   index,
+  decimal,
 } from 'drizzle-orm/pg-core'
 import type {
   Book,
@@ -238,6 +238,59 @@ export const chunks = pgTable('chunks', {
 
 export type Chunk = typeof chunks.$inferSelect
 export type NewChunk = typeof chunks.$inferInsert
+
+// Credits system tables
+export const userCredits = pgTable(
+  'user_credits',
+  {
+    id: serial('id').primaryKey(),
+    userId: text('user_id')
+      .notNull()
+      .unique()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    credits: decimal('credits', { precision: 10, scale: 2 })
+      .notNull()
+      .default('1000.00'),
+    totalEarned: decimal('total_earned', { precision: 10, scale: 2 })
+      .notNull()
+      .default('1000.00'),
+    totalSpent: decimal('total_spent', { precision: 10, scale: 2 })
+      .notNull()
+      .default('0.00'),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [index('user_credits_userId_idx').on(table.userId)]
+)
+
+export const creditTransactions = pgTable(
+  'credit_transactions',
+  {
+    id: serial('id').primaryKey(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    amount: decimal('amount', { precision: 10, scale: 2 }).notNull(),
+    type: text('type').notNull(),
+    modelId: text('model_id'),
+    inputTokens: integer('input_tokens'),
+    outputTokens: integer('output_tokens'),
+    metadata: jsonb('metadata'),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [index('credit_transactions_userId_idx').on(table.userId)]
+)
+
+export type UserCredits = typeof userCredits.$inferSelect
+export type NewUserCredits = typeof userCredits.$inferInsert
+export type CreditTransaction = typeof creditTransactions.$inferSelect
+export type NewCreditTransaction = typeof creditTransactions.$inferInsert
 
 export type {
   Book,

@@ -5,7 +5,10 @@ export class ReadingSessionService {
   async getReadingSession(bookId: string) {
     try {
       const response = await fetch(
-        `${env.apiBaseUrl}/api/v1/reading-session/${bookId}`
+        `${env.apiBaseUrl}/api/v1/reading-session/${bookId}`,
+        {
+          credentials: 'include',
+        }
       )
 
       if (!response.ok) {
@@ -27,7 +30,11 @@ export class ReadingSessionService {
         `${env.apiBaseUrl}/api/v1/reading-session/${bookId}`,
         {
           method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
           body: JSON.stringify({ bookId, startedAt }),
+          credentials: 'include',
         }
       )
 
@@ -50,7 +57,11 @@ export class ReadingSessionService {
         `${env.apiBaseUrl}/api/v1/reading-session/${bookId}`,
         {
           method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
           body: JSON.stringify({ durationSeconds }),
+          credentials: 'include',
         }
       )
 

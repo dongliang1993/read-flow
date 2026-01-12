@@ -2,8 +2,14 @@ import { Hono } from 'hono'
 import { db } from '../db'
 import { readingSessions } from '../db/schema'
 import { eq, sql, gte, and } from 'drizzle-orm'
+import type { auth } from '../lib/auth'
 
-const readingStatsRoute = new Hono()
+type Variables = {
+  user: typeof auth.$Infer.Session.user | null
+  session: typeof auth.$Infer.Session.session | null
+}
+
+const readingStatsRoute = new Hono<{ Variables: Variables }>()
 
 /**
  * 获取阅读统计数据
@@ -11,7 +17,11 @@ const readingStatsRoute = new Hono()
  */
 readingStatsRoute.get('/', async (c) => {
   try {
-    const userId = 'default-user'
+    const user = c.get('user')
+    if (!user) {
+      return c.json({ error: 'Unauthorized' }, 401)
+    }
+
     const oneYearAgo = new Date()
     oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1)
 
@@ -23,7 +33,7 @@ readingStatsRoute.get('/', async (c) => {
         activeDays: sql<number>`count(distinct date(started_at))::int`,
       })
       .from(readingSessions)
-      .where(eq(readingSessions.userId, userId))
+      .where(eq(readingSessions.userId, user.id))
 
     // 获取热力图数据（每天的阅读时长）
     const heatmapData = await db
@@ -35,11 +45,11 @@ readingStatsRoute.get('/', async (c) => {
       .from(readingSessions)
       .where(
         and(
-          eq(readingSessions.userId, userId),
+          eq(readingSessions.userId, user.id),
           gte(readingSessions.startedAt, oneYearAgo)
         )
       )
-      .groupBy(sql`to_char(started_at, 'YYYY-MM-DD')`) // 改成一致的
+      .groupBy(sql`to_char(started_at, 'YYYY-MM-DD')`)
     const totalSessions = stats?.totalSessions || 0
     const activeDays = stats?.activeDays || 0
 

@@ -1,13 +1,19 @@
 import { Hono } from 'hono'
 import { db } from '../db'
 import { books, readingProgress } from '../db/schema'
-import { eq, desc } from 'drizzle-orm'
+import { eq, desc, and } from 'drizzle-orm'
 import { supabaseAdmin } from '../lib/supabase'
-import { enqueueJob } from '../jobs'
+// import { enqueueJob } from '../jobs'
 
 import type { Book, BookStatus, BookFormat } from '@read-flow/shared'
+import type { auth } from '../lib/auth'
 
-const booksRoute = new Hono()
+type Variables = {
+  user: typeof auth.$Infer.Session.user | null
+  session: typeof auth.$Infer.Session.session | null
+}
+
+const booksRoute = new Hono<{ Variables: Variables }>()
 
 /**
  * 获取所有书籍
@@ -71,7 +77,7 @@ booksRoute.get('/:id', async (c) => {
 
     const {
       data: { publicUrl },
-    } = supabaseAdmin.storage.from('books').getPublicUrl(book.filePath)
+    } = supabaseAdmin.storage.from('books').getPublicUrl(book.filePath || '')
 
     const bookWithUrl: Book = {
       ...book,
@@ -215,8 +221,11 @@ booksRoute.post('/', async (c) => {
       .insert(books)
       .values({
         title: body.title,
-        author: body.author,
+        author: body.author || null,
+        format: body.format,
+        language: body.language || null,
         coverUrl: body.coverUrl,
+        coverPath: body.coverPath,
         filePath: body.filePath,
         fileSize: body.fileSize,
         status: body.status || 'unread',
@@ -329,13 +338,22 @@ booksRoute.get('/:id/download', async (c) => {
 
 booksRoute.get('/:id/progress', async (c) => {
   try {
+    const user = c.get('user')
+    if (!user) {
+      return c.json({ error: 'Unauthorized' }, 401)
+    }
+
     const bookId = parseInt(c.req.param('id'))
-    const userId = c.req.query('userId') || 'default-user'
 
     const [progress] = await db
       .select()
       .from(readingProgress)
-      .where(eq(readingProgress.bookId, bookId))
+      .where(
+        and(
+          eq(readingProgress.bookId, bookId),
+          eq(readingProgress.userId, user.id)
+        )
+      )
       .orderBy(desc(readingProgress.lastReadAt))
       .limit(1)
 
@@ -348,17 +366,24 @@ booksRoute.get('/:id/progress', async (c) => {
 
 booksRoute.put('/:id/progress', async (c) => {
   try {
+    const user = c.get('user')
+    if (!user) {
+      return c.json({ error: 'Unauthorized' }, 401)
+    }
+
     const bookId = parseInt(c.req.param('id'))
     const body = await c.req.json()
-    const userId = body.userId || 'default-user'
 
     const [newProgress] = await db
       .insert(readingProgress)
       .values({
         bookId,
-        userId,
+        userId: user.id,
         currentLocation: body.location,
-        progress: body.progress,
+        progressCurrent: body.progressCurrent ?? body.progress ?? 0,
+        progressTotal: body.progressTotal ?? 0,
+        status: body.status ?? 'reading',
+        lastReadAt: body.lastReadAt ? new Date(body.lastReadAt) : new Date(),
       })
       .returning()
 

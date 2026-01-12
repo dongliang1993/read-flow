@@ -30,7 +30,6 @@ export const useProgressAutoSave = (bookId: string) => {
       }
 
       const updateData = {
-        userId: 'default-user',
         status: newStatus,
         progressCurrent,
         progressTotal,

@@ -10,7 +10,11 @@ class NoteService {
   async createNote(note: CreateNoteRequest) {
     const response = await fetch(`${env.apiBaseUrl}/api/v1/note`, {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify(note),
+      credentials: 'include',
     })
 
     if (!response.ok) {
@@ -24,7 +28,11 @@ class NoteService {
   async getNotes(bookId: string, page: number) {
     const response = await fetch(`${env.apiBaseUrl}/api/v1/note/listNotes`, {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({ bookId, page }),
+      credentials: 'include',
     })
 
     if (!response.ok) {
@@ -38,6 +46,7 @@ class NoteService {
   async deleteNote(noteId: number) {
     const response = await fetch(`${env.apiBaseUrl}/api/v1/note/${noteId}`, {
       method: 'DELETE',
+      credentials: 'include',
     })
 
     if (!response.ok) {

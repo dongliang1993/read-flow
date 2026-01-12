@@ -5,6 +5,7 @@ import { Resizable } from 're-resizable'
 
 import { DashboardLink } from './dashboard-link'
 import { UserPopover } from '@/components/user'
+import { CreditDisplay } from '@/components/user/credit-display'
 import { Logo } from '@/components/logo'
 
 import { cn } from '@/lib/utils'
@@ -119,9 +120,12 @@ export function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className='p-4 flex items-center justify-between'>
-        <UserPopover />
-        <DashboardLink />
+      <div className='p-4 flex justify-between flex-col'>
+        <CreditDisplay className='px-3 py-2 border-[1.5px] border-neutral-200 rounded-full mb-2' />
+        <div className='flex items-center justify-between'>
+          <UserPopover />
+          <DashboardLink />
+        </div>
       </div>
     </Resizable>
   )

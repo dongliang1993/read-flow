@@ -4,12 +4,18 @@ import type {
   CreateReadingSessionRequest,
   UpdateReadingSessionRequest,
 } from '@read-flow/shared'
-import { eq, desc } from 'drizzle-orm'
+import { eq, desc, and } from 'drizzle-orm'
 
 import { db } from '../db'
 import { readingSessions } from '../db/schema'
+import type { auth } from '../lib/auth'
 
-const readingSessionRoute = new Hono()
+type Variables = {
+  user: typeof auth.$Infer.Session.user | null
+  session: typeof auth.$Infer.Session.session | null
+}
+
+const readingSessionRoute = new Hono<{ Variables: Variables }>()
 
 /**
  * Get reading session
@@ -17,11 +23,21 @@ const readingSessionRoute = new Hono()
  */
 readingSessionRoute.get('/:bookId', async (c) => {
   try {
+    const user = c.get('user')
+    if (!user) {
+      return c.json({ error: 'Unauthorized' }, 401)
+    }
+
     const bookId = c.req.param('bookId')
     const [dbSession] = await db
       .select()
       .from(readingSessions)
-      .where(eq(readingSessions.bookId, parseInt(bookId)))
+      .where(
+        and(
+          eq(readingSessions.bookId, parseInt(bookId)),
+          eq(readingSessions.userId, user.id)
+        )
+      )
       .orderBy(desc(readingSessions.startedAt))
       .limit(1)
 
@@ -51,6 +67,11 @@ readingSessionRoute.get('/:bookId', async (c) => {
  */
 readingSessionRoute.post('/:bookId', async (c) => {
   try {
+    const user = c.get('user')
+    if (!user) {
+      return c.json({ error: 'Unauthorized' }, 401)
+    }
+
     const body = await c.req.json<CreateReadingSessionRequest>()
     const bookId = c.req.param('bookId')
     const { startedAt } = body
@@ -59,8 +80,8 @@ readingSessionRoute.post('/:bookId', async (c) => {
       .insert(readingSessions)
       .values({
         bookId: parseInt(bookId),
-        userId: 'default-user',
-        startedAt: new Date(startedAt), // 时间戳转 Date
+        userId: user.id,
+        startedAt: new Date(startedAt),
         durationSeconds: 0,
       })
       .returning()
@@ -91,6 +112,11 @@ readingSessionRoute.post('/:bookId', async (c) => {
  */
 readingSessionRoute.put('/:bookId', async (c) => {
   try {
+    const user = c.get('user')
+    if (!user) {
+      return c.json({ error: 'Unauthorized' }, 401)
+    }
+
     const body = await c.req.json<UpdateReadingSessionRequest>()
     const bookId = c.req.param('bookId')
     const { durationSeconds } = body
@@ -98,7 +124,12 @@ readingSessionRoute.put('/:bookId', async (c) => {
     const [dbSession] = await db
       .update(readingSessions)
       .set({ durationSeconds })
-      .where(eq(readingSessions.bookId, parseInt(bookId)))
+      .where(
+        and(
+          eq(readingSessions.bookId, parseInt(bookId)),
+          eq(readingSessions.userId, user.id)
+        )
+      )
       .returning()
 
     const session: ReadingSession | null = dbSession

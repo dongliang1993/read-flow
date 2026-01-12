@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { streamText, UIMessage, stepCountIs, convertToModelMessages } from 'ai'
-import { eq, desc } from 'drizzle-orm'
+import { eq, desc, and } from 'drizzle-orm'
 
 import { convertHistoryToUIMessages } from '../lib/chat-transformer'
 import { promptService } from '../services/prompt'
@@ -8,35 +8,48 @@ import { db } from '../db'
 import { chatHistory } from '../db/schema'
 import { providerService } from '../services/provider'
 import { getAllToolsSync } from '../lib/ai/tools'
+import { creditService } from '../services/credit-service'
 
 import type { OpenAIResponsesProviderOptions } from '@ai-sdk/openai'
 import type { UpdateChatMessagesRequest } from '@read-flow/shared'
+import type { auth } from '../lib/auth'
 
-const chat = new Hono()
+type Variables = {
+  user: typeof auth.$Infer.Session.user | null
+  session: typeof auth.$Infer.Session.session | null
+}
 
-// 3. 新增：将 UIMessage 保存到数据库
-export async function saveUserMessage(
-  db: any,
+const chat = new Hono<{ Variables: Variables }>()
+
+async function saveUserMessage(
   bookId: number | null,
+  userId: string,
   message: UIMessage
 ) {
   await db.insert(chatHistory).values({
     bookId,
-    userId: 'default-user',
+    userId,
     role: message.role,
-    content: message.parts, // parts 直接存储为 jsonb
+    content: message.parts,
   })
 }
 
 chat.get('/history/:bookId', async (c) => {
   try {
+    const user = c.get('user')
+    if (!user) {
+      return c.json({ error: 'Unauthorized' }, 401)
+    }
+
     const bookId = parseInt(c.req.param('bookId'))
     const limit = parseInt(c.req.query('limit') || '50')
 
     const messages = await db
       .select()
       .from(chatHistory)
-      .where(eq(chatHistory.bookId, bookId))
+      .where(
+        and(eq(chatHistory.bookId, bookId), eq(chatHistory.userId, user.id))
+      )
       .orderBy(desc(chatHistory.createdAt))
       .limit(limit)
 
@@ -54,6 +67,11 @@ chat.get('/history/:bookId', async (c) => {
  */
 chat.post('/', async (c) => {
   try {
+    const user = c.get('user')
+    if (!user) {
+      return c.json({ error: 'Unauthorized' }, 401)
+    }
+
     const body = await c.req.json<UpdateChatMessagesRequest>()
     const { messages, bookId, chatContext, model } = body
 
@@ -70,7 +88,7 @@ chat.post('/', async (c) => {
 
     // 1. 保存用户消息到数据库
     if (lastMessage.role === 'user' && lastMessage.parts) {
-      await saveUserMessage(db, validBookId, lastMessage)
+      await saveUserMessage(validBookId, user.id, lastMessage)
     }
 
     // 2. 获取历史消息（用于发给 AI）
@@ -78,23 +96,26 @@ chat.post('/', async (c) => {
       ? await db
           .select()
           .from(chatHistory)
-          .where(eq(chatHistory.bookId, validBookId))
+          .where(
+            and(
+              eq(chatHistory.bookId, validBookId),
+              eq(chatHistory.userId, user.id)
+            )
+          )
           .orderBy(chatHistory.createdAt)
           .limit(10)
       : []
 
-    const modelMessages = convertHistoryToUIMessages(history) //convertHistoryToModelMessages(history)
-    // 3. 构建 prompt 和调用 AI
-    const systemPrompt = await promptService.buildReadingPrompt(chatContext)
-    const providerModel = providerService.getProviderModel(model)
+    const modelMessages = convertHistoryToUIMessages(history)
 
-    // Initialize agent loop state
-    const loopState = {
-      messages: [],
-      currentIteration: 0,
-      isComplete: false,
-      lastFinishReason: undefined,
-      lastRequestTokens: 0,
+    // 3. 构建 prompt 和调用 AI（provider 会从缓存中获取用户配置）
+    const systemPrompt = await promptService.buildReadingPrompt(chatContext)
+    const providerModel = await providerService.getProviderModel(model, user.id)
+
+    // 获取模型定价（从用户配置缓存中获取）
+    const modelPricing = await providerService.getModelPricing(model, user.id)
+    if (!modelPricing) {
+      console.warn('[Chat] No pricing found for model:', model)
     }
 
     const filteredTools = { ...getAllToolsSync() }
@@ -112,14 +133,46 @@ chat.post('/', async (c) => {
       },
       stopWhen: stepCountIs(30),
       tools: filteredTools,
-      // experimental_transform: smoothStream({
-      //   chunking: 'word',
-      // }),
-      // onFinish: async ({ text, finishReason, totalUsage, response }) => {
-      //   if (totalUsage?.totalTokens) {
-      //     loopState.lastRequestTokens = totalUsage.totalTokens
-      //   }
-      // },
+      onFinish: async ({ usage }) => {
+        console.log('[Chat] streamText usage:', usage)
+        // 扣除积分
+        if (modelPricing && usage) {
+          const promptTokens =
+            (usage as any).promptTokens || (usage as any).inputTokens || 0
+          const completionTokens =
+            (usage as any).completionTokens || (usage as any).outputTokens || 0
+
+          if (promptTokens > 0 || completionTokens > 0) {
+            const costCalc = creditService.calculateCost(
+              promptTokens,
+              completionTokens,
+              modelPricing
+            )
+
+            console.log('[Chat] Usage:', {
+              promptTokens,
+              completionTokens,
+              cost: costCalc,
+            })
+
+            const success = await creditService.deductCredits(
+              user.id,
+              costCalc.credits,
+              {
+                modelId: model,
+                inputTokens: promptTokens,
+                outputTokens: completionTokens,
+                bookId: validBookId,
+                costUSD: costCalc.totalCost,
+              }
+            )
+
+            if (!success) {
+              console.error('[Chat] Failed to deduct credits')
+            }
+          }
+        }
+      },
     })
 
     return result.toUIMessageStreamResponse({
@@ -128,7 +181,7 @@ chat.post('/', async (c) => {
           messages.forEach(async (message) => {
             await db.insert(chatHistory).values({
               bookId: validBookId,
-              userId: 'default-user',
+              userId: user.id,
               role: message.role,
               content: message.parts,
             })

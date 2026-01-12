@@ -26,7 +26,10 @@ class SummarizeService {
     const response = await fetch(
       `${env.apiBaseUrl}/api/v1/summarize/cache/${bookId}/${encodeURIComponent(
         chapterHref
-      )}`
+      )}`,
+      {
+        credentials: 'include',
+      }
     )
 
     if (!response.ok) {
@@ -46,6 +49,7 @@ class SummarizeService {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(request),
+      credentials: 'include',
     })
 
     if (!response.ok) {
@@ -89,6 +93,7 @@ class SummarizeService {
       `${env.apiBaseUrl}/api/v1/summarize/cache/${bookId}`,
       {
         method: 'DELETE',
+        credentials: 'include',
       }
     )
 

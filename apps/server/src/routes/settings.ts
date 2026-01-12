@@ -92,6 +92,9 @@ settingsRoute.put('/providers', async (c) => {
       })
       .where(eq(user.id, currentUser.id))
 
+    // 清除用户的 provider 缓存
+    providerService.clearUserCache(currentUser.id)
+
     return c.json({ success: true })
   } catch (error) {
     console.error('Save provider settings error:', error)
