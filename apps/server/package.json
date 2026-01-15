@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "bun run --hot src/index.ts",
-    "build": "bun build src/index.ts --outdir ./dist --target node",
+    "build": "bun build src/index.ts --outdir ./dist --target node --external process.env",
     "start": "bun run src/index.ts",
     "clean": "rm -rf dist",
     "db:generate": "drizzle-kit generate",
