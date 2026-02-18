@@ -32,15 +32,16 @@ echo '
 #=============================================================================#
 
 pnpm install
-pnpm --filter=server build
+pnpm --filter=server build:vercel
 
 mkdir -p "${INDEX_FUNCTION_DIR}"
-cp -v ./apps/server/package.json ./apps/server/dist/* "${INDEX_FUNCTION_DIR}"
+cp -v ./apps/server/dist/* "${INDEX_FUNCTION_DIR}"
+echo '{ "type": "module" }' > "${INDEX_FUNCTION_DIR}/package.json"
 
 echo '
 {
   "runtime": "nodejs22.x",
-  "handler": "index.js",
+  "handler": "vercel.js",
   "launcherType": "Nodejs"
 }
 ' > "${INDEX_FUNCTION_DIR}/.vc-config.json"

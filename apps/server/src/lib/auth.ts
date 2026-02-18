@@ -16,7 +16,10 @@ export const auth = betterAuth({
   }),
   secret: env.auth.secret,
   baseURL: env.auth.baseUrl,
-  trustedOrigins: ['http://localhost:3000'],
+  trustedOrigins: [
+    'http://localhost:3000',
+    process.env.FRONTEND_URL || '',
+  ].filter(Boolean),
   socialProviders: {
     google: {
       clientId: env.auth.google.clientId,
@@ -27,6 +30,12 @@ export const auth = betterAuth({
     enabled: true,
     sendResetPassword: async ({ user, url }) => {
       console.log(`[Auth] Password reset email for ${user.email}: ${url}`)
+    },
+  },
+  advanced: {
+    defaultCookieAttributes: {
+      sameSite: 'none',
+      secure: true,
     },
   },
 })
