@@ -30,21 +30,20 @@ booksRoute.get('/', async (c) => {
       updatedAt: book.updatedAt.toISOString(),
     }))
 
-    for (const book of allBooksWithCovers) {
-      if (!book.coverPath) {
-        continue
-      }
-
-      const { data: signedUrlData, error } = await supabaseAdmin.storage
+    const booksWithCovers = allBooksWithCovers.filter((book) => book.coverPath)
+    if (booksWithCovers.length > 0) {
+      const paths = booksWithCovers.map((book) => book.coverPath!)
+      const { data, error } = await supabaseAdmin.storage
         .from('book-cover')
-        .createSignedUrl(book.coverPath || '', 3600)
+        .createSignedUrls(paths, 3600)
 
-      if (error || !signedUrlData) {
-        console.error('Failed to create signed URL for cover:', error)
-        continue
+      if (!error && data) {
+        data.forEach((item, index) => {
+          if (item.signedUrl) {
+            booksWithCovers[index].coverUrl = item.signedUrl
+          }
+        })
       }
-
-      book.coverUrl = signedUrlData.signedUrl
     }
 
     return c.json({ books: allBooksWithCovers })
