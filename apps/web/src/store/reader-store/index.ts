@@ -3,6 +3,7 @@ import { queryClient } from '@/lib/query-client'
 
 import { DocumentLoader } from '@/lib/document'
 import { booksApi, loadBookConfig } from '@/service/books'
+import { getBookFile, saveBookFile } from '@/lib/book-cache'
 import { useAppSettingsStore } from '@/store/app-settings-store'
 
 import type { Book, ChatReference } from '@read-flow/shared'
@@ -124,17 +125,22 @@ export const useReaderStore = create<ReaderStore>((set, get) => ({
         throw new Error('Book file path is missing')
       }
 
-      const fileUrl = book?.fileUrl
-      const response = await fetch(fileUrl || '')
+      let arrayBuffer = await getBookFile(bookId)
 
-      if (!response.ok) {
-        throw new Error(
-          `Failed to fetch book file: ${response.status} ${response.statusText}`
-        )
+      if (!arrayBuffer) {
+        const fileUrl = book?.fileUrl
+        const response = await fetch(fileUrl || '')
+
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch book file: ${response.status} ${response.statusText}`
+          )
+        }
+
+        arrayBuffer = await response.arrayBuffer()
+        saveBookFile(bookId, arrayBuffer).catch(console.error)
       }
-
-      const arrayBuffer = await response.arrayBuffer()
-      const filename = book.title + '.' + (fileUrl?.split('.').pop() || '')
+      const filename = book.title + '.' + (book.filePath?.split('.').pop() || 'epub')
       const file = new File([arrayBuffer], filename, {
         type: 'application/epub+zip',
       })

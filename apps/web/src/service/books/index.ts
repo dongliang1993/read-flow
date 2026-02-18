@@ -1,5 +1,6 @@
 import { env } from '@/config/env'
 import { DocumentLoader } from '@/lib/document'
+import { removeBookFile } from '@/lib/book-cache'
 
 import type { Book, BookFormat } from '@read-flow/shared'
 
@@ -178,6 +179,8 @@ export const booksApi = {
     if (!response.ok) {
       throw new Error('Failed to delete book')
     }
+
+    removeBookFile(String(id)).catch(console.error)
   },
 
   async downloadBook(id: number): Promise<ArrayBuffer> {
@@ -188,11 +191,18 @@ export const booksApi = {
       }
     )
 
-    console.log('response', `${env.apiBaseUrl}/api/v1/books/${id}/download`)
     if (!response.ok) {
       throw new Error('Failed to get download URL')
     }
-    return response.arrayBuffer()
+
+    const { url } = await response.json()
+    const fileResponse = await fetch(url)
+
+    if (!fileResponse.ok) {
+      throw new Error('Failed to download book file')
+    }
+
+    return fileResponse.arrayBuffer()
   },
 
   async getBookInfo(id: number): Promise<BookResponse> {
